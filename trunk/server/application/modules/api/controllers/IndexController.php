@@ -7,7 +7,7 @@
  * @version $Id$
  */
 
-class IndexController extends Zend_Controller_Action {
+class Api_IndexController extends Zend_Controller_Action {
 	/**
 	 * The default action - show the home page
 	 */
