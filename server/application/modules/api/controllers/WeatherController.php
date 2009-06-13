@@ -5,8 +5,6 @@
  * @author Frederick
  * @version $Id$
  */
-require '../models/Authenticator.php';
-require '../models/YWeather.php';
 class Api_WeatherController extends Zend_Controller_Action
 {
 	/**
@@ -21,7 +19,7 @@ class Api_WeatherController extends Zend_Controller_Action
 			$server = new Zend_XmlRpc_Server();
 			$server->setClass('Api_Model_YWeather');
 			echo $server->handle();
-		} else
-			$this->getResponse()->setHttpResponseCode(401);
+		} else $this->getResponse()->setHttpResponseCode(401);
+		
 	}
 }
