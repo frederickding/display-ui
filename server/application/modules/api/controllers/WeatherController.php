@@ -12,6 +12,7 @@ class Api_WeatherController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
+		$this->_helper->viewRenderer->setNoRender();
 		$authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$api_key = $this->getRequest()->getParam('api_key');
