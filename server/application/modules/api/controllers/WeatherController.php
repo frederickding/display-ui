@@ -12,6 +12,8 @@ class Api_WeatherController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
+		set_include_path(get_include_path()
+			.PATH_SEPARATOR.realpath(dirname(__FILE__)).'/../models/');
 		$authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$api_key = $this->getRequest()->getParam('api_key');
