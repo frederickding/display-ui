@@ -15,7 +15,6 @@ class Api_Model_YWeather
 			'u' => 'c' ,
 			'p' => $location
 			));
-		$remote_feed->request();
-		return $remote_feed;
+		return $remote_feed->request()->getBody();
 	}
 }
