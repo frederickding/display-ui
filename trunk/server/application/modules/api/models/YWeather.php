@@ -5,9 +5,16 @@
  */
 class Api_Model_YWeather
 {
-	public function retrieve ($location)
+	private $_location;
+	public function __construct ($location)
 	{
-		$remote_feed = new Zend_Http_Client(
+		$this->_location = $location;
+	}
+	public function retrieve ()
+	{
+		$channel = new Zend_Feed_Rss('http://weather.yahooapis.com/forecastrss?u=c&p=' . $this->_location);
+		return $channel;
+		/* $remote_feed = new Zend_Http_Client(
 			'http://weather.yahooapis.com/forecastrss',
 			array('maxredirects' => 0 , 'timeout' => 15)
 			);
@@ -15,6 +22,11 @@ class Api_Model_YWeather
 			'u' => 'c' ,
 			'p' => $location
 			));
-		return $remote_feed->request()->getBody();
+		return $remote_feed->request()->getBody(); */
+	}
+	public function temperature ()
+	{
+		$_data = $this->retrieve();
+		var_dump($_data);
 	}
 }
