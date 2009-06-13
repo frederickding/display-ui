@@ -13,13 +13,12 @@ class Api_WeatherController extends Zend_Controller_Action
 	public function indexAction ()
 	{
 		$this->_helper->viewRenderer->setNoRender();
-		$authenticator = new Api_Model_Authenticator();
+		$Authenticator = new Api_Model_Authenticator();
+		$YWeather = new Api_Model_YWeather();
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$api_key = $this->getRequest()->getParam('api_key');
-		if ($authenticator->verify($sys_name, $api_key)) {
-			$server = new Zend_XmlRpc_Server();
-			$server->setClass('Api_Model_YWeather');
-			echo $server->handle();
+		if ($Authenticator->verify($sys_name, $api_key)) {
+			echo $YWeather->retrieve($this->getRequest()->getParam('location'));
 		} else $this->getResponse()->setHttpResponseCode(401);
 		
 	}
