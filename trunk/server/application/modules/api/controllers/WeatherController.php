@@ -12,6 +12,10 @@ class Api_WeatherController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
+		$this->_forward('current');
+	}
+	public function currentAction ()
+	{
 		// don't let Zend Framework render a view
 		$this->_helper->viewRenderer->setNoRender();
 		$YWeather = new Api_Model_YWeather(
