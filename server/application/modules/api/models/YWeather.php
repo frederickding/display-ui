@@ -6,9 +6,11 @@
 class Api_Model_YWeather
 {
 	private $_location;
+	private $_conditions;
 	public function __construct ($location)
 	{
 		$this->_location = $location;
+		Zend_Feed::registerNamespace('yweather', 'http://xml.weather.yahoo.com/ns/rss/1.0');
 	}
 	public function retrieve ()
 	{
@@ -24,9 +26,16 @@ class Api_Model_YWeather
 			));
 		return $remote_feed->request()->getBody(); */
 	}
-	public function temperature ()
+	public function conditions ($r)
 	{
-		$_data = $this->retrieve();
-		var_dump($_data);
+		if(!isset($this->_conditions['code']))
+		{
+			$_data = $this->retrieve()->current()->{'yweather:condition'}->getDOM();
+			$this->_conditions = array(
+				'temp' => $_data->getAttribute('temp') ,
+				'description' => $_data->getAttribute('text') ,
+				'code' => $_data->getAttribute('code'));
+		}
+		return $this->_conditions[$r];
 	}
 }
