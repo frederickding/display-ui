@@ -19,7 +19,8 @@ class Api_WeatherController extends Zend_Controller_Action
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$api_key = $this->getRequest()->getParam('api_key');
 		if ($Authenticator->verify($sys_name, $api_key)) {
-			echo $YWeather->temperature();
+			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
+			echo $YWeather->conditions('temp');
 		} else
 			$this->getResponse()->setHttpResponseCode(401);
 	}
