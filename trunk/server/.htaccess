@@ -6,3 +6,8 @@ RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
 RewriteRule ^.*$ index.php [NC,L]
+
+# Send version information in HTTP headers
+<IfModule mod_headers.c>
+Header set X-Powered-By "Display UI Server/trunk, Zend Framework/1.8.3"
+</IfModule>
