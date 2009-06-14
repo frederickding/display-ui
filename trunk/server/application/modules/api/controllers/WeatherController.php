@@ -8,20 +8,30 @@
 class Api_WeatherController extends Zend_Controller_Action
 {
 	/**
-	 * The default action - show the home page
+	 * Provides a plain-text API to retrieve the current conditions
 	 */
 	public function indexAction ()
 	{
+		// don't let Zend Framework render a view
 		$this->_helper->viewRenderer->setNoRender();
-		$Authenticator = new Api_Model_Authenticator();
 		$YWeather = new Api_Model_YWeather(
 			$this->getRequest()->getParam('location'));
+		
+		// authenticate the request
+		$Authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$api_key = $this->getRequest()->getParam('api_key');
 		if ($Authenticator->verify($sys_name, $api_key)) {
 			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
-			echo $YWeather->conditions('temp');
-		} else
+			echo $YWeather->conditions('temp')."\n"
+				.$YWeather->conditions('description')."\n"
+				.$YWeather->conditions('code');
+		} else {
 			$this->getResponse()->setHttpResponseCode(401);
+			$this->view->message = 'Unauthenticated Request';
+			$this->view->explanation = 'All API calls to this service must include a '
+				.'valid system identifier and API key.';
+			$this->render();
+		}
 	}
 }
