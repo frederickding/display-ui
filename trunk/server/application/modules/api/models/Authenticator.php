@@ -27,6 +27,23 @@
 class Api_Model_Authenticator
 {
 	/**
+	 * Stores the unix timestamp of 1 year in the future, rounded
+	 *
+	 * @var string
+	 */
+	private $_install_date = '';
+	private $_config;
+	/**
+	 * Constructor method
+	 *
+	 * Loads the configuration and calculates the unix timestamp using the install date
+	 */
+	public function __construct ()
+	{
+		$this->_config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/configuration.ini', 'production');
+		$this->_install_date = round(strtotime('+1 year', strtotime($this->_config->production->server->install->date)), - 3);
+	}
+	/**
 	 * Authentication parameters verification method
 	 *
 	 * Checks whether provided system name and API key are valid
@@ -34,14 +51,28 @@ class Api_Model_Authenticator
 	 * @param string|int $sys_name the name of the client system
 	 * @param string|int $api_key the associated API key
 	 * @return boolean
-	 * @todo need to implement a real authentication system
 	 */
-	public function verify ($sys_name, $api_key)
+	public function verify ($sys_name = '', $api_key = '')
 	{
-		// TODO real authentication system
-		if (isset($sys_name, $api_key))
+		// Make sure required parameters are provided
+		if (! $sys_name || ! $api_key)
+			return false;
+		// Check whether a valid API key matches the provided key
+		elseif ($this->generate($sys_name) == $api_key)
 			return true;
 		else
 			return false;
+	}
+	public function generate ($sys_name = '')
+	{
+		// Make sure required parameter is provided
+		if (! $sys_name)
+			return false;
+		// Generate a valid API key using SHA1.
+		// HMAC with the SHA256 algorithm generates a message digest
+		// for the system install date, using the client system name as the secret
+		$valid_api_key = sha1(hash_hmac('sha256', $this->_install_date, $sys_name)
+			.$this->_config->production->server->install->secret);
+		return $valid_api_key;
 	}
 }
