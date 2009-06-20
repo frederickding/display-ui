@@ -35,4 +35,17 @@ class Api_IndexController extends Zend_Controller_Action
 	{
 		$this->getResponse()->setHttpResponseCode(400);
 	}
+	/**
+	 * API key generator
+	 *
+	 * Generates an API key for the given system name
+	 * In the future, should be REMOVED
+	 * @todo Move this to protected admin area
+	 */
+	public function getkeyAction ()
+	{
+		$Authenticator = new Api_Model_Authenticator();
+		$sys_name = $this->getRequest()->getParam('sys_name');
+		$this->getResponse()->setHeader('X-API-Key', $Authenticator->generate($sys_name));
+	}
 }
