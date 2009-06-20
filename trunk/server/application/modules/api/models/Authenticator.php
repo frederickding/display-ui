@@ -40,8 +40,10 @@ class Api_Model_Authenticator
 	 */
 	public function __construct ()
 	{
-		$this->_config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/configuration.ini', 'production');
-		$this->_install_date = round(strtotime('+1 year', strtotime($this->_config->production->server->install->date)), - 3);
+		$this->_config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
+		$this->_install_date = round(
+			strtotime('+1 year', strtotime($this->_config->production->server->install->date)), - 3
+		);
 	}
 	/**
 	 * Authentication parameters verification method
@@ -63,6 +65,14 @@ class Api_Model_Authenticator
 		else
 			return false;
 	}
+	/**
+	 * API key generator method
+	 *
+	 * Generates a valid API key for the given client system name
+	 *
+	 * @param string $sys_name the name of the client system
+	 * @return false|string
+	 */
 	public function generate ($sys_name = '')
 	{
 		// Make sure required parameter is provided

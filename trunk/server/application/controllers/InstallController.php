@@ -29,8 +29,9 @@ class InstallController extends Zend_Controller_Action
 	/**
 	 * Default method
 	 *
+	 * Don't actually do anything
 	 */
-	public function indexAction()
+	public function indexAction ()
 	{
 		$this->_helper->viewRenderer->setNoRender();
 	}
@@ -43,29 +44,41 @@ class InstallController extends Zend_Controller_Action
 	public function configAction ()
 	{
 		$this->_helper->viewRenderer->setNoRender();
-		if (file_exists(APPLICATION_PATH . '/configs/configuration.ini')) {
+		if (file_exists(CONFIG_DIR . '/configuration.ini')) {
 			// the configuration is already set up
 			$this->view->h1 = 'An error occurred';
 			$this->view->title = 'System already set up';
-			$this->view->message = 'According to the system, the configuration ' . 'has already been set up. The installer will not continue.';
+			$this->view->message = 'According to the system, '
+				. 'the configuration has already been set up. '
+				. 'The installer will not continue.';
 			$this->render('index');
 		} else {
 			// we need to set up the configuration file
-			$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/configuration.default.ini', null, array(
+			$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.default.ini',
+				null, array(
 				'allowModifications' => true
 			));
+			// note the date of installation
 			$config->production->server->install->date = date('Y-m-d');
+			/*
+			 * generate a reasonably random secret
+			 * that must NEVER be changed after install
+			 * or cryptographic hashes generated with it will become invalid!
+			 */
 			$config->production->server->install->secret = sha1(
-				hash_hmac('sha256', time(), sha1(microtime(TRUE)))
-			);
+				hash_hmac('sha256', time(), sha1(microtime(TRUE))));
+			// now write the new config to file
 			$writer = new Zend_Config_Writer_Ini(array(
 				'config' => $config ,
-				'filename' => APPLICATION_PATH . '/configs/configuration.ini'
+				'filename' => CONFIG_DIR . '/configuration.ini'
 			));
 			$writer->write();
 			$this->view->h1 = 'Install successful';
 			$this->view->title = 'Display UI Server is ready to go';
-			$this->view->message = 'The system has set up your configuration files.';
+			$this->view->message = 'The system has set up your configuration files.'
+				. '<br />'
+				. 'Keep this server secret in a safe place:<br />'
+				. '<code>' . $config->production->server->install->secret . '</code>';
 			$this->render('index');
 		}
 	}
