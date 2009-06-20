@@ -32,18 +32,23 @@ class Api_Model_Authenticator
 	 * @var string
 	 */
 	private $_install_date = '';
+	/**
+	 * Holds the configuration read from Zend_Config
+	 *
+	 * @var Zend_Config_Ini
+	 */
 	private $_config;
 	/**
 	 * Constructor method
 	 *
-	 * Loads the configuration and calculates the unix timestamp using the install date
+	 * Loads the configuration, calculates the unix timestamp using install date
 	 */
 	public function __construct ()
 	{
-		$this->_config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
-		$this->_install_date = round(
-			strtotime('+1 year', strtotime($this->_config->production->server->install->date)), - 3
-		);
+		$this->_config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini',
+											'production');
+		$this->_install_date = round(strtotime('+1 year',
+			strtotime($this->_config->production->server->install->date)), - 3);
 	}
 	/**
 	 * Authentication parameters verification method
