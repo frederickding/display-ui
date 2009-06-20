@@ -54,7 +54,10 @@ class InstallController extends Zend_Controller_Action
 				'filename' => APPLICATION_PATH . '/configs/configuration.ini'
 			));
 			$writer->write();
-			
+			$this->view->h1 = 'Install successful';
+			$this->view->title = 'Display UI Server is ready to go';
+			$this->view->message = 'The system has set up your configuration files.';
+			$this->render('index');
 		}
 	}
 }
