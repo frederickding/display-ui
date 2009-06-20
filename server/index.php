@@ -6,7 +6,12 @@ defined('APPLICATION_PATH')
 
 // Define application environment
 defined('APPLICATION_ENV')
-    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+    || define('APPLICATION_ENV',
+    	(getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+
+// Define configuration directory; in the future, may be above public directory
+defined('CONFIG_DIR')
+	|| define('CONFIG_DIR', realpath(APPLICATION_PATH . '/configs'));
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(
