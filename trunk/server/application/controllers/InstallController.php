@@ -29,9 +29,18 @@ class InstallController extends Zend_Controller_Action
 	/**
 	 * Default method
 	 *
-	 *
 	 */
-	public function indexAction ()
+	public function indexAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+	}
+	/**
+	 * Configuration set up method
+	 *
+	 * Reads the distrib configuration files and changes certain variables,
+	 * then writes those files to the configuration file.
+	 */
+	public function configAction ()
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		if (file_exists(APPLICATION_PATH . '/configs/configuration.ini')) {
@@ -45,7 +54,7 @@ class InstallController extends Zend_Controller_Action
 			$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/configuration.default.ini', null, array(
 				'allowModifications' => true
 			));
-			$config->production->server->install->date = date('Ymd');
+			$config->production->server->install->date = date('Y-m-d');
 			$config->production->server->install->secret = sha1(
 				hash_hmac('sha256', time(), sha1(microtime(TRUE)))
 			);
