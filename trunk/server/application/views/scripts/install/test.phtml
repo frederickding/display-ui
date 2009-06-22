@@ -4,6 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Display UI Server | Installer</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
 <style type="text/css">
 <!--
@@ -128,7 +129,7 @@ a.next {
 		<p>Before we begin, make sure that your server meets these minimum requirements:</p>
 		<table width="500" border="0" cellspacing="2">
 			<tr>
-				<td onmouseover="$("#php-hidden").show('fade',,500);return false;">PHP version
+				<td onmouseover="$(\"#php-hidden\").show(\"fade\");return false;">PHP version
 				<span id="php-hidden" class="hidden">Display UI Server requires PHP 5.2 and above</span>
 				</td>
 				<?php if($this->tests[0]) {
