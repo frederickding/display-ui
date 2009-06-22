@@ -34,6 +34,12 @@ class InstallController extends Zend_Controller_Action
 	public function indexAction ()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		// first of all, we need a way to find the current URL
+		// and the URL of the images
+		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
+		$this->view->base_uri = $this->view->base_uri[0];
+		$this->render('index');
+		
 	}
 	/**
 	 * Configuration set up method
@@ -51,7 +57,7 @@ class InstallController extends Zend_Controller_Action
 			$this->view->message = 'According to the system, '
 				. 'the configuration has already been set up. '
 				. 'The installer will not continue.';
-			$this->render('index');
+			$this->render('config');
 		} else {
 			// we need to set up the configuration file
 			$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.default.ini',
@@ -79,7 +85,7 @@ class InstallController extends Zend_Controller_Action
 				. '<br />'
 				. 'Keep this server secret in a safe place:<br />'
 				. '<code>' . $config->production->server->install->secret . '</code>';
-			$this->render('index');
+			$this->render('config');
 		}
 	}
 }
