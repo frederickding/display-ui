@@ -33,13 +33,58 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
-		$this->_helper->viewRenderer->setNoRender();
 		// first of all, we need a way to find the current URL
 		// and the URL of the images
 		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
 		$this->view->base_uri = $this->view->base_uri[0];
-		$this->render('index');
+		$this->view->version = APPLICATION_VER;
 		
+		// initiate a session for the installer
+		$this->session = new Zend_Session_Namespace('installer');
+	    $this->session->page = 1;
+	}
+	/**
+	 * Test method
+	 *
+	 * Checks whether server configuration is compatible
+	 */
+	public function testAction ()
+	{
+		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
+		$this->view->base_uri = $this->view->base_uri[0];
+		$this->view->version = APPLICATION_VER;
+		$this->view->tests = array();
+		
+		// if session page isn't 1, don't proceed
+		$this->session = new Zend_Session_Namespace('installer');
+		if($this->session->page != 1)
+			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+		
+		// if PHP version is greater than 5.2.0, TRUE (pass)
+		$this->view->tests[0] = phpversion() >= '5.2.0';
+		// hash is necessary
+		$this->view->tests[1] = extension_loaded('hash');
+		// curl?
+		$this->view->tests[2] = extension_loaded('curl');
+		// sockets?
+		$this->view->tests[3] = extension_loaded('sockets');
+		// PDO & PDO_MySQL
+		$this->view->tests[4] = (extension_loaded('pdo') && extension_loaded('pdo_mysql'));
+		// MySQLi?
+		$this->view->tests[5] = extension_loaded('mysqli');
+		// APC?
+		$this->view->tests[6] = extension_loaded('apc');
+		// writable files?
+		$this->view->tests[7] = (@file_exists(CONFIG_DIR.'/configuration.default.ini')
+								&& @file_exists(CONFIG_DIR.'/database.default.ini')
+								&& is_writable(CONFIG_DIR));
+
+		// Safe mode off
+		$this->view->tests[8] = ((bool) ini_get('safe_mode')) ? FALSE : TRUE;
+		// Output buffering
+		$this->view->tests[9] = ((bool) ini_get('output_buffering')) ? FALSE : TRUE;
+		
+		$this->session->page = 2;
 	}
 	/**
 	 * Configuration set up method
@@ -49,6 +94,15 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function configAction ()
 	{
+		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
+		$this->view->base_uri = $this->view->base_uri[0];
+		$this->view->version = APPLICATION_VER;
+		
+		// if session page isn't 1, don't proceed
+		$this->session = new Zend_Session_Namespace('installer');
+		if($this->session->page != 2)
+			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+		
 		$this->_helper->viewRenderer->setNoRender();
 		if (file_exists(CONFIG_DIR . '/configuration.ini')) {
 			// the configuration is already set up
