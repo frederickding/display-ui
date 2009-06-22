@@ -52,7 +52,8 @@ class Api_Model_YWeather
 	 */
 	public function retrieve ()
 	{
-		$channel = new Zend_Feed_Rss('http://weather.yahooapis.com/forecastrss?u=c&p=' . $this->_location);
+		$channel = new Zend_Feed_Rss('http://weather.yahooapis.com/forecastrss?u=c&p='
+									. $this->_location);
 		return $channel;
 	}
 	/**
