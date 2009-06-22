@@ -25,7 +25,7 @@ li {
 	line-height: 1.75;
 }
 div.wrapper {
-	background: #FEFEFE url(../../../../images/installer/background.jpg) bottom right no-repeat;
+	background: #FEFEFE url(<?php echo $this->base_uri; ?>/images/installer/background.jpg) bottom right no-repeat;
 	width: 920px;
 	margin: 1em auto;
 	padding: 10px;
@@ -34,7 +34,7 @@ div.wrapper {
 	-webkit-border-radius: 10px;
 }
 div.wrapper#step1 {
-	background-image: url(../../../../images/installer/background-switch.jpg);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/background-switch.jpg);
 }
 div#header {
 	width: 880px;
@@ -82,15 +82,15 @@ a.home, a.back, a.next {
 	text-indent: -1000em;
 }
 a.home {
-	background-image: url(../../../../images/installer/home.png);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/home.png);
 }
 a.back {
-	background-image: url(../../../../images/installer/back.png);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/back.png);
 }
 a.next {
 	margin-top: -48px;
 	margin-left: 30em;
-	background-image: url(../../../../images/installer/next.png);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/next.png);
 }
 -->
 </style></head>
@@ -99,7 +99,7 @@ a.next {
 
 <div class="wrapper" id="step1">
 	<div id="header">
-		<h1><img src="../../../../images/installer/title.png" width="670" height="35" alt="Display UI Server &raquo; Installer" /></h1>
+		<h1><img src="<?php echo $this->base_uri; ?>/images/installer/title.png" width="670" height="35" alt="Display UI Server &raquo; Installer" /></h1>
 	</div>
 	<div id="body">
 		<h2>Step 1 &raquo; Welcome</h2>
