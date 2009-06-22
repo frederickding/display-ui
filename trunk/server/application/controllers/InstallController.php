@@ -68,10 +68,10 @@ class InstallController extends Zend_Controller_Action
 		$this->view->tests[2] = extension_loaded('curl');
 		// sockets?
 		$this->view->tests[3] = extension_loaded('sockets');
-		// PDO & PDO_MySQL
-		$this->view->tests[4] = (extension_loaded('pdo') && extension_loaded('pdo_mysql'));
 		// MySQLi?
-		$this->view->tests[5] = extension_loaded('mysqli');
+		$this->view->tests[4] = extension_loaded('mysqli');
+		// PDO & PDO_MySQL
+		$this->view->tests[5] = (extension_loaded('pdo') && extension_loaded('pdo_mysql'));
 		// APC?
 		$this->view->tests[6] = extension_loaded('apc');
 		// writable files?
