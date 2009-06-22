@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Display UI Server | Installer</title>
+<style type="text/css">
+<!--
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #206080;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 100%;
+}
+div {
+	padding: 0;
+	margin: 0;
+}
+p {
+	line-height: 1.75;
+	font-size: 0.875em;
+	width: 40em;
+	margin-top: 1.75em;
+	margin-bottom: 1.75em;
+}
+table {
+	font-size: 0.875em;
+	line-height: 1.25;
+	margin-bottom: 1.75em;
+}
+td.good {
+	color: #1E7B0D;
+}
+td.bad {
+	color: #900;
+}
+li {
+	font-size: 0.875em;
+	line-height: 1.75;
+}
+div.wrapper {
+ background: #FEFEFE url(<?php echo $this->base_uri; ?>/images/installer/background.jpg) bottom right no-repeat;
+	width: 920px;
+	margin: 1em auto;
+	padding: 10px;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+div.wrapper#step1 {
+ background-image: url(<?php echo $this->base_uri; ?>/images/installer/background-switch.jpg);
+}
+div#header {
+	width: 880px;
+	margin: 0 auto 2em auto;
+}
+div#body {
+	width: 880px;
+	margin: 1em auto;
+}
+div#header {
+	border-bottom: 1px #444 solid;
+}
+div#footer {
+	position: relative;
+	top: 3em;
+	width: 880px;
+	color: #FEFEFE;
+	margin-left: 1em;
+}
+h1 {
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: 2.25em;
+	margin: 1em 0;
+}
+h2, h3, h4, h5 {
+	font-weight: bold;
+}
+h2 {
+	font-size: 1.5em;
+}
+ul.requirements {
+	list-style-type: circle;
+}
+span.mouseover {
+	border-bottom: 1px #666 dashed;
+}
+small {
+	font-size: 0.75em;
+}
+a.home, a.back, a.next {
+	display: block;
+	width: 48px;
+	height: 48px;
+	text-indent: -1000em;
+}
+a.home {
+ background-image: url(<?php echo $this->base_uri; ?>/images/installer/home.png);
+}
+a.back {
+ background-image: url(<?php echo $this->base_uri; ?>/images/installer/back.png);
+}
+a.next {
+	margin-top: -48px;
+	margin-left: 30em;
+ background-image: url(<?php echo $this->base_uri; ?>/images/installer/next.png);
+}
+-->
+</style>
+</head>
+<body>
+<div class="wrapper" id="step2">
+	<div id="header">
+		<h1><img src="<?php echo $this->base_uri; ?>/images/installer/title.png"
+		width="670" height="35" alt="Display UI Server &raquo; Installer" /></h1>
+	</div>
+	<div id="body">
+		<h2>Step 2 &raquo; Testing</h2>
+		<p>The installer has checked your system for compatibility requirements.</p>
+		<p>Before we begin, make sure that your server meets these minimum requirements:</p>
+		<table width="500" border="0" cellspacing="2">
+			<tr>
+				<td>PHP version</td>
+				<td <?php if($this->tests[0])
+				echo 'class="good">';
+				else echo 'class="bad">';
+				echo phpversion(); ?></td>
+			</tr>
+			<tr>
+				<td>Hash functions</td>
+				<td <?php if($this->tests[1])
+				echo 'class="good">supported';
+				else echo 'class="bad">not supported'; ?></td>
+			</tr>
+			<tr>
+				<td>cURL</td>
+				<td <?php if($this->tests[2])
+				echo 'class="good">supported';
+				else echo 'class="bad">not supported'; ?></td>
+			</tr>
+			<tr>
+				<td>Sockets</td>
+				<td <?php if($this->tests[3])
+				echo 'class="good">supported';
+				else echo 'class="bad">not supported'; ?></td>
+			</tr>
+			<tr>
+				<td>PHP Data Objects &amp; MySQL driver</td>
+				<td <?php if($this->tests[4])
+				echo 'class="good">installed';
+				else echo 'class="bad">not installed'; ?></td>
+			</tr>
+			<tr>
+				<td>MySQLi functions</td>
+				<td <?php if($this->tests[5])
+				echo 'class="good">supported';
+				else echo 'class="bad">not supported'; ?></td>
+			</tr>
+			<tr>
+				<td>Alternative PHP Cache</td>
+				<td <?php if($this->tests[6])
+				echo 'class="good">installed';
+				else echo 'class="bad">not installed'; ?></td>
+			</tr>
+			<tr>
+				<td>Configuration files</td>
+				<td <?php if($this->tests[7])
+				echo 'class="good">writable';
+				else echo 'class="bad">not writable'; ?></td>
+			</tr>
+			<tr>
+				<td>PHP safe mode</td>
+				<td <?php if($this->tests[8])
+				echo 'class="good">disabled';
+				else echo 'class="bad">enabled'; ?></td>
+			</tr>
+			<tr>
+				<td>Output buffering</td>
+				<td <?php if($this->tests[9])
+				echo 'class="good">disabled';
+				else echo 'class="bad">enabled'; ?></td>
+			</tr>
+		</table>
+		<a class="back" href="<?php echo $this->base_uri; ?>/install/">Start over</a> <a class="next" href="<?php echo $this->base_uri; ?>/install/config/">Next</a> </div>
+	<div id="footer"> <small>Display UI Server/<?php echo $this->version; ?></small> </div>
+</div>
+</body>
+</html>
