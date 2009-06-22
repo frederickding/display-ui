@@ -57,7 +57,7 @@ class InstallController extends Zend_Controller_Action
 		
 		// if session page isn't 1, don't proceed
 		$this->session = new Zend_Session_Namespace('installer');
-		if($this->session->page != 1)
+		if(!($this->session->page >= 1))
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 		
 		// if PHP version is greater than 5.2.0, TRUE (pass)
