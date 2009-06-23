@@ -31,10 +31,13 @@ table {
 	line-height: 1.25;
 	margin-bottom: 1.75em;
 }
-td.good {
+.underline {
+	text-decoration: underline;
+}
+.good {
 	color: #1E7B0D;
 }
-td.bad {
+.bad {
 	color: #900;
 }
 li {
@@ -42,7 +45,7 @@ li {
 	line-height: 1.75;
 }
 div.wrapper {
- background: #FEFEFE url(<?php echo $this->base_uri; ?>/images/installer/background.jpg) bottom right no-repeat;
+	background: #FEFEFE url(<?php echo $this->base_uri; ?>/images/installer/background.jpg) bottom right no-repeat;
 	width: 920px;
 	margin: 1em auto;
 	padding: 10px;
@@ -51,7 +54,7 @@ div.wrapper {
 	-webkit-border-radius: 10px;
 }
 div.wrapper#step1 {
- background-image: url(<?php echo $this->base_uri; ?>/images/installer/background-switch.jpg);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/background-switch.jpg);
 }
 div#header {
 	width: 880px;
@@ -100,24 +103,36 @@ a.home, a.back, a.next {
 	text-indent: -1000em;
 }
 a.home {
- background-image: url(<?php echo $this->base_uri; ?>/images/installer/home.png);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/home.png);
 }
 a.back {
- background-image: url(<?php echo $this->base_uri; ?>/images/installer/back.png);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/back.png);
 }
 a.next {
 	margin-top: -48px;
 	margin-left: 30em;
- background-image: url(<?php echo $this->base_uri; ?>/images/installer/next.png);
+	background-image: url(<?php echo $this->base_uri; ?>/images/installer/next.png);
+}
+p.notice.good {
+	background-color: #c1f7a8;
+	padding: 0.5em;
+	color: #003c00;
+}
+p.notice.bad {
+	padding: 0.5em;
+	background-color: #f5afb0;
+	color: #500000;
 }
 -->
 </style>
 <script type="text/javascript">
-$('tr[title]').qtip({
-	style: { name: 'light', tip: true; }
-});
-$('td.bad[title]').qtip({
-	style: { name: 'light', tip: true; }
+$(document).ready(function(){
+    $('tr[title]').qtip({
+        style: {
+            name: 'dark',
+            tip: true
+        }
+    });
 });
 </script>
 
@@ -131,7 +146,9 @@ $('td.bad[title]').qtip({
 	<div id="body">
 		<h2>Step 2 &raquo; Testing</h2>
 		<p>The installer has checked your system for compatibility requirements.</p>
-		<p>Before we begin, make sure that your server meets these minimum requirements:</p>
+		<p>Before we begin, make sure that your server meets these minimum requirements:<br />
+		<small>Tip: mouse over any requirement to see a brief explanation.</small></p>
+		
 		<table width="500" border="0" cellspacing="2">
 			<tr title="Zend Framework requires PHP 5.2 or above to function properly">
 				<td>PHP version</td>
@@ -195,8 +212,34 @@ $('td.bad[title]').qtip({
 				else echo '<td class="bad">enabled'; ?></td>
 			</tr>
 		</table>
-		<a class="back" href="<?php echo $this->base_uri; ?>/install/">Start over</a> <a class="next" href="<?php echo $this->base_uri; ?>/install/config/">Next</a> </div>
-	<div id="footer"> <small>Display UI Server/<?php echo $this->version; ?></small> </div>
+<?php if($this->fail >= 100) { ?>
+		<p class="notice bad">It would appear that one or more of the essential
+		requirements for running Display UI Server were not met. 
+		<span class="bad">The installer cannot continue.</span></p>
+<?php } elseif($this->fail == 2) { 
+	$this->failed = ($this->tests[2]) ? 'Sockets' : 'cURL'; ?>
+		<p class="notice">It would appear that a required component, 
+		<span class="underline"><?php echo $this->failed; ?></span>, 
+		is not available. However, the installer <em>can</em> continue 
+		since the backup dependency is available.</p>
+<?php } elseif($this->fail == 3) {
+	$this->failed = ($this->tests[4]) ? 'PDO/PDO_MySQL' : 'MySQLi'; ?>
+		<p class="notice">It would appear that a required component, 
+		<span class="underline"><?php echo $this->failed; ?></span>, 
+		is not available. However, the installer <em>can</em> continue 
+		since the backup dependency is available.</p>
+<?php } else { ?>
+		<p class="notice good">Excellent! Your server set up meets the requirements
+		to install Display UI Server.<br />Please click the arrow to continue.</p>
+<?php } ?>
+		<a class="back" href="<?php echo $this->base_uri; ?>/install/">Start over</a>
+<?php if($this->fail < 100) { ?>
+		<a class="next" href="<?php echo $this->base_uri; ?>/install/config/">Next</a>
+<?php } ?>
+	</div>
+	<div id="footer">
+		<small>Display UI Server/<?php echo $this->version; ?></small>
+	</div>
 </div>
 </body>
 </html>
