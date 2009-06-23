@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Display UI Server | Installer</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base_dir; ?>/images/installer/jquery.qtip-1.0.0-rc3.min.js"></script>
 <style type="text/css">
 <!--
 body {
@@ -113,11 +113,11 @@ a.next {
 -->
 </style>
 <script type="text/javascript">
-$(document).ready(function() {
-	$("tr#php-tr").mouseenter(function() {
-		$("span#php-hidden").show("fold");
-	});
-	$("span.hidden").hide();
+$('tr[title]').qtip({
+	style: { name: 'light', tip: true; }
+});
+$('td.bad[title]').qtip({
+	style: { name: 'light', tip: true; }
 });
 </script>
 
@@ -133,52 +133,50 @@ $(document).ready(function() {
 		<p>The installer has checked your system for compatibility requirements.</p>
 		<p>Before we begin, make sure that your server meets these minimum requirements:</p>
 		<table width="500" border="0" cellspacing="2">
-			<tr id="php-tr">
-				<td>PHP version
-				<span id="php-hidden" class="hidden">Display UI Server requires PHP 5.2 and above</span>
-				</td>
+			<tr title="Zend Framework requires PHP 5.2 or above to function properly">
+				<td>PHP version</td>
 				<?php if($this->tests[0]) {
 				echo '<td class="good">'; }
-				else echo '<td class="bad">';
+				else echo '<td class="bad" title="You\'ll need to upgrade PHP">';
 				echo phpversion(); ?></td>
 			</tr>
-			<tr>
+			<tr title="Hash functions are used for cryptography, in securing this application">
 				<td>Hash functions</td>
 				<?php if($this->tests[1])
 				echo '<td class="good">supported';
 				else echo '<td class="bad">not supported'; ?></td>
 			</tr>
-			<tr>
+			<tr title="cURL is used to fetch data for weather and headlines">
 				<td>cURL</td>
 				<?php if($this->tests[2])
 				echo '<td class="good">supported';
 				else echo '<td class="bad">not supported'; ?></td>
 			</tr>
-			<tr>
+			<tr title="Sockets can be used instead of cURL">
 				<td>Sockets</td>
 				<?php if($this->tests[3])
 				echo '<td class="good">supported';
 				else echo '<td class="bad">not supported'; ?></td>
 			</tr>
-			<tr>
+			<tr title="MySQLi is one way of connecting to the database">
 				<td>MySQLi functions</td>
 				<?php if($this->tests[4])
 				echo '<td class="good">supported';
 				else echo '<td class="bad">not supported'; ?></td>
 			</tr>
-			<tr>
+			<tr title="PDO is the preferred driver for connecting to a database">
 				<td>PHP Data Objects &amp; MySQL driver</td>
 				<?php if($this->tests[5])
 				echo '<td class="good">installed';
 				else echo '<td class="bad">not installed'; ?></td>
 			</tr>
-			<tr>
+			<tr title="APC helps to speed up the application when under load">
 				<td>Alternative PHP Cache</td>
 				<?php if($this->tests[6])
 				echo '<td class="good">installed';
 				else echo '<td class="bad">not installed'; ?></td>
 			</tr>
-			<tr>
+			<tr title="We have to store the settings somewhere!">
 				<td>Configuration files</td>
 				<?php if($this->tests[7])
 				echo '<td class="good">writable';
