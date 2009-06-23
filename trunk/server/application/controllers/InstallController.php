@@ -61,7 +61,7 @@ class InstallController extends Zend_Controller_Action
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 		
 		// if PHP version is greater than 5.2.0, TRUE (pass)
-		$this->view->tests[0] = phpversion() >= '5.2.0';
+		$this->view->tests[0] = 0; // phpversion() >= '5.2.0';
 		// hash is necessary
 		$this->view->tests[1] = extension_loaded('hash');
 		// curl?
@@ -84,7 +84,23 @@ class InstallController extends Zend_Controller_Action
 		// Output buffering
 		$this->view->tests[9] = ((bool) ini_get('output_buffering')) ? FALSE : TRUE;
 		
-		$this->session->page = 2;
+		if(!$this->view->tests[0] || !$this->view->tests[1] ||
+			!$this->view->tests[8] || !$this->view->tests[9]) {
+			$this->view->fail = 100;
+		} elseif(!$this->view->tests[2] XOR !$this->view->tests[3]) {
+			$this->view->fail = 2;
+			$this->session->page = 2;
+		} elseif(!$this->view->tests[2] AND !$this->view->tests[3]) {
+			$this->view->fail = 200;
+		} elseif(!$this->view->tests[4] XOR !$this->view->tests[5]) {
+			$this->view->fail = 3;
+			$this->session->page = 2;
+		} elseif(!$this->view->tests[4] AND !$this->view->tests[5]) {
+			$this->view->fail = 300;
+		} else {
+			$this->view->fail = 0;
+			$this->session->page = 2;
+		}
 	}
 	/**
 	 * Configuration set up method
