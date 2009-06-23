@@ -110,11 +110,16 @@ a.next {
 	margin-left: 30em;
  background-image: url(<?php echo $this->base_uri; ?>/images/installer/next.png);
 }
-.hidden {
-	display: none;
-}
 -->
 </style>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("tr#php-tr").mouseenter(function() {
+		$("span#php-hidden").show("fold");
+	});
+	$("span.hidden").hide();
+});
+</script>
 
 </head>
 <body>
@@ -128,8 +133,8 @@ a.next {
 		<p>The installer has checked your system for compatibility requirements.</p>
 		<p>Before we begin, make sure that your server meets these minimum requirements:</p>
 		<table width="500" border="0" cellspacing="2">
-			<tr>
-				<td onmouseover="$(\"#php-hidden\").show(\"fade\");return false;">PHP version
+			<tr id="php-tr">
+				<td>PHP version
 				<span id="php-hidden" class="hidden">Display UI Server requires PHP 5.2 and above</span>
 				</td>
 				<?php if($this->tests[0]) {
