@@ -48,8 +48,8 @@ class Api_WeatherController extends Zend_Controller_Action
 		// authenticate the request
 		$Authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->getRequest()->getParam('sys_name');
-		$api_key = $this->getRequest()->getParam('api_key');
-		if ($Authenticator->verify($sys_name, $api_key)) {
+		$signature = $this->getRequest()->getParam('sig');
+		if ($Authenticator->verify($sys_name, $signature)) {
 			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
 			echo $YWeather->conditions('temp') . "\n"
 				.$YWeather->conditions('description') . "\n"
@@ -58,7 +58,7 @@ class Api_WeatherController extends Zend_Controller_Action
 			$this->getResponse()->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
 			$this->view->explanation = 'All API calls to this service '
-				. 'must include a valid system identifier and API key.';
+				. 'must include a valid system identifier and request signature.';
 			$this->render('index');
 		}
 	}
@@ -75,8 +75,8 @@ class Api_WeatherController extends Zend_Controller_Action
 		// authenticate the request
 		$Authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->getRequest()->getParam('sys_name');
-		$api_key = $this->getRequest()->getParam('api_key');
-		if ($Authenticator->verify($sys_name, $api_key)) {
+		$signature = $this->getRequest()->getParam('sig');
+		if ($Authenticator->verify($sys_name, $signature)) {
 			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
 			switch ($this->getRequest()->getParam('day')) {
 				case 1:
@@ -96,7 +96,7 @@ class Api_WeatherController extends Zend_Controller_Action
 			$this->getResponse()->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
 			$this->view->explanation = 'All API calls to this service '
-				. 'must include a valid system identifier and API key.';
+				. 'must include a valid system identifier and request signature.';
 			$this->render('index');
 		}
 	}

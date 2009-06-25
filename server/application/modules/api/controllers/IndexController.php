@@ -46,7 +46,7 @@ class Api_IndexController extends Zend_Controller_Action
 	{
 		$Authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->getRequest()->getParam('sys_name');
-		$this->getResponse()->setHeader('X-API-Key', $Authenticator->generate($sys_name));
+		$this->getResponse()->setHeader('X-API-Key', $Authenticator->apiKey($sys_name));
 		$this->_helper->viewRenderer->setNoRender();
 	}
 }
