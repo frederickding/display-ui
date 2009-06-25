@@ -60,24 +60,10 @@ class Api_Model_Authenticator {
         if (!$sys_name || !$signature || strlen($signature) != 40)
             return false;
         // Check whether a valid API key matches the provided key
-        elseif ($this->signature($sys_name) == $signature)
+        elseif (sha1($this->apiKey($sys_name).$this->_date) == $signature)
             return true;
         else
             return false;
-    }
-    /**
-     * Signature generator method
-     *
-     * Generates a valid current signature for the given client system name
-     *
-     * @param string $sys_name the name of the client system
-     * @return false|string
-     */
-    public function signature($sys_name = '') {
-        // Make sure required parameter is provided
-        if (!$sys_name)
-            return false;
-        return sha1($this->apiKey($sys_name), $this->_date);
     }
 	/**
 	 * API key generator method
