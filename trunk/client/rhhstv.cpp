@@ -227,5 +227,8 @@ void make_url(char *dest, char *format){
 int download(char *url, char *dest_file){
 	char *full_url = (char *) malloc(strlen(url) + 39);
 	make_url(full_url, url);
-	return URLDownloadToFile(NULL, full_url, dest_file, 0, NULL);
+	int ret = URLDownloadToFile(NULL, full_url, dest_file, 0, NULL);
+	free(full_url);
+
+	return ret;
 }
