@@ -79,17 +79,17 @@ small {
 }
 a.home, a.back, a.next {
 	display: block;
-	width: 48px; height: 48px;
+	width: 88px; height: 89px;
 	text-indent: -1000em;
 }
 a.home {
-	background-image: url(<?php echo $this->base_uri; ?>/images/installer/home.png);
+	background: none;
 }
 a.back {
 	background-image: url(<?php echo $this->base_uri; ?>/images/installer/back.png);
 }
 a.next {
-	margin-top: -48px;
+	margin-top: -89px;
 	margin-left: 30em;
 	background-image: url(<?php echo $this->base_uri; ?>/images/installer/next.png);
 }
@@ -142,7 +142,7 @@ $(document).ready(function(){
     });
 	$('a.next[title]').qtip({
 		style: {
-			name: 'green',
+			name: 'blue',
 			tip: true
 		}
 	});

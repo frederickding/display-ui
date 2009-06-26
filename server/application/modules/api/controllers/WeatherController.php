@@ -50,16 +50,12 @@ class Api_WeatherController extends Zend_Controller_Action
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$signature = $this->getRequest()->getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
-			$this->getResponse()->setHeader('Content-Type', 'application/x-displayui', true);
-			/* echo sprintf("[%c]\n", $YWeather->conditions('temp'))
-				. sprintf("[%d%s]\n", strlen($YWeather->conditions('description')), $YWeather->conditions('description'))
-				. sprintf("%c", $YWeather->conditions('code')); */
-			// target format: |CCCC|T|DL|.........desc............|
-			$this->getResponse()->setBody(sprintf("[%4c]", $YWeather->conditions('code')))
-								->appendBody(sprintf("%c", $YWeather->conditions('temp')))
-								->appendBody(sprintf("%1d", strlen($YWeather->conditions('description'))))
-								->appendBody($YWeather->conditions('description'));
-			$this->getResponse()->setHeader('Content-Length', strlen($this->getResponse()->getBody()));
+			// target format: CC TT\nSL DESCRIPTION
+			$this->getResponse()->setHeader('Content-Type', 'text/plain', true)
+								->setBody($YWeather->conditions('code').' '
+								.$YWeather->conditions('temp')."\n"
+								.strlen($YWeather->conditions('description')).' '
+								.$YWeather->conditions('description'));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
@@ -84,18 +80,23 @@ class Api_WeatherController extends Zend_Controller_Action
 		$signature = $this->getRequest()->getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
 			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
+			// target format: CC HI LO\nSL DESCRIPTION 
 			switch ($this->getRequest()->getParam('day')) {
 				case 1:
-					echo $YWeather->forecast(1, 'high') . "\n"
+					$this->getResponse()->setBody(
+						$YWeather->forecast(1, 'code') . ' '
+						.$YWeather->forecast(1, 'high') . ' '
 						.$YWeather->forecast(1, 'low') . "\n"
-						.$YWeather->forecast(1, 'description') . "\n"
-						.$YWeather->forecast(1, 'code');
+						.strlen($YWeather->forecast(1, 'description')) . ' '
+						.$YWeather->forecast(1, 'description'));
 					break;
 				case 0:
-					echo $YWeather->forecast(0, 'high') . "\n"
+					$this->getResponse()->setBody(
+						$YWeather->forecast(0, 'code') . ' '
+						.$YWeather->forecast(0, 'high') . ' '
 						.$YWeather->forecast(0, 'low') . "\n"
-						.$YWeather->forecast(0, 'description') . "\n"
-						.$YWeather->forecast(0, 'code');
+						.strlen($YWeather->forecast(0, 'description')) . ' '
+						.$YWeather->forecast(0, 'description'));
 					break;
 			}
 		} else {
