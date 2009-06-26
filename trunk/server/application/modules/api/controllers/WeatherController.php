@@ -55,7 +55,7 @@ class Api_WeatherController extends Zend_Controller_Action
 								->setBody($YWeather->conditions('code').' '
 								.$YWeather->conditions('temp')."\n"
 								.strlen($YWeather->conditions('description')).' '
-								.$YWeather->conditions('description'));
+								.strtolower($YWeather->conditions('description')));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
@@ -88,7 +88,7 @@ class Api_WeatherController extends Zend_Controller_Action
 						.$YWeather->forecast(1, 'high') . ' '
 						.$YWeather->forecast(1, 'low') . "\n"
 						.strlen($YWeather->forecast(1, 'description')) . ' '
-						.$YWeather->forecast(1, 'description'));
+						.strtolower($YWeather->forecast(1, 'description')));
 					break;
 				case 0:
 					$this->getResponse()->setBody(
@@ -96,7 +96,7 @@ class Api_WeatherController extends Zend_Controller_Action
 						.$YWeather->forecast(0, 'high') . ' '
 						.$YWeather->forecast(0, 'low') . "\n"
 						.strlen($YWeather->forecast(0, 'description')) . ' '
-						.$YWeather->forecast(0, 'description'));
+						.strtolower($YWeather->forecast(0, 'description')));
 					break;
 			}
 		} else {
