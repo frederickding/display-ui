@@ -69,9 +69,9 @@ class Api_Model_YWeather
 		{
 			$_data = $this->retrieve()->current()->{'yweather:condition'}->getDOM();
 			$this->_conditions = array(
-				'temp' => $_data->getAttribute('temp') ,
+				'temp' => (int) $_data->getAttribute('temp') ,
 				'description' => $_data->getAttribute('text') ,
-				'code' => $_data->getAttribute('code'));
+				'code' => (int) $_data->getAttribute('code'));
 		}
 		return $this->_conditions[$r];
 	}
