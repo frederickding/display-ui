@@ -50,10 +50,16 @@ class Api_WeatherController extends Zend_Controller_Action
 		$sys_name = $this->getRequest()->getParam('sys_name');
 		$signature = $this->getRequest()->getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
-			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
-			echo $YWeather->conditions('temp') . "\n"
-				.$YWeather->conditions('description') . "\n"
-				.$YWeather->conditions('code');
+			$this->getResponse()->setHeader('Content-Type', 'application/x-displayui', true);
+			/* echo sprintf("[%c]\n", $YWeather->conditions('temp'))
+				. sprintf("[%d%s]\n", strlen($YWeather->conditions('description')), $YWeather->conditions('description'))
+				. sprintf("%c", $YWeather->conditions('code')); */
+			// target format: |CCCC|T|DL|.........desc............|
+			$this->getResponse()->setBody(sprintf("[%4c]", $YWeather->conditions('code')))
+								->appendBody(sprintf("%c", $YWeather->conditions('temp')))
+								->appendBody(sprintf("%1d", strlen($YWeather->conditions('description'))))
+								->appendBody($YWeather->conditions('description'));
+			$this->getResponse()->setHeader('Content-Length', strlen($this->getResponse()->getBody()));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
