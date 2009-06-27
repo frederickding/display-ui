@@ -1,6 +1,7 @@
 
 #include <urlmon.h>
 #include <stdio.h>
+#include <time.h>
 #include "display_ui.h"
 #include "weather.h"
 #include "debug.h"
@@ -56,7 +57,11 @@ int weather_update(){
 			fclose(fp);
 			
 			char imgurl[48];
-			sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%dd.png", current.condition);
+			time_t rawtime;
+			tm *ptm;
+			time (&rawtime);
+			ptm = localtime(&rawtime);
+			sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%d%c.png", current.condition, (ptm->tm_hour < 6 || ptm->tm_hour > 19) ? 'n' : 'd');
 			URLDownloadToFile(NULL, imgurl, "img\\current.png", 0, NULL);
 			
 		}else{
@@ -76,8 +81,8 @@ int weather_update(){
 				fscanf(fp, "%d", &temp_lo);
 				
 				// stupid gdi+ needs widechars.
-				swprintf(forecast[i]->temp_hi, L"%d°C", temp_hi);
-				swprintf(forecast[i]->temp_lo, L"%d°C", temp_lo);
+				swprintf(forecast[i]->temp_hi, L"%d°", temp_hi);
+				swprintf(forecast[i]->temp_lo, L"%d", temp_lo);
 				
 				int length;
 				fscanf(fp, "%d ", &length);
