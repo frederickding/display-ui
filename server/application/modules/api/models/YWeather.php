@@ -41,7 +41,7 @@ class Api_Model_YWeather
 	{
 		// Default location is used:
 		// CAXX0401 (Richmond Hill)
-		$this->_location = $location;
+		$this->_location = (!empty($location)) ? $location : 'CAXX0401';
 		Zend_Feed::registerNamespace('yweather', 'http://xml.weather.yahoo.com/ns/rss/1.0');
 	}
 	/**
