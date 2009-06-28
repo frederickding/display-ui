@@ -18,7 +18,7 @@ void weather_init(){
 	memset(forecast[0], 0, sizeof(weather_fc_t));
 	memset(forecast[1], 0, sizeof(weather_fc_t));
 
-	weather_update();
+	weather_update(NULL);
 }
 
 void weather_exit(){
@@ -27,7 +27,7 @@ void weather_exit(){
 	if(forecast) free(forecast);
 }
 
-int weather_update(){
+unsigned long weather_update(void *p){
 	if(download("http://du.geekie.org/server/api/weather/current/?sys_name=1&sig=%s&location=CAXX0401", "data\\weather\\weather_c.dat") == S_OK){
 		
 		FILE *fp = fopen("data\\weather\\weather_c.dat", "r");
@@ -113,6 +113,8 @@ int weather_update(){
 			return 1;
 		}
 	}
+
+	return 0;
 }
 
 weather_t *weather_getcurrent(){
