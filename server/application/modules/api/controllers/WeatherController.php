@@ -98,6 +98,19 @@ class Api_WeatherController extends Zend_Controller_Action
 						.strlen($YWeather->forecast(0, 'description')) . ' '
 						.strtolower($YWeather->forecast(0, 'description')));
 					break;
+				default:
+					$this->getResponse()->setBody(
+						$YWeather->forecast(0, 'code') . ' '
+						.$YWeather->forecast(0, 'high') . ' '
+						.$YWeather->forecast(0, 'low') . "\n"
+						.strlen($YWeather->forecast(0, 'description')) . ' '
+						.strtolower($YWeather->forecast(0, 'description')))
+					->appendBody("\n"
+						.$YWeather->forecast(1, 'code') . ' '
+						.$YWeather->forecast(1, 'high') . ' '
+						.$YWeather->forecast(1, 'low') . "\n"
+						.strlen($YWeather->forecast(1, 'description')) . ' '
+						.strtolower($YWeather->forecast(1, 'description')));
 			}
 		} else {
 			$this->getResponse()->setHttpResponseCode(401);
