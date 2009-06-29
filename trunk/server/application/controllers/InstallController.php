@@ -114,7 +114,7 @@ class InstallController extends Zend_Controller_Action
 		$this->view->base_uri = $this->view->base_uri[0];
 		$this->view->version = APPLICATION_VER;
 		
-		// if session page isn't 1, don't proceed
+		// if session page isn't 2, don't proceed
 		$this->session = new Zend_Session_Namespace('installer');
 		if($this->session->page != 2)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
@@ -145,9 +145,50 @@ class InstallController extends Zend_Controller_Action
 				'filename' => CONFIG_DIR . '/configuration.ini'
 			));
 			$writer->write();
-			$this->view->status = 1;
+			$this->view->status = 3;
 			$this->view->secret = $config->production->server->install->secret;
 			$this->render('config');
+		}
+	}
+	public function databaseAction()
+	{
+		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
+		$this->view->base_uri = $this->view->base_uri[0];
+		$this->view->version = APPLICATION_VER;
+/*		// if session page isn't 3, don't proceed
+		$this->session = new Zend_Session_Namespace('installer');
+		if($this->session->page != 3)
+			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/'); */
+		$this->_helper->viewRenderer->setNoRender();
+		if (file_exists(CONFIG_DIR . '/database.ini')) {
+			// the configuration is already set up
+			$this->view->status = -1;
+			$this->render('databaseerror');
+		} else {
+			$req = $this->getRequest();
+			if(is_null($req->getParam('driver')))
+				$this->render('databaseform');
+			else {
+				$this->view->hostname = $req->getParam('hostname');
+				$this->view->username = $req->getParam('username');
+				$this->view->password = $req->getParam('password');
+				$this->view->dbname = $req->getParam('dbname');
+				$this->view->driver = $req->getParam('driver');
+				$db = new Default_Model_Installsql(
+					$this->view->hostname,
+					$this->view->username,
+					$this->view->password,
+					$this->view->dbname,
+					$this->view->driver
+				);
+				if($db->test()!=1) {
+					$this->view->uhoh = TRUE;
+					$this->render('databaseform');					
+				} else {
+					if($db->installStructure()) $this->getResponse()->setBody('SQL success.');
+					else $this->getResponse()->setBody('SQL error.');
+				}
+			}
 		}
 	}
 }
