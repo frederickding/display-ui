@@ -40,27 +40,46 @@ class Default_Model_Installsql
 	 * @param string $_dbname
 	 * @param string $_driver [optional]
 	 */
-	public function __construct($_host='localhost', $_username='', $_password='', $_dbname='', $_driver='Pdo_Mysql')
+	public function __construct($_installed, $_host='localhost', $_username='', $_password='', $_dbname='', $_driver='Pdo_Mysql')
 	{
-		$this->_host = trim($_host);
-		$this->_username = trim($_username);
-		$this->_password = $_password;
-		$this->_dbname = trim($_dbname);
-		$this->_driver = (in_array($_driver, array('Pdo_Mysql', 'Mysqli'))) ? $_driver : 'Pdo_Mysql';
-		try {
-			$this->db = Zend_Db::factory($this->_driver, array(
-				'host'		=>	$this->_host,
-				'username'	=>	$this->_username,
-				'password'	=>	$this->_password,
-				'dbname'	=>	$this->_dbname
-			));
-			$this->db->getConnection();
-		} catch (Zend_Db_Adapter_Exception $e) {
-			$this->db = FALSE;
-			// couldn't connect
-		} catch (Zend_Exception $e) {
-			$this->db = FALSE;
-			// couldn't load Adapter class
+		if(!$_installed) {
+			$this->_host = trim($_host);
+			$this->_username = trim($_username);
+			$this->_password = $_password;
+			$this->_dbname = trim($_dbname);
+			$this->_driver = (in_array($_driver, array('Pdo_Mysql', 'Mysqli'))) ? $_driver : 'Pdo_Mysql';
+			try {
+				$this->db = Zend_Db::factory($this->_driver, array(
+					'host'		=>	$this->_host,
+					'username'	=>	$this->_username,
+					'password'	=>	$this->_password,
+					'dbname'	=>	$this->_dbname
+				));
+				$this->db->getConnection();
+			} catch (Zend_Db_Adapter_Exception $e) {
+				$this->db = FALSE;
+				// couldn't connect
+			} catch (Zend_Exception $e) {
+				$this->db = FALSE;
+				// couldn't load Adapter class
+			}
+		} else {
+			$config = new Zend_Config_Ini(CONFIG_DIR.'/database.ini');
+			try {
+				$this->db = Zend_Db::factory($config->production->server->db->driver, array(
+					'host'		=>	$config->production->server->db->hostname,
+					'username'	=>	$config->production->server->db->username,
+					'password'	=>	$config->production->server->db->password,
+					'dbname'	=>	$config->production->server->db->name
+				));
+				$this->db->getConnection();
+			} catch (Zend_Db_Adapter_Exception $e) {
+				$this->db = FALSE;
+				// couldn't connect
+			} catch (Zend_Exception $e) {
+				$this->db = FALSE;
+				// couldn't load Adapter class
+			}
 		}
 	}
 	/**
@@ -72,19 +91,78 @@ class Default_Model_Installsql
 		if($this->db == FALSE) return FALSE;
 		else return TRUE;
 	}
-	
+	/**
+	 * Executes the database structure SQL commands
+	 * @return boolean
+	 */
 	public function installStructure()
 	{
 		$query = file_get_contents(APPLICATION_PATH.'/controllers/structure.mysql.sql')
 			or die('Couldn\'t load SQL query.');
 		if($this->_driver == 'Mysqli') {
 			// operate in MySQLi mode
-			$result = $this->db->getConnection()->query($query, MYSQLI_USE_RESULT);
+			$result = $this->db->getConnection()->multi_query($query);
 		} elseif($this->_driver == 'Pdo_Mysql') {
 			// operate in PDO mode
 			$result = $this->db->getConnection()->exec($query);
 		}
 		if($result !== FALSE) return TRUE;
+		else return FALSE;
+	}
+	/**
+	 * Writes the database configuration to file
+	 * @return boolean
+	 */
+	public function writeConfig()
+	{
+		$config = new Zend_Config_Ini(CONFIG_DIR . '/database.default.ini',
+				null, array(
+				'allowModifications' => true
+		));
+
+		$config->production->server->db->hostname = $this->_host;
+		$config->production->server->db->username = $this->_username;
+		$config->production->server->db->password = $this->_password;
+		$config->production->server->db->name = $this->_dbname;
+		$config->production->server->db->driver = $this->_driver;
+		$config->production->server->db->live = 0;
+		
+		$writer = new Zend_Config_Writer_Ini(array(
+				'config' => $config ,
+				'filename' => CONFIG_DIR . '/database.ini'
+		));
+		if($writer->write()) return TRUE;
+		else return FALSE;
+	}
+	/**
+	 * Checks whether the first user is already set up in the user table
+	 * @return boolean
+	 */
+	public function hasFirstUser()
+	{
+		if($this->db) {
+			$result = $this->db->fetchOne('SELECT username FROM dui_users WHERE id = 1 LIMIT 1');
+			if(empty($result)) return FALSE;
+			else return TRUE;
+		};
+	}
+	/**
+	 * Inserts the first user into the database
+	 * @param string $_username
+	 * @param string $_password
+	 * @param string $_email
+	 * @return boolean
+	 */
+	public function insertFirstUser($_username, $_password, $_email)
+	{
+		$this->db->insert('dui_users', array(
+			'username' => $_username,
+			'password' => $_password,
+			'email' => $_email,
+			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
+			'acl_role' => 'administrator'
+		));
+		if($this->db->lastInsertId()==1) return TRUE;
 		else return FALSE;
 	}
 }
