@@ -1,5 +1,4 @@
 <?php
-
 defined('APPLICATION_VER')
 	|| define('APPLICATION_VER', 'trunk');
 
