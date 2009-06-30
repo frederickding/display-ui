@@ -202,7 +202,7 @@ class InstallController extends Zend_Controller_Action
 					$db->writeConfig();
 					// send user to next step
 					$this->session->page = 4;
-					$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/user/');
+					$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/user/');
 				} else {
 					// connection apparently works but couldn't execute SQL
 					$this->view->status = 1;
@@ -242,7 +242,7 @@ class InstallController extends Zend_Controller_Action
 				} elseif($db->insertFirstUser($this->view->username, $this->view->password, $this->view->email)) {
 					// send user to finished screen
 					$this->session->page = 5;
-					$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/done/');
+					$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/done/');
 				} else {
 					$this->uhoh = TRUE;
 					$this->render('databasesuccess');
@@ -252,7 +252,7 @@ class InstallController extends Zend_Controller_Action
 			// user already installed
 			// send user to finished screen
 			$this->session->page = 5;
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/done/');
+			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/done/');
 		}
 	}
 	/**
