@@ -26,6 +26,15 @@
  */
 class InstallController extends Zend_Controller_Action
 {
+	public function init()
+	{
+		// first of all, we need a way to find the current URL
+		// and the URL of the images
+		$this->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
+		$this->base_uri = $this->base_uri[0];
+		// initiate a session for the installer
+		$this->session = new Zend_Session_Namespace('installer');
+	}
 	/**
 	 * Default method
 	 *
@@ -33,14 +42,7 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
-		// first of all, we need a way to find the current URL
-		// and the URL of the images
-		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->view->base_uri = $this->view->base_uri[0];
-		$this->view->version = APPLICATION_VER;
-		
-		// initiate a session for the installer
-		$this->session = new Zend_Session_Namespace('installer');
+		$this->view->base_uri = $this->base_uri;
 	    $this->session->page = 1;
 	}
 	/**
@@ -50,13 +52,10 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function testAction ()
 	{
-		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->view->base_uri = $this->view->base_uri[0];
-		$this->view->version = APPLICATION_VER;
+		$this->view->base_uri = $this->base_uri;
 		$this->view->tests = array();
 		
 		// if session page isn't 1, don't proceed
-		$this->session = new Zend_Session_Namespace('installer');
 		if(!($this->session->page >= 1))
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 		
@@ -110,12 +109,9 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function configAction ()
 	{
-		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->view->base_uri = $this->view->base_uri[0];
-		$this->view->version = APPLICATION_VER;
+		$this->view->base_uri = $this->base_uri;
 		
 		// if session page isn't 2, don't proceed
-		$this->session = new Zend_Session_Namespace('installer');
 		if($this->session->page < 2)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 		
@@ -160,11 +156,8 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function databaseAction()
 	{
-		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->view->base_uri = $this->view->base_uri[0];
-		$this->view->version = APPLICATION_VER;
+		$this->view->base_uri = $this->base_uri;
 		// if session page isn't 3, don't proceed
-		$this->session = new Zend_Session_Namespace('installer');
 		if($this->session->page < 3)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 		$this->_helper->viewRenderer->setNoRender();
@@ -216,11 +209,8 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function userAction()
 	{
-		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->view->base_uri = $this->view->base_uri[0];
-		$this->view->version = APPLICATION_VER;
+		$this->view->base_uri = $this->base_uri;
 		// if session page isn't 4, don't proceed
-		$this->session = new Zend_Session_Namespace('installer');
 		if($this->session->page < 4)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 		$this->_helper->viewRenderer->setNoRender();
@@ -260,12 +250,9 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function doneAction()
 	{
-		$this->view->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->view->base_uri = $this->view->base_uri[0];
-		$this->view->version = APPLICATION_VER;
+		$this->view->base_uri = $this->base_uri;
 		
 		// if session page isn't 5, don't proceed
-		$this->session = new Zend_Session_Namespace('installer');
 		if($this->session->page < 5)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
 	}
