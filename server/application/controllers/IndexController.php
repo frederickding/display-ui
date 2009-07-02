@@ -19,7 +19,4 @@ class IndexController extends Zend_Controller_Action
 		$this->view->base_uri = $this->base_uri;
 		
     }
-
-
 }
-
