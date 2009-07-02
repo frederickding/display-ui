@@ -5,7 +5,12 @@ class IndexController extends Zend_Controller_Action
 
     public function init()
     {
-		$this->base_uri = $_SERVER['REQUEST_URI'];
+		if(strpos($_SERVER['REQUEST_URI'], 'index')===FALSE) {
+			$this->base_uri = rtrim($_SERVER['REQUEST_URI'],'/');
+		} else {
+			$this->base_uri = explode('/index', $_SERVER['REQUEST_URI']);
+			$this->base_uri = $this->base_uri[0];
+		}
     }
 
     public function indexAction()
