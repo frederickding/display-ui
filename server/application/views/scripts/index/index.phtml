@@ -1,45 +1,38 @@
-<style>
-    
-    a:link,
-    a:visited
-    {
-        color: #0398CA;
-    }
-
-    span#zf-name
-    {
-        color: #91BE3F;
-    }
-
-    div#welcome
-    {
-        color: #FFFFFF;
-        background-image: url(http://framework.zend.com/images/bkg_header.jpg);
-        width:  600px;
-        height: 400px;
-        border: 2px solid #444444;
-        overflow: hidden;
-    }
-    
-    div#more-information
-    {
-        background-image: url(http://framework.zend.com/images/bkg_body-bottom.gif);
-        height: 100%;
-    }
-
-</style>
-<center>
-    <div id="welcome">
-        <center>
-        <br />
-        <h1>Welcome to the <span id="zf-name">Zend Framework!</span><h1 />
-        <h3>This is your project's main page<h3 /><br /><br />
-        <div id="more-information">
-            <br />
-            <img src="http://framework.zend.com/images/PoweredBy_ZF_4LightBG.png" /><br /><br />
-            Helpful Links: <br />
-            <A href="http://framework.zend.com/">Zend Framework Website</a> |
-            <A href="http://framework.zend.com/manual/en/">Zend Framework Manual</a>
-        </div>
-    </div>
-</center>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Display UI Server | Welcome</title>
+	<style type="text/css">
+	<!--
+	body {
+		background-color: #F0F0F0;
+	}
+	img {
+		border: none;
+		display: block;
+	}
+	img#welcomeimg {
+		position: fixed;
+		left: 50%; top: 45%;
+		margin-left: -400px;
+		margin-top: -300px;
+	}
+	-->
+	</style>
+</head>
+<body>
+<div class="wrapper">
+	<div id="body">
+		<img id="welcomeimg" src="<?php echo $this->base_uri; ?>/images/welcome.jpg" width="800" height="600"
+		alt="Welcome to Display UI" usemap="#welcomemap" />
+		<map id="welcomemap" name="welcomemap">
+			<area shape="rect" coords="40,420,277,557" href="<?php echo $this->base_uri; ?>/install/" alt="Install Display UI Server" />
+			<area shape="rect" coords="278,420,522,557" href="<?php echo $this->base_uri; ?>admin/" alt="Manage Display UI" />
+			<area shape="rect" coords="523,420,760,557" href="<?php echo $this->base_uri; ?>/link/" alt="Display the interface on a TV screen" />
+		</map>
+	</div>
+</div>
+</body>
+</html>
