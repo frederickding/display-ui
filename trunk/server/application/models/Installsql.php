@@ -155,7 +155,7 @@ class Default_Model_Installsql
 	 */
 	public function insertFirstUser($_username, $_password, $_email)
 	{
-		$PasswordHash = new PasswordHash(8, TRUE);
+		$PasswordHash = new Default_Model_PasswordHash(8, TRUE);
 		$this->db->insert('dui_users', array(
 			'username' => $_username,
 			'password' => $PasswordHash->HashPassword($_password),
