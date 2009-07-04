@@ -155,9 +155,10 @@ class Default_Model_Installsql
 	 */
 	public function insertFirstUser($_username, $_password, $_email)
 	{
+		$PasswordHash = new PasswordHash(8, TRUE);
 		$this->db->insert('dui_users', array(
 			'username' => $_username,
-			'password' => $_password,
+			'password' => $PasswordHash->HashPassword($_password),
 			'email' => $_email,
 			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
 			'acl_role' => 'administrator'
