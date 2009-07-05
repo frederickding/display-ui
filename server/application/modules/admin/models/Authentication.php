@@ -50,10 +50,10 @@ class Admin_Model_Authentication
 		$this->dbconfig = new Zend_Config_Ini(CONFIG_DIR.'/database.ini');
 		try {
 			$this->db = Zend_Db::factory($this->dbconfig->production->server->db->driver, array(
-				'host'		=>	$dbconfig->production->server->db->hostname,
-				'username'	=>	$dbconfig->production->server->db->username,
-				'password'	=>	$dbconfig->production->server->db->password,
-				'dbname'	=>	$dbconfig->production->server->db->name
+				'host'		=>	$this->dbconfig->production->server->db->hostname,
+				'username'	=>	$this->dbconfig->production->server->db->username,
+				'password'	=>	$this->dbconfig->production->server->db->password,
+				'dbname'	=>	$this->dbconfig->production->server->db->name
 			));
 			$this->db->getConnection();
 		} catch (Zend_Db_Adapter_Exception $e) {
