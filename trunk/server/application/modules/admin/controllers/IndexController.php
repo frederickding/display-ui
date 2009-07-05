@@ -33,10 +33,13 @@ class Admin_IndexController extends Zend_Controller_Action{
 	{
 		// TODO implement login
 		$_user = $this->getRequest()->getParam('username');
-		$_password = $this->getRequest()->getParam('password');
+		$_password = trim($this->getRequest()->getParam('password'));
 		$Auth = new Admin_Model_Authentication();
 		if($Auth->checkPassword($_user, $_password))
-			$this->getResponse()->setBody('Valid');
-		else $this->getResponse()->setBody('Invalid');
+			$this->_helper->viewRenderer()->setNoRender();
+		else {
+			$this->view->valid = FALSE;
+			$this->view->username = $_user;
+		}
 	}
 }
