@@ -24,7 +24,8 @@
 /**
  * The default controller for the Admin module
  */
-class Admin_IndexController extends Zend_Controller_Action{
+class Admin_IndexController extends Zend_Controller_Action
+{
 	public function indexAction()
 	{
 		// TODO implement actions
@@ -32,14 +33,15 @@ class Admin_IndexController extends Zend_Controller_Action{
 	public function loginAction()
 	{
 		// TODO implement login
-		$_user = $this->getRequest()->getParam('username');
-		$_password = trim($this->getRequest()->getParam('password'));
+		$this->_helper->viewRenderer->setNoRender();
+		$_user = $this->_getParam('username');
+		$_password = trim($this->_getParam('password'));
 		$Auth = new Admin_Model_Authentication();
-		if($Auth->checkPassword($_user, $_password))
-			$this->_helper->viewRenderer()->setNoRender();
+		if($Auth->checkPassword($_user, $_password)) return TRUE;
 		else {
 			$this->view->valid = FALSE;
 			$this->view->username = $_user;
+			$this->render('login');
 		}
 	}
 }

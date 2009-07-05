@@ -44,11 +44,11 @@ class Api_WeatherController extends Zend_Controller_Action
 	{
 		// don't let Zend Framework render a view
 		$this->_helper->viewRenderer->setNoRender();
-		$YWeather = new Api_Model_YWeather($this->getRequest()->getParam('location'));
+		$YWeather = new Api_Model_YWeather($this->_getParam('location'));
 		// authenticate the request
 		$Authenticator = new Api_Model_Authenticator();
-		$sys_name = $this->getRequest()->getParam('sys_name');
-		$signature = $this->getRequest()->getParam('sig');
+		$sys_name = $this->_getParam('sys_name');
+		$signature = $this->_getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// target format: CC TT\nSL DESCRIPTION
 			$this->getResponse()->setHeader('Content-Type', 'text/plain', true)
@@ -73,15 +73,15 @@ class Api_WeatherController extends Zend_Controller_Action
 	{
 		// don't let Zend Framework render a view
 		$this->_helper->viewRenderer->setNoRender();
-		$YWeather = new Api_Model_YWeather($this->getRequest()->getParam('location'));
+		$YWeather = new Api_Model_YWeather($this->_getParam('location'));
 		// authenticate the request
 		$Authenticator = new Api_Model_Authenticator();
-		$sys_name = $this->getRequest()->getParam('sys_name');
-		$signature = $this->getRequest()->getParam('sig');
+		$sys_name = $this->_getParam('sys_name');
+		$signature = $this->_getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
 			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
 			// target format: CC HI LO\nSL DESCRIPTION 
-			switch ($this->getRequest()->getParam('day')) {
+			switch ($this->_getParam('day')) {
 				case 1:
 					$this->getResponse()->setBody(
 						$YWeather->forecast(1, 'code') . ' '
@@ -131,10 +131,8 @@ class Api_WeatherController extends Zend_Controller_Action
 	{
 		// don't let Zend Framework render a view
 		$this->_helper->viewRenderer->setNoRender();
-		$_code = '34';
-		if($this->getRequest()->getParam('code')) {
-			$_code = $this->getRequest()->getParam('code');
-		} elseif($this->getRequest()->getParam('location')) {
+		$_code = ($this->_getParam('code')) ? $this->_getParam('code') : '34';
+		if($this->getRequest()->getParam('location')) {
 			$YWeather = new Api_Model_YWeather($this->getRequest()->getParam('location'));
 			$_code = $YWeather->conditions('code');
 			unset($YWeather);
