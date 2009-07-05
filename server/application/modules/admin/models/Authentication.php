@@ -75,8 +75,8 @@ class Admin_Model_Authentication
 	{
 		$query = $this->db->quoteInto('SELECT id,password FROM dui_users WHERE username = ? LIMIT 1', $_user);
 		$result = $this->db->fetchAssoc($query);
-		$user_id = $result[0]['id'];
-		$stored_hash = $result[0]['password'];
+		$user_id = $result[1]['id'];
+		$stored_hash = $result[1]['password'];
 		if($this->PasswordHash->CheckPassword($_password, $stored_hash)) {
 			return (int) $user_id;
 		} else return FALSE;
