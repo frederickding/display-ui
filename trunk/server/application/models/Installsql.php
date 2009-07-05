@@ -31,6 +31,10 @@ class Default_Model_Installsql
 	private $_username;
 	private $_password;
 	private $_dbname;
+	/**
+	 * A connection to the database
+	 * @var
+	 */
 	private $db;
 	/**
 	 * Initializes private class variables
@@ -119,7 +123,8 @@ class Default_Model_Installsql
 				null, array(
 				'allowModifications' => true
 		));
-
+		
+		// load all the values from the variables in this class
 		$config->production->server->db->hostname = $this->_host;
 		$config->production->server->db->username = $this->_username;
 		$config->production->server->db->password = $this->_password;
@@ -155,6 +160,7 @@ class Default_Model_Installsql
 	 */
 	public function insertFirstUser($_username, $_password, $_email)
 	{
+		// initialize the PHPass class
 		$PasswordHash = new Default_Model_PasswordHash(8, TRUE);
 		$this->db->insert('dui_users', array(
 			'username' => $_username,
