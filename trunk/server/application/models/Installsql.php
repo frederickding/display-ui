@@ -167,7 +167,7 @@ class Default_Model_Installsql
 			'password' => $PasswordHash->HashPassword($_password),
 			'email' => $_email,
 			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
-			'acl_role' => 'administrator'
+			'acl_role' => 'admin'
 		));
 		if($this->db->lastInsertId()==1) return TRUE;
 		else return FALSE;
