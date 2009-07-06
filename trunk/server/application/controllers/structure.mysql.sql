@@ -2,8 +2,6 @@
 -- SQL database structure for Display UI Server
 -- -----------------------------------------------------------------------------
 
--- SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
 --
 -- Table structure for table `dui_users`
 --
@@ -29,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `dui_clients` (
   `id`			int(10) unsigned NOT NULL auto_increment,
   `sys_name`	varchar(64) NOT NULL,
   `last_active`	datetime NOT NULL,
-  `admin`		int(11) NOT NULL,
+  `admin`		int(10) unsigned NOT NULL,
   `users`		varchar(64) NOT NULL,
   `location`	varchar(16) NOT NULL,
   PRIMARY KEY  (`id`)
@@ -48,7 +46,8 @@ CREATE TABLE IF NOT EXISTS `dui_headlines` (
   `type`		varchar(32) NOT NULL,
   `clients`		varchar(32) NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `title` (`title`,`type`)
+  KEY `title` (`title`),
+  KEY `type` (`type`)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
@@ -59,8 +58,8 @@ DROP TABLE IF EXISTS `dui_options`;
 CREATE TABLE IF NOT EXISTS `dui_options` (
   `id`			int(10) unsigned NOT NULL auto_increment,
   `option_name`	varchar(64) NOT NULL,
-  `option_value` longtext NOT NULL,
-  `client_id`	int(11) NOT NULL,
+  `option_value` mediumtext NOT NULL,
+  `client_id`	int(10) unsigned NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `option_name` (`option_name`)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -75,11 +74,12 @@ CREATE TABLE IF NOT EXISTS `dui_media` (
   `title`		varchar(64) NOT NULL,
   `activates`	datetime NOT NULL,
   `expires`		datetime NOT NULL,
-  `active`		tinyint NOT NULL,
+  `active`		tinyint(1) NOT NULL,
   `type`		varchar(32) NOT NULL,
-  `clients`		int(10) NOT NULL,
+  `clients`		varchar(64) NOT NULL,
   `weight`		smallint NOT NULL,
-  `content`		blob NOT NULL,
+  `content`		varchar(128) NOT NULL,
+  `data`		mediumblob NULL,
   PRIMARY KEY (`id`),
   KEY `title` (`title`)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -93,9 +93,9 @@ CREATE TABLE IF NOT EXISTS `dui_playlists` (
   `id`			int(10) unsigned NOT NULL auto_increment,
   `generated`	datetime NOT NULL,
   `revision`	tinyint NOT NULL,
-  `client`		int(10) NOT NULL,
+  `client`		int(10) unsigned NOT NULL,
   `played`		datetime NOT NULL,
-  `content`		text NOT NULL,
+  `content`		mediumtext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `client` (`client`)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

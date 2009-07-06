@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `dui_users`;
 CREATE TABLE IF NOT EXISTS `dui_users` (
-  `id`			int(10) NOT NULL PRIMARY KEY,
+  `id`			integer PRIMARY KEY AUTOINCREMENT,
   `username`	varchar(64) NOT NULL,
   `password`	varchar(64) NOT NULL,
   `email`		varchar(128) NOT NULL,
@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS `dui_users` (
 
 DROP TABLE IF EXISTS `dui_clients`;
 CREATE TABLE IF NOT EXISTS `dui_clients` (
-  `id`			int(10) NOT NULL PRIMARY KEY,
+  `id`			integer PRIMARY KEY AUTOINCREMENT,
   `sys_name`	varchar(64) NOT NULL,
   `last_active`	datetime NOT NULL,
-  `admin`		int(11) NOT NULL,
+  `admin`		integer NOT NULL,
   `users`		varchar(64) NOT NULL,
   `location`	varchar(16) NOT NULL
 );
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `dui_clients` (
 
 DROP TABLE IF EXISTS `dui_headlines`;
 CREATE TABLE IF NOT EXISTS `dui_headlines` (
-  `id`			int(10) NOT NULL PRIMARY KEY,
+  `id`			integer PRIMARY KEY AUTOINCREMENT,
   `title`		varchar(256) NOT NULL,
   `active`		tinyint(1) NOT NULL,
   `expires`		datetime NOT NULL,
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS `dui_headlines` (
 
 DROP TABLE IF EXISTS `dui_options`;
 CREATE TABLE IF NOT EXISTS `dui_options` (
-  `id`			int(10) NOT NULL PRIMARY KEY,
+  `id`			integer PRIMARY KEY AUTOINCREMENT,
   `option_name`	varchar(64) NOT NULL,
-  `option_value` longtext NOT NULL,
-  `client_id`	int(11) NOT NULL
+  `option_value` mediumtext NOT NULL,
+  `client_id`	integer NOT NULL
 );
 
 --
@@ -54,15 +54,16 @@ CREATE TABLE IF NOT EXISTS `dui_options` (
 
 DROP TABLE IF EXISTS `dui_media`;
 CREATE TABLE IF NOT EXISTS `dui_media` (
-  `id`			int(10) NOT NULL PRIMARY KEY,
+  `id`			integer PRIMARY KEY AUTOINCREMENT,
   `title`		varchar(64) NOT NULL,
   `activates`	datetime NOT NULL,
   `expires`		datetime NOT NULL,
   `active`		tinyint NOT NULL,
   `type`		varchar(32) NOT NULL,
-  `clients`		int(10) NOT NULL,
+  `clients`		varchar(64) NOT NULL,
   `weight`		smallint NOT NULL,
-  `content`		blob NOT NULL
+  `content`		varchar(128) NOT NULL,
+  `data`		mediumblob NULL
 );
 
 --
@@ -71,10 +72,10 @@ CREATE TABLE IF NOT EXISTS `dui_media` (
 
 DROP TABLE IF EXISTS `dui_playlists`;
 CREATE TABLE IF NOT EXISTS `dui_playlists` (
-  `id`			int(10) NOT NULL PRIMARY KEY,
+  `id`			integer PRIMARY KEY AUTOINCREMENT,
   `generated`	datetime NOT NULL,
   `revision`	tinyint NOT NULL,
-  `client`		int(10) NOT NULL,
+  `client`		integer NOT NULL,
   `played`		datetime NOT NULL,
-  `content`		text NOT NULL
+  `content`		mediumtext NOT NULL
 );
