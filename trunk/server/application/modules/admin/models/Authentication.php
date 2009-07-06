@@ -33,7 +33,7 @@ class Admin_Model_Authentication
 	private $dbconfig;
 	/**
 	 * An instance of the PasswordHash class
-	 * @var
+	 * @var PasswordHash
 	 */
 	private $PasswordHash;
 	/**
@@ -69,7 +69,7 @@ class Admin_Model_Authentication
 	 * Checks whether the provided user's password is valid
 	 * @param string $_user
 	 * @param string $_password
-	 * @return boolean|int
+	 * @return boolean|int On true, returns User ID
 	 */
 	public function checkPassword($_user, $_password)
 	{
@@ -82,7 +82,7 @@ class Admin_Model_Authentication
 	/**
 	 * Checks whether a given user exists
 	 * @param string $_user
-	 * @return boolean|int
+	 * @return boolean|int On true, returns User ID
 	 */
 	public function userExists($_user)
 	{
@@ -96,7 +96,7 @@ class Admin_Model_Authentication
 	 * @param string $_user
 	 * @param string $_oldpass
 	 * @param string $_newpass
-	 * @return boolean|int
+	 * @return boolean
 	 */
 	public function changePassword($_user, $_oldpass, $_newpass)
 	{
@@ -110,5 +110,17 @@ class Admin_Model_Authentication
 			);
 			return $this->db->update('dui_users', $query, 'id = '.$result1);
 		} else return FALSE;
+	}
+	/**
+	 * Finds the ACL role of the given user
+	 * @param string $_user
+	 * @return string one of 'publisher', 'it' or 'admin', or when not found, ''
+	 */
+	public function userRole($_user)
+	{
+		$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$result = $this->db->fetchOne($query);
+		if(!is_empty($result)) return $result;
+		else return '';
 	}
 }
