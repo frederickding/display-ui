@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `dui_options` (
   `id`			integer PRIMARY KEY AUTOINCREMENT,
   `option_name`	varchar(64) NOT NULL,
   `option_value` mediumtext NOT NULL,
-  `client_id`	integer NOT NULL
+  `client_id`	integer NOT NULL DEFAULT 0
 );
 
 --
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `dui_media` (
   `active`		tinyint NOT NULL,
   `type`		varchar(32) NOT NULL,
   `clients`		varchar(64) NOT NULL,
-  `weight`		smallint NOT NULL,
+  `weight`		smallint NOT NULL DEFAULT 1,
   `content`		varchar(128) NOT NULL,
   `data`		mediumblob NULL
 );
@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS `dui_playlists`;
 CREATE TABLE IF NOT EXISTS `dui_playlists` (
   `id`			integer PRIMARY KEY AUTOINCREMENT,
   `generated`	datetime NOT NULL,
-  `revision`	tinyint NOT NULL,
+  `revision`	tinyint NOT NULL DEFAULT 1,
   `client`		integer NOT NULL,
   `played`		datetime NOT NULL,
   `content`		mediumtext NOT NULL
