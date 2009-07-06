@@ -30,18 +30,4 @@ class Admin_IndexController extends Zend_Controller_Action
 	{
 		// TODO implement actions
 	}
-	public function loginAction()
-	{
-		// TODO implement login
-		$this->_helper->viewRenderer->setNoRender();
-		$_user = $this->_getParam('username');
-		$_password = trim($this->_getParam('password'));
-		$Auth = new Admin_Model_Authentication();
-		if($Auth->checkPassword($_user, $_password)) return TRUE;
-		else {
-			$this->view->valid = FALSE;
-			$this->view->username = $_user;
-			$this->render('login');
-		}
-	}
 }
