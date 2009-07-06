@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `dui_options` (
   `id`			int(10) unsigned NOT NULL auto_increment,
   `option_name`	varchar(64) NOT NULL,
   `option_value` mediumtext NOT NULL,
-  `client_id`	int(10) unsigned NOT NULL,
+  `client_id`	int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY  (`id`),
   KEY `option_name` (`option_name`)
 ) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `dui_media` (
   `active`		tinyint(1) NOT NULL,
   `type`		varchar(32) NOT NULL,
   `clients`		varchar(64) NOT NULL,
-  `weight`		smallint NOT NULL,
+  `weight`		smallint NOT NULL DEFAULT 1,
   `content`		varchar(128) NOT NULL,
   `data`		mediumblob NULL,
   PRIMARY KEY (`id`),
@@ -92,7 +92,7 @@ DROP TABLE IF EXISTS `dui_playlists`;
 CREATE TABLE IF NOT EXISTS `dui_playlists` (
   `id`			int(10) unsigned NOT NULL auto_increment,
   `generated`	datetime NOT NULL,
-  `revision`	tinyint NOT NULL,
+  `revision`	tinyint NOT NULL DEFAULT 1,
   `client`		int(10) unsigned NOT NULL,
   `played`		datetime NOT NULL,
   `content`		mediumtext NOT NULL,
