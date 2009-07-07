@@ -26,22 +26,32 @@
  */
 class Admin_LoginController extends Zend_Controller_Action
 {
+	public function init()
+	{
+		if(strpos($_SERVER['REQUEST_URI'], 'index')===FALSE) {
+			$this->base_uri = rtrim($_SERVER['REQUEST_URI'],'/');
+		} else {
+			$this->base_uri = explode('/index', $_SERVER['REQUEST_URI']);
+			$this->base_uri = $this->base_uri[0];
+		}
+		// initiate a session for the installer
+		$this->session = new Zend_Session_Namespace('auth');
+	}
 	public function indexAction()
 	{
-		// TODO implement login
+		$this->view->base_uri = $this->base_uri;
+	}
+	public function submitAction()
+	{
 		$this->_helper->viewRenderer->setNoRender();
 		$_user = $this->_getParam('username');
 		$_password = trim($this->_getParam('password'));
 		$Auth = new Admin_Model_Authentication();
-		if($Auth->checkPassword($_user, $_password)) return TRUE;
+		if($Auth->checkPassword($_user, $_password)) echo TRUE;
 		else {
 			$this->view->valid = FALSE;
 			$this->view->username = $_user;
-			$this->render('login');
+			$this->_forward('index');
 		}
-	}
-	public function loginAction()
-	{
-		// TODO implement something
 	}
 }
