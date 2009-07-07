@@ -74,15 +74,13 @@ class Admin_Model_Acl
 		$this->acl->allow('publisher', array(
 			'headlines',
 			'multimedia'
-		), array('view', 'add', 'edit', 'delete'));
+		));
 		$this->acl->allow('publisher', 'clients', 'view');
 		$this->acl->allow('it', array(
 			'options',
 			'users',
-			'clients'
-		), array('view', 'add', 'edit', 'delete'));
-		$this->acl->allow('it', 'backuprestore', array(
-			'view', 'make', 'delete', 'restore'
+			'clients',
+			'backuprestore'
 		));
 		$this->acl->allow('it', array('headlines', 'multimedia'), 'view');
 		$this->acl->allow('admin');
@@ -113,6 +111,28 @@ class Admin_Model_Acl
 	 */
 	public function dump()
 	{
-		return $this->acl->_getRoleRegistry();
+		$resources = array(
+			'backend',
+			'headlines',
+			'multimedia',
+			'options',
+			'users',
+			'clients',
+			'backuprestore'
+		);
+		$dump = '';
+		foreach($resources as $resource) {
+			$dump .= "PUBLISHER GROUP $resource\n";
+			$dump .= $this->acl->isAllowed('publisher', $resource) ? "allowed\n" : "denied\n";
+		}
+		foreach($resources as $resource) {
+			$dump .= "IT GROUP $resource\n";
+			$dump .= $this->acl->isAllowed('it', $resource) ? "allowed\n" : "denied\n";
+		}
+		foreach($resources as $resource) {
+			$dump .= "ADMIN GROUP $resource\n";
+			$dump .= $this->acl->isAllowed('admin', $resource) ? "allowed\n" : "denied\n";
+		}
+		return $dump;
 	}
 }
