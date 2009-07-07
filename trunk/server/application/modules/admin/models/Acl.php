@@ -108,10 +108,10 @@ class Admin_Model_Acl
 	}
 	/**
 	 * Returns true if given role has access to the specified resource/privilege
-     * @param  Zend_Acl_Role_Interface|string
-     * @param  Zend_Acl_Resource_Interface|string
-     * @param  string
-     * @return boolean
+	 * @param  Zend_Acl_Role_Interface|string
+	 * @param  Zend_Acl_Resource_Interface|string
+	 * @param  string
+	 * @return boolean
 	 */
 	public function isAllowed($_role, $_resource, $_privilege = NULL)
 	{
