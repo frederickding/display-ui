@@ -36,7 +36,7 @@ class Admin_LoginController extends Zend_Controller_Action
 	public function indexAction()
 	{
 		$this->view->base_uri = $this->base_uri;
-		$_user = addslashes($this->_getParam('username'));
+		$this->view->username = addslashes($this->_getParam('username'));
 	}
 	public function submitAction()
 	{
