@@ -54,6 +54,10 @@ class Admin_LoginController extends Zend_Controller_Action
 	}
 	public function logoutAction()
 	{
+		if(strpos($_SERVER['REQUEST_URI'], 'logout') !== FALSE) {
+			$this->base_uri = explode('/admin/logout', $_SERVER['REQUEST_URI']);
+			$this->base_uri = $this->base_uri[0];
+		}
 		$this->session->authenticated = FALSE;
 		$this->view->base_uri = $this->base_uri;
 	}
