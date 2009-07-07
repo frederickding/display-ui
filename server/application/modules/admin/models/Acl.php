@@ -70,19 +70,26 @@ class Admin_Model_Acl
 	 */
 	private function addAllows()
 	{
+		// all authenticated users can use the backend
 		$this->acl->allow(array('publisher','it','admin'), 'backend');
+		// publisher can view, add, edit and delete; hence no privileges enumerated
 		$this->acl->allow('publisher', array(
 			'headlines',
 			'multimedia'
 		));
+		// give view-only privilege for clients resource
 		$this->acl->allow('publisher', 'clients', 'view');
+		// IT can view, add, edit, delete options, users and clients
+		// IT can also view, make and restore backups
 		$this->acl->allow('it', array(
 			'options',
 			'users',
 			'clients',
 			'backuprestore'
 		));
+		// give view-only privilege for headlines and multimedia
 		$this->acl->allow('it', array('headlines', 'multimedia'), 'view');
+		// admin can do everything
 		$this->acl->allow('admin');
 	}
 	/**
@@ -90,9 +97,13 @@ class Admin_Model_Acl
 	 */
 	private function addDenys()
 	{
+		// deny publishers all access to backup/restore functionality
 		$this->acl->deny('publisher', 'backuprestore', NULL)
+		// deny publishers write access to client system info
 				  ->deny('publisher', 'clients', array('add', 'edit', 'delete'))
+		// deny publishers access to users resource
 				  ->deny('publisher', 'users', NULL)
+		// deny IT write access to content functionality
 				  ->deny('it', array('headlines', 'multimedia'), array('add', 'edit', 'delete'));
 	}
 	/**
