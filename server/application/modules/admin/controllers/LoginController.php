@@ -44,10 +44,11 @@ class Admin_LoginController extends Zend_Controller_Action
 		$_user = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 		$_password = trim($this->_getParam('password'));
 		$Auth = new Admin_Model_Authentication();
-		if($Auth->checkPassword($_user, $_password)) echo TRUE;
-		else {
-			$this->view->valid = FALSE;
-			$this->view->username = $_user;
+		if($Auth->checkPassword($_user, $_password)) {
+			$this->session->authenticated = TRUE;
+			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/');
+		} else {
+			$this->session->authenticated = FALSE;
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/login/?username='.$_user);
 		}
 	}

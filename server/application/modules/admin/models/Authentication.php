@@ -113,12 +113,16 @@ class Admin_Model_Authentication
 	}
 	/**
 	 * Finds the ACL role of the given user
-	 * @param string $_user
+	 * @param string|int $_user
 	 * @return string one of 'publisher', 'it' or 'admin', or when not found, ''
 	 */
 	public function userRole($_user)
 	{
-		$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		if(is_int($_user)) {
+			$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE id = ? LIMIT 1', $_user);
+		} else {
+			$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		}
 		$result = $this->db->fetchOne($query);
 		if(!is_empty($result)) return $result;
 		else return '';
