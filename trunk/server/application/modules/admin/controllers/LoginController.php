@@ -36,12 +36,12 @@ class Admin_LoginController extends Zend_Controller_Action
 	public function indexAction()
 	{
 		$this->view->base_uri = $this->base_uri;
-		$this->view->username = addslashes($this->_getParam('username'));
+		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 	}
 	public function submitAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
-		$_user = addslashes($this->_getParam('username'));
+		$_user = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 		$_password = trim($this->_getParam('password'));
 		$Auth = new Admin_Model_Authentication();
 		if($Auth->checkPassword($_user, $_password)) echo TRUE;
