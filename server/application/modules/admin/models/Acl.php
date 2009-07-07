@@ -144,6 +144,10 @@ class Admin_Model_Acl
 			$dump .= "ADMIN GROUP $resource\n";
 			$dump .= $this->acl->isAllowed('admin', $resource) ? "allowed\n" : "denied\n";
 		}
+		$dump .= "PUBLISHER GROUP clients.view\n"
+				.($this->acl->isAllowed('publisher', 'clients', 'view') ? "allowed\n" : "denied\n");
+		$dump .= "IT GROUP headlines.view\n"
+				.($this->acl->isAllowed('it', 'headlines', 'view') ? "allowed\n" : "denied\n");
 		return $dump;
 	}
 }
