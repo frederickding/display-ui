@@ -52,4 +52,9 @@ class Admin_LoginController extends Zend_Controller_Action
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/login/?username='.$_user);
 		}
 	}
+	public function logoutAction()
+	{
+		$this->session->authenticated = FALSE;
+		$this->view->base_uri = $this->base_uri;
+	}
 }
