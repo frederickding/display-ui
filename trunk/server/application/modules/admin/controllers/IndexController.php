@@ -26,8 +26,19 @@
  */
 class Admin_IndexController extends Zend_Controller_Action
 {
+	public function init()
+	{
+		$this->base_uri = explode('/admin', $_SERVER['REQUEST_URI']);
+		$this->base_uri = $this->base_uri[0];
+		// initiate a session for the installer
+		$this->auth_session = new Zend_Session_Namespace('auth');
+	}
 	public function indexAction()
 	{
 		// TODO implement actions
+		$this->_helper->viewRenderer->setNoRender();
+		if(!$this->auth_session->authenticated) {
+			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/login/');
+		}
 	}
 }
