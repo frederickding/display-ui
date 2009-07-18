@@ -1,0 +1,26 @@
+#summary The minimum requirements to run the software.
+
+= System Requirements =
+
+== Server ==
+The Display UI server is powered by PHP, and requires the following components, at minimum:
+  * PHP 5.2
+   * Hash extension
+   * cURL (or sockets)
+   * PDO (or MySQLi)
+   * Safe mode off
+   * Output buffering off
+  * Apache 2.2
+  * MySQL 5.0
+
+The server software _must be able to write to the filesystem_, especially the `application/configs` and cache directories.
+
+Additionally, we recommend a setup with the following configuration:
+  * Alternative PHP Cache
+
+== Client ==
+
+The Display UI client is built in C/C++ and GDI, and has only been tested with the following prerequisites:
+  * Windows XP or Server 2003, Windows Vista or Server 2008, Windows 7
+  * Broadband Internet connection
+  * 1280x720 screen resolution
