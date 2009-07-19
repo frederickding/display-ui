@@ -49,7 +49,6 @@ class Api_Model_Headlines {
 	}
 	public function fetch($_number = 25, $_sys_name, $_type = NULL)
 	{
-		$_number = (int) $_number;
 		if(is_null($_type)) {
 		$result = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
@@ -68,7 +67,6 @@ class Api_Model_Headlines {
 	}
 	public function fetchConcatenated($_number = 25, $_sys_name, $_type = NULL)
 	{
-		$_number = (int) $_number;
 		if(is_null($_type)) {
 		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
