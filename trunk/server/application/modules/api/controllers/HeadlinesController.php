@@ -49,10 +49,10 @@ class Api_HeadlinesController extends Zend_Controller_Action {
 			$type = (!empty($_REQUEST['type'])) ? trim($this->_getParam('type')) : NULL;
 			// let's prepare the headlines
 			$HeadlinesModel = new Api_Model_Headlines();
-			$headlines = $HeadlinesModel->fetchConcatenated($number, $sys_name, $type);
 			// target format: HEADLINE | HEADLINE | HEADLINE ...
+			$headlines = $HeadlinesModel->fetchConcatenated($number, $sys_name, $type);
 			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-								->setBody(iconv('UTF-8', 'UTF-16LE', $headlines));
+			->setBody(iconv('UTF-8', 'UTF-16LE', $headlines));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
