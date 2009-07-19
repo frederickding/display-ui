@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `dui_headlines` (
   `active`		tinyint(1) NOT NULL,
   `expires`		datetime NOT NULL,
   `type`		varchar(32) NOT NULL,
-  `clients`		varchar(32) NOT NULL,
+  `clients`		varchar(32) NULL,
   PRIMARY KEY  (`id`),
   KEY `title` (`title`),
   KEY `type` (`type`)
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `dui_media` (
   `expires`		datetime NOT NULL,
   `active`		tinyint(1) NOT NULL,
   `type`		varchar(32) NOT NULL,
-  `clients`		varchar(64) NOT NULL,
+  `clients`		varchar(64) NULL,
   `weight`		smallint NOT NULL DEFAULT 1,
   `content`		varchar(128) NOT NULL,
   `data`		mediumblob NULL,
