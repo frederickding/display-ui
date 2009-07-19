@@ -41,7 +41,7 @@ class Api_HeadlinesController extends Zend_Controller_Action {
 		$sys_name = $this->_getParam('sys_name');
 		$signature = $this->_getParam('sig');
 		$number = (int) $this->_getParam('number');
-		$type = (!empty($this->_getParam('type'))) ? trim($this->_getParam('type')) : NULL;
+		$type = (!empty($_REQUEST['type'])) ? trim($this->_getParam('type')) : NULL;
 		
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// we don't need $signature or the Authenticator model anymore
