@@ -45,7 +45,7 @@ class Api_HeadlinesController extends Zend_Controller_Action {
 			// we don't need $signature or the Authenticator model anymore
 			unset($signature, $Authenticator);
 			// get some more variables
-			$number = (int) $this->_getParam('number');
+			$number = (!empty($_REQUEST['number'])) ? (int) $this->_getParam('number') : NULL;
 			$type = (!empty($_REQUEST['type'])) ? trim($this->_getParam('type')) : NULL;
 			// let's prepare the headlines
 			$HeadlinesModel = new Api_Model_Headlines();
