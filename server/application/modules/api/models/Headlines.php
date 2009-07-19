@@ -39,9 +39,11 @@ class Api_Model_Headlines {
 			$this->db->getConnection();
 		} catch (Zend_Db_Adapter_Exception $e) {
 			$this->db = FALSE;
+			die('Could not connect to database');
 			// couldn't connect
 		} catch (Zend_Exception $e) {
 			$this->db = FALSE;
+			die('Could not connect to database');
 			// couldn't load Adapter class
 		}
 	}
@@ -71,6 +73,7 @@ class Api_Model_Headlines {
 		foreach($headlines as $headline) {
 			$result .= $headline . '  |  ';
 		}
+		$result = substr($result, 0, -5);
 		return $result;
 	}
 }

@@ -52,7 +52,8 @@ class Api_HeadlinesController extends Zend_Controller_Action {
 			$headlines = $HeadlinesModel->fetchConcatenated($number, $sys_name, $type);
 			// target format: HEADLINE | HEADLINE | HEADLINE ...
 			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-								->setBody(iconv('UTF-8', 'UTF-16LE', $headlines));
+								//->setBody(iconv('UTF-8', 'UTF-16LE', $headlines));
+								->setBody($headlines);
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
