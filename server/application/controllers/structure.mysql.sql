@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `dui_headlines` (
   `active`		tinyint(1) NOT NULL,
   `expires`		datetime NOT NULL,
   `type`		varchar(32) NOT NULL,
-  `clients`		varchar(32) NULL,
+  `client`		int(10) unsigned NULL,
   PRIMARY KEY  (`id`),
   KEY `title` (`title`),
   KEY `type` (`type`)
