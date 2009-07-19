@@ -50,6 +50,7 @@ class Api_Model_Headlines {
 	public function fetch($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (int) $_number;
+		$this->db->setFetchMode(Zend_Db::FETCH_COLUMN);
 		if(is_null($_type)) {
 		$result = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
@@ -68,7 +69,22 @@ class Api_Model_Headlines {
 	}
 	public function fetchConcatenated($_number = 25, $_sys_name, $_type = NULL)
 	{
-		$headlines = $this->fetch($_number, $_sys_name, $_type);
+		$_number = (int) $_number;
+		$this->db->setFetchMode(Zend_Db::FETCH_COLUMN);
+		if(is_null($_type)) {
+		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
+			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
+			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
+			.' AND (c.`sys_name` = \'?\' OR h.`client` IS NULL)'
+			.' ORDER BY RAND() LIMIT '.$_number, $_sys_name);
+		} else {
+		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
+			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
+			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
+			.' AND h.`type` = '.$this->db->quote($_type)
+			.' AND (c.`sys_name` = \'?\' OR h.`client` IS NULL)'
+			.' ORDER BY RAND() LIMIT '.$_number, $_sys_name);
+		}
 		$result = '';
 		foreach($headlines as $headline) {
 			$result .= $headline . '  |  ';
