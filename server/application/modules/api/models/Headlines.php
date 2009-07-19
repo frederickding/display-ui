@@ -54,14 +54,14 @@ class Api_Model_Headlines {
 		$result = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
 			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
-			.' AND (c.`sys_name` = '.$_sys_name.' OR h.`client` IS NULL)'
+			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
 			.' ORDER BY RAND() LIMIT '.$_number);
 		} else {
 		$result = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
 			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
 			.' AND h.`type` = '.$this->db->quote($_type)
-			.' AND (c.`sys_name` = '.$_sys_name.' OR h.`client` IS NULL)'
+			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
 			.' ORDER BY RAND() LIMIT '.$_number);
 		}
 		return $result;
@@ -73,14 +73,14 @@ class Api_Model_Headlines {
 		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
 			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
-			.' AND (c.`sys_name` = '.$_sys_name.' OR h.`client` IS NULL)'
+			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
 			.' ORDER BY RAND() LIMIT '.$_number);
 		} else {
 		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
 			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
 			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
 			.' AND h.`type` = '.$this->db->quote($_type)
-			.' AND (c.`sys_name` = '.$_sys_name.' OR h.`client` IS NULL)'
+			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
 			.' ORDER BY RAND() LIMIT '.$_number);
 		}
 		$result = '';
