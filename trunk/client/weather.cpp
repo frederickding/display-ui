@@ -1,4 +1,4 @@
-
+#include <windows.h>
 #include <urlmon.h>
 #include <stdio.h>
 #include <time.h>
@@ -18,7 +18,8 @@ void weather_init(){
 	memset(forecast[0], 0, sizeof(weather_fc_t));
 	memset(forecast[1], 0, sizeof(weather_fc_t));
 
-	weather_update(NULL);
+
+	//weather_update(NULL);
 }
 
 void weather_exit(){
@@ -113,7 +114,10 @@ unsigned long weather_update(void *p){
 			return 1;
 		}
 	}
-
+	RECT rt;
+	rt.top = 112; rt.left = 980; rt.right = 1280; rt.bottom = 664;
+	InvalidateRect((HWND) p, &rt, false);
+	
 	return 0;
 }
 
