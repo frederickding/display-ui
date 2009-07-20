@@ -29,13 +29,39 @@ VOID RepaintContent(HDC hdc);
 ULONG_PTR gdiplusToken;
 LPVOID pHeaderImage;
 
-unsigned short *headline_txt = L"Random headline text  |  Blah blah blah ... | asdf ak sdfkj sdfkj sdkj | The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit. Quisque commodo ornare tincidunt. In quis felis et lectus laoreet tempus pellentesque elementum nunc. Donec eu leo lectus. Phasellus iaculis dignissim lacinia. Sed vitae turpis in est condimentum aliquet at a nisl.";
+unsigned short *headline_txt = NULL; //L"Random headline text  |  Blah blah blah ... | asdf ak sdfkj sdfkj sdkj | The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit. Quisque commodo ornare tincidunt. In quis felis et lectus laoreet tempus pellentesque elementum nunc. Donec eu leo lectus. Phasellus iaculis dignissim lacinia. Sed vitae turpis in est condimentum aliquet at a nisl.";
 
 Gdiplus::Image *content_bg;
 
 int ticks = 0;
 
 char *sig; // request signature (api key + date)
+
+void update(void *p){
+	weather_update(p);
+	if(download("http://du.geekie.org/server/api/headlines?sys_name=1&sig=%s", "data\\headlines.dat") == S_OK){
+		
+		FILE *fp = fopen("data\\headlines.dat", "r");
+		
+		if(fp){
+			if(headline_txt){
+				free(headline_txt);
+			}
+			fseek(fp, 0, SEEK_END);
+			int size = ftell(fp);
+			fseek(fp, 0, SEEK_SET);
+
+
+			headline_txt = (unsigned short*) malloc(size + 2);
+			memset(headline_txt, 0, size + 2);
+			
+			fread(headline_txt, 1, size, fp);
+
+			
+			fclose(fp);
+		}
+	}
+}
 
 // the entry point for any Windows program
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -84,7 +110,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	sig = (char *) malloc(41);
 	generate_sig();
 	weather_init();
+	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
 	
+
 	content_bg = Gdiplus::Image::FromFile(L"img\\content-bg.jpg");
 
     // enter the main loop:
@@ -140,7 +168,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//ticks++;
 			return 0;
 		}else if(wParam == 2){
-			CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))weather_update, NULL, 0, NULL);
+			CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
 			//weather_update();
 			return 0;
 		}else if(wParam == 3){
@@ -486,6 +514,8 @@ void make_url(char *dest, char *format){
 int download(char *url, char *dest_file){
 	char *full_url = (char *) malloc(strlen(url) + 39);
 	make_url(full_url, url);
+
+	debug_print("%s\n", full_url);
 	int ret = URLDownloadToFile(NULL, full_url, dest_file, 0, NULL);
 	free(full_url);
 
