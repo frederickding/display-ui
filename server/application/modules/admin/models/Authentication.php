@@ -24,46 +24,20 @@
 /**
  * Provides authentication logic for admin interface
  */
-class Admin_Model_Authentication
+class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 {
-	/**
-	 * A database configuration object
-	 * @var
-	 */
-	private $dbconfig;
 	/**
 	 * An instance of the PasswordHash class
 	 * @var PasswordHash
 	 */
 	private $PasswordHash;
 	/**
-	 * A connection to the database
-	 * @var
-	 */
-	private $db;
-	/**
 	 * Sets up the PasswordHash class and the database
 	 */
 	public function __construct()
 	{
 		$this->PasswordHash = new Default_Model_PasswordHash(8, TRUE);
-		$this->dbconfig = new Zend_Config_Ini(CONFIG_DIR.'/database.ini');
-		try {
-			$this->db = Zend_Db::factory($this->dbconfig->production->server->db->driver, array(
-				'host'		=>	$this->dbconfig->production->server->db->hostname,
-				'username'	=>	$this->dbconfig->production->server->db->username,
-				'password'	=>	$this->dbconfig->production->server->db->password,
-				'dbname'	=>	$this->dbconfig->production->server->db->name
-			));
-			$this->db->getConnection();
-		} catch (Zend_Db_Adapter_Exception $e) {
-			$this->db = FALSE;
-			// couldn't connect
-		} catch (Zend_Exception $e) {
-			$this->db = FALSE;
-			// couldn't load Adapter class
-		}
-		unset($this->dbconfig);
+		parent::__construct();
 	}
 	/**
 	 * Checks whether the provided user's password is valid
