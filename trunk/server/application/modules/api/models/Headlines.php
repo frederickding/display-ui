@@ -24,29 +24,8 @@
  /**
  * Provides logic for the Headlines API
  */
-class Api_Model_Headlines {
-	private $db;
-	public function __construct()
-	{
-		$config = new Zend_Config_Ini(CONFIG_DIR.'/database.ini');
-		try {
-			$this->db = Zend_Db::factory($config->production->server->db->driver, array(
-				'host'		=>	$config->production->server->db->hostname,
-				'username'	=>	$config->production->server->db->username,
-				'password'	=>	$config->production->server->db->password,
-				'dbname'	=>	$config->production->server->db->name
-			));
-			$this->db->getConnection();
-		} catch (Zend_Db_Adapter_Exception $e) {
-			$this->db = FALSE;
-			die('Could not connect to database');
-			// couldn't connect
-		} catch (Zend_Exception $e) {
-			$this->db = FALSE;
-			die('Could not connect to database');
-			// couldn't load Adapter class
-		}
-	}
+class Api_Model_Headlines extends Default_Model_DatabaseAbstract
+{
 	public function fetch($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;

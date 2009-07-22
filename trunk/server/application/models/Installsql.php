@@ -24,7 +24,7 @@
 /**
  * Provides database access for the installer
  */
-class Default_Model_Installsql
+class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 {
 	private $_driver;
 	private $_host;
@@ -35,7 +35,7 @@ class Default_Model_Installsql
 	 * A connection to the database
 	 * @var
 	 */
-	private $db;
+	protected $db;
 	/**
 	 * Initializes private class variables
 	 * @param string $_host
@@ -68,22 +68,7 @@ class Default_Model_Installsql
 				// couldn't load Adapter class
 			}
 		} else {
-			$config = new Zend_Config_Ini(CONFIG_DIR.'/database.ini');
-			try {
-				$this->db = Zend_Db::factory($config->production->server->db->driver, array(
-					'host'		=>	$config->production->server->db->hostname,
-					'username'	=>	$config->production->server->db->username,
-					'password'	=>	$config->production->server->db->password,
-					'dbname'	=>	$config->production->server->db->name
-				));
-				$this->db->getConnection();
-			} catch (Zend_Db_Adapter_Exception $e) {
-				$this->db = FALSE;
-				// couldn't connect
-			} catch (Zend_Exception $e) {
-				$this->db = FALSE;
-				// couldn't load Adapter class
-			}
+			parent::__construct();
 		}
 	}
 	/**
@@ -93,7 +78,8 @@ class Default_Model_Installsql
 	public function test()
 	{
 		if($this->db == FALSE) return FALSE;
-		else return TRUE;
+		elseif($this->db->isConnected()) return TRUE;
+		else return FALSE;
 	}
 	/**
 	 * Executes the database structure SQL commands
