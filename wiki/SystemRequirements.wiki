@@ -25,3 +25,6 @@ The Display UI client is built in C/C++ and GDI, and has only been tested with t
   * Windows XP or Server 2003, Windows Vista or Server 2008, Windows 7
   * Broadband Internet connection
   * 1280x720 screen resolution
+
+The client has the following requirements:
+  * DejaVu Sans font, and condensed variant
