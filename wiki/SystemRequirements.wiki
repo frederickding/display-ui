@@ -4,7 +4,7 @@
 
 == Server ==
 The Display UI server is powered by PHP, and requires the following components, at minimum:
-  * PHP 5.2
+  * PHP 5.2.4
    * Hash extension
    * cURL (or sockets)
    * PDO (or MySQLi)
