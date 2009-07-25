@@ -27,4 +27,4 @@ The Display UI client is built in C/C++ and GDI, and has only been tested with t
   * 1280x720 screen resolution
 
 The client has the following requirements:
-  * DejaVu Sans font, and condensed variant
+  * DejaVu Sans font, and condensed and bold variants
