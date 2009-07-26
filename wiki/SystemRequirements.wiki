@@ -1,4 +1,5 @@
 #summary The minimum requirements to run the software.
+#labels Featured,Phase-Deploy
 
 = System Requirements =
 
