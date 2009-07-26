@@ -22,9 +22,12 @@ Additionally, we recommend a setup with the following configuration:
 == Client ==
 
 The Display UI client is built in C/C++ and GDI, and has only been tested with the following prerequisites:
-  * Windows XP or Server 2003, Windows Vista or Server 2008, Windows 7
-  * Broadband Internet connection
-  * 1280x720 screen resolution
 
-The client has the following requirements:
-  * DejaVu Sans font, and condensed and bold variants
+
+||  || *Minimum Requirements* || *Recommended Requirements* ||
+|| *Operating System* || Windows XP or newer ||
+|| *Processor* || 1 GHz || 1.7 GHz or greater ||
+|| *RAM* || 512 MB || 1 GB or greater ||
+|| *Internet Connection* || Dial-up (56.6 Kbps) || Broadband ||
+|| *Screen Resolution* || 1280x720 or greater ||
+|| *Other Requirements* || DejaVu Sans font, and condensed variant ||
