@@ -53,7 +53,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0, 0, 7, 0
+ FILEVERSION 0,0,1,9
  PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
@@ -70,7 +70,7 @@ BEGIN
         BLOCK "100904b0"
         BEGIN
             VALUE "FileDescription", "The client executable which shows the Display UI."
-            VALUE "FileVersion", "0, 0, 7, 0\0"
+            VALUE "FileVersion", "0, 0, 1, 9"
             VALUE "InternalName", "display_ui_client"
             VALUE "LegalCopyright", "Copyright (C) 2009 Kirill Peretoltchine & Frederick Ding."
             VALUE "OriginalFilename", "display_ui.exe"
@@ -107,6 +107,4 @@ IDI_ICON1               ICON                    "icon.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
-
 
