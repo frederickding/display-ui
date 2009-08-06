@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `dui_headlines` (
   `active`		tinyint(1) NOT NULL,
   `expires`		datetime NOT NULL,
   `type`		varchar(32) NOT NULL,
-  `clients`		varchar(32) NOT NULL
+  `clients`		integer NULL
 );
 
 --
@@ -76,6 +76,6 @@ CREATE TABLE IF NOT EXISTS `dui_playlists` (
   `generated`	datetime NOT NULL,
   `revision`	tinyint NOT NULL DEFAULT 1,
   `client`		integer NOT NULL,
-  `played`		datetime NOT NULL,
+  `played`		datetime NULL,
   `content`		mediumtext NOT NULL
 );
