@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `dui_playlists` (
   `generated`	datetime NOT NULL,
   `revision`	tinyint NOT NULL DEFAULT 1,
   `client`		int(10) unsigned NOT NULL,
-  `played`		datetime NOT NULL,
+  `played`		datetime NULL,
   `content`		mediumtext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `client` (`client`)
