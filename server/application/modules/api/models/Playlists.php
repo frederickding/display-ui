@@ -29,7 +29,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	public function fetch($_sys_name)
 	{
 		$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
-		$query = $this->db->quote('SELECT p.`id`, p.`generated`, p.`content`
+		$query = $this->db->quoteInto('SELECT p.`id`, p.`generated`, p.`content`
 			FROM `dui_playlists` AS p 
 			INNER JOIN `dui_clients` AS c ON (p.`client`=c.`id`) 
 			WHERE p.`played` IS NULL 
