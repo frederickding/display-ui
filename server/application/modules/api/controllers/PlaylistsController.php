@@ -40,13 +40,12 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			unset($signature, $Authenticator);
 			// let's prepare the playlists
 			$PlaylistsModel = new Api_Model_Playlists();
-			// target format: ???
-			$playlists = $PlaylistsModel->fetch($sys_name);
-			
-			ob_start();
-			var_dump($playlists);
+			// get the data
+			$raw_data = $PlaylistsModel->fetch($sys_name);
+			// mark it as played in the db
+			$PlaylistsModel->updatePlayed($raw_data[0]);
 			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', ob_get_clean()));
+			->setBody(iconv('UTF-8', 'UTF-16LE', $raw_data[2]));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
