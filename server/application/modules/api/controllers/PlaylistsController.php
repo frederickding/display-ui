@@ -45,7 +45,7 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
 			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', $raw_data[2]));
+			->setBody(iconv('UTF-8', 'UTF-16LE', serialize($raw_data[2])));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
