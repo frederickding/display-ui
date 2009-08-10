@@ -46,7 +46,7 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			ob_start();
 			var_dump($playlists);
 			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', ob_get_contents()));
+			->setBody(iconv('UTF-8', 'UTF-16LE', ob_get_flush()));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
