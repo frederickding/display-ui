@@ -57,7 +57,8 @@ class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 					'host'		=>	$this->_host,
 					'username'	=>	$this->_username,
 					'password'	=>	$this->_password,
-					'dbname'	=>	$this->_dbname
+					'dbname'	=>	$this->_dbname,
+					'charset'	=>	'utf8'
 				));
 				$this->db->getConnection();
 			} catch (Zend_Db_Adapter_Exception $e) {

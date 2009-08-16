@@ -51,7 +51,8 @@ abstract class Default_Model_DatabaseAbstract
 				'host'		=>	$config->production->server->db->hostname,
 				'username'	=>	$config->production->server->db->username,
 				'password'	=>	$config->production->server->db->password,
-				'dbname'	=>	$config->production->server->db->name
+				'dbname'	=>	$config->production->server->db->name,
+				'charset'	=>	'utf8'
 			));
 			$this->db->getConnection();
 			unset($config);
