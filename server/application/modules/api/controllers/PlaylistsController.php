@@ -26,6 +26,25 @@
  */
 class Api_PlaylistsController extends Zend_Controller_Action
 {
+	/**
+	 * 400 error on index action
+	 * 
+	 * For bad API implementations, indicates that the fetch action should be called;
+	 * a 300-series redirect is possible but not preferred, and the _forward()
+	 * internal redirect is also not used.
+	 */
+	public function indexAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$this->getResponse()->setHttpResponseCode(400)
+		->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', TRUE)
+		->setBody(iconv('UTF-8', 'UTF-16LE', 'API method does not exist; try /api/playlists/fetch/'));	
+	}
+	/**
+	 * Fetches an unplayed playlist from the database
+	 * 
+	 * If this is not possible, redirects the client to the generate action.
+	 */
 	public function fetchAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();

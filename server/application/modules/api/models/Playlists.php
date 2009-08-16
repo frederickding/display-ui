@@ -26,16 +26,31 @@
  */
 class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 {
+	/**
+	 * Retrieves one playlist at random from the known, stored playlists
+	 * @param string $_sys_name
+	 * @return array
+	 */
 	public function fetch($_sys_name)
 	{
 		$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
-		$query = $this->db->quoteInto('SELECT p.`id`, p.`generated`, p.`content`
+		$query = $this->db->select()
+				->from(array('p' => 'dui_playlists'),
+					array('id', 'generated', 'content'))
+				->joinInner(array('c' => 'dui_clients'),
+					'p.client = c.id', '')
+				->where('p.played IS NULL')
+				->where('c.sys_name = ? OR p.client IS NULL', $_sys_name)
+				->order('RAND()')
+				->limit(1);
+		$result = $query->query()->fetch();
+		/* $query = $this->db->quoteInto('SELECT p.`id`, p.`generated`, p.`content`
 			FROM `dui_playlists` AS p 
 			INNER JOIN `dui_clients` AS c ON (p.`client`=c.`id`) 
 			WHERE p.`played` IS NULL 
 			AND (c.`sys_name` = ? OR p.`client` IS NULL) 
 			ORDER BY RAND() LIMIT 1', $_sys_name);
-		$result = $this->db->fetchRow($query);
+		$result = $this->db->fetchRow($query); */
 		if(is_string($result->content)) {
 			return array(
 				$result->id,
@@ -44,12 +59,22 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			);
 		} else return FALSE;
 	}
+	/**
+	 * Marks a playlist in the database as played
+	 * by updating the 'played' column with the timestamp of retrieval
+	 * @param int $_id
+	 * @return int The number of rows affected
+	 */
 	public function updatePlayed($_id)
 	{
 		$_id = (int) $_id;
 		$query = array(
 			'played' => new Zend_Db_Expr('UTC_TIMESTAMP()')
 		);
-		$this->db->update('dui_playlists', $query, 'id = '.$_id);
+		return $this->db->update('dui_playlists', $query, 'id = '.$_id);
+	}
+	public function getMedia($_sys_name, $_number = 20)
+	{
+		
 	}
 }
