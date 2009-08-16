@@ -26,42 +26,53 @@
  */
 class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 {
+	/**
+	 * Retrieves the headlines from the database, returns as an array
+	 * @param int $_number [optional]
+	 * @param string $_sys_name
+	 * @param string $_type [optional]
+	 * @return array
+	 */
 	public function fetch($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
-		if(is_null($_type)) {
-		$result = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
-			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
-			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
-			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
-			.' ORDER BY RAND() LIMIT '.$_number);
-		} else {
-		$result = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
-			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
-			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
-			.' AND h.`type` = '.$this->db->quote($_type)
-			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
-			.' ORDER BY RAND() LIMIT '.$_number);
+		$query = $this->db->select()
+					->from(array('h' => 'dui_headlines'), 'title')
+					->joinInner(array('c' => 'dui_clients'),
+						'h.client = c.id OR h.client IS NULL', '')
+					->where('h.active = 1')
+					->where('h.expires > UTC_TIMESTAMP()')
+					->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
+					->order('RAND()')
+					->limit($_number);
+		if(!is_null($_type)) {
+			$query = $query->where($this->db->quoteIdentifier('h.type').' = ?', $_type);
 		}
-		return $result;
+		return $query->query(Zend_Db::FETCH_COLUMN)->fetchAll(Zend_Db::FETCH_COLUMN);
 	}
+	/**
+	 * Retrieves the headlines from the database, creates a | delimited string
+	 * @param int $_number [optional]
+	 * @param string $_sys_name
+	 * @param string $_type [optional]
+	 * @return string
+	 */
 	public function fetchConcatenated($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
-		if(is_null($_type)) {
-		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
-			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
-			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
-			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
-			.' ORDER BY RAND() LIMIT '.$_number);
-		} else {
-		$headlines = $this->db->fetchCol('SELECT h.`title` FROM `dui_headlines` AS h'
-			.' INNER JOIN `dui_clients` AS c ON (h.`client`=c.`id` OR h.`client` IS NULL)'
-			.' WHERE h.`active`=1 AND h.`expires`>UTC_TIMESTAMP()'
-			.' AND h.`type` = '.$this->db->quote($_type)
-			.' AND (c.`sys_name` = '.$this->db->quote($_sys_name).' OR h.`client` IS NULL)'
-			.' ORDER BY RAND() LIMIT '.$_number);
+		$query = $this->db->select()
+					->from(array('h' => 'dui_headlines'), 'title')
+					->joinInner(array('c' => 'dui_clients'),
+						'h.client = c.id OR h.client IS NULL', '')
+					->where('h.active = 1')
+					->where('h.expires > UTC_TIMESTAMP()')
+					->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
+					->order('RAND()')
+					->limit($_number);
+		if(!is_null($_type)) {
+			$query = $query->where($this->db->quoteIdentifier('h.type').' = ?', $_type);
 		}
+		$headlines = $query->query(Zend_Db::FETCH_COLUMN)->fetchAll(Zend_Db::FETCH_COLUMN);
 		$result = '';
 		foreach($headlines as $headline) {
 			$result .= $headline . '  |  ';
