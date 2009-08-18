@@ -49,19 +49,27 @@ class Api_Model_PlaylistItem
 	private $height = 0;
 	private $filename = '';
 	/**
+	 * The ID of the item from the dui_media table
+	 * @var int Unsigned integer
+	 */
+	private $media_id = 0;
+	/**
 	 * Builds a playlist item with the specified type and content
+	 * @param int $media_id
 	 * @param int $type
 	 * @param array $content
 	 * @param int $duration
 	 * @param int $trans
+	 * @return Api_Model_PlaylistItem fluent interface
 	 */
-	public function __construct($type, $content, $duration = 20, $trans = 0)
+	public function __construct($media_id, $type, $content, $duration = 20, $trans = 0)
 	{
+		$this->media_id = $media_id;
 		if(1 <= $type && $type <= 3) {
-			$this->type = $type;
+			$this->type = (int) $type;
 		} else die('Bad type for Api_Playlist_Item.');
 		$this->duration = $duration;
-		$this->transition = $trans;
+		$this->transition = (int) $trans;
 		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
 			$this->width = $content['width'];
 			$this->height = $content['height'];
@@ -69,6 +77,7 @@ class Api_Model_PlaylistItem
 		} elseif($this->type == self::TEXT_TYPE) {
 			$this->filename = $content['filename'];
 		}
+		return $this;
 	}
 	/**
 	 * Produces a binary string containing all necessary item data
@@ -76,9 +85,9 @@ class Api_Model_PlaylistItem
 	 */
 	public function __toString()
 	{
-		$binary = pack('ccv', $this->type, $this->duration, $this->transition);
+		$binary = pack('ccvV', $this->type, $this->duration, $this->transition, $this->media_id);
 		if($this->type == self::IMAGE_TYPE) {
-			$binary .= pack('VvvV', 16 + 2*strlen($this->filename),
+			$binary .= pack('VvvV', 20 + 2*strlen($this->filename),
 						$this->width, $this->height, strlen($this->filename));
 			$binary .= iconv('UTF-8', 'UTF-16LE', $this->filename);
 		}
