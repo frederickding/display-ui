@@ -69,8 +69,8 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			}
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
-			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', serialize($raw_data[2])));
+			$this->getResponse()->setHeader('Content-Type', 'text/plain', true)
+			->setBody(bin2hex($PlaylistsModel->buildBinary($raw_data[2])));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
@@ -96,8 +96,8 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			$raw_data = $PlaylistsModel->fetch($sys_name, $playlist_id);
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
-			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', serialize($raw_data[2])));
+			$this->getResponse()->setHeader('Content-Type', 'text/plain', true)
+			->setBody(bin2hex($PlaylistsModel->buildBinary($raw_data[2])));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
 			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)

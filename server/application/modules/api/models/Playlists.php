@@ -60,7 +60,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			ORDER BY RAND() LIMIT 1', $_sys_name);
 		$result = $this->db->fetchRow($query); */
 		if (is_string($result->content)) {
-			return array($result->id , $result->generated , unserialize($result->content));
+			return array($result->id , $result->generated , $result->content);
 		} else
 			return FALSE;
 	}
@@ -89,7 +89,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
 		$query = $this->db->select()
 				->from(array('m' => 'dui_media'),
-					array('id' , 'type' , 'content' , 'data' => '(data IS NULL)'))
+					array('id' , 'type' , 'content'))
 				->joinInner(array('c' => 'dui_clients'),
 					'm.clients REGEXP CONCAT(\'(^|[0-9]*,)\', c.id, \'(,|$)\')', '')
 				/* (^|[0-9]*,)###(,|$) searches in comma-delimited clients column
@@ -115,8 +115,8 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 		// randomize the media a little bit
 		shuffle($media);
 		/* array is now something like
-		 * [0] => array(4) { ['id'] => 3, ['type'] => 'video', ['content'] => '...', ['data'] => 1 }
-		 * [1] => array(4) { ['id'] => 1, ['type'] => 'image', ['content'] => '...', ['data'] => 0 }
+		 * [0] => array(4) { ['id'] => 3, ['type'] => 'video', ['content'] => '...' }
+		 * [1] => array(4) { ['id'] => 1, ['type'] => 'image', ['content'] => '...' }
 		 */
 		// build a $playlist
 		foreach ($media as $medium) {
@@ -124,14 +124,18 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			/* first element is now filename / path
 			 * second element is MIME type
 			 * third element if it exists is duration
+			 * fourth element if it exists is widthxheight
 			 */
 			// set a default duration of 20 seconds
 			if (! $medium['content'][2]) $medium['content'][2] = 20;
+			// set a default widthxheight of 0x0
+			if (! $medium['content'][4]) $medium['content'][4] = '0x0';
 			$playlist[] = array(
 				'type' => $medium['type'] ,
-				'storage' => ($medium['data']) ? 'database' : 'filesystem' ,
 				'filename' => $medium['content'][0] ,
 				'duration' => ($medium['type'] == 'video') ? 'file' : $medium['content'][2] ,
+				'width' => substr($medium['content'][4], 0, strpos($medium['content'][4], 'x')) ,
+				'height' => strstr($medium['content'][4], 'x') ,
 				'media-id' => $medium['id']
 			);
 		}
@@ -143,5 +147,37 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			'content' => serialize($playlist)
 		));
 		return $this->db->lastInsertId('dui_playlists');
+	}
+	public function buildBinary ($_playlist)
+	{
+		$_playlist = unserialize($_playlist);
+		$playlist_objects = array();
+		$binary = pack('c', count($_playlist));
+		foreach($_playlist as $item) {
+			switch($item['type']) {
+				case 'image':
+					$item['type'] = Api_Model_PlaylistItem::IMAGE_TYPE;
+					break;
+				case 'video':
+					$item['type'] = Api_Model_PlaylistItem::VIDEO_TYPE;
+					break;
+				case 'text':
+					$item['type'] = Api_Model_PlaylistItem::TEXT_TYPE;
+					break;
+				default:
+					$item['type'] = (int) 0;
+			}
+			$playlist_objects[] = new Api_Model_PlaylistItem(
+				$item['media-id'], $item['type'], array(
+					'width' => $item['width'],
+					'height' => $item['height'],
+					'filename' => $item['filename']
+				), $item['duration']
+			);
+		}
+		foreach($playlist_objects[] as $item) {
+			$binary .= $item->__toString();
+		}
+		return $binary;
 	}
 }
