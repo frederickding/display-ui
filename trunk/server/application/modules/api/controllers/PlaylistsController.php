@@ -65,7 +65,7 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			if($raw_data === FALSE) {
 				$this->_helper->redirector->gotoUrlAndExit(
 					'api/playlists/generate/?sys_name='.$sys_name.'&sig='.$signature,
-					array('code' => '307'));
+					array('code' => 307));
 			}
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
