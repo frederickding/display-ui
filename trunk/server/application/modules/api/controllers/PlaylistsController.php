@@ -28,7 +28,7 @@ class Api_PlaylistsController extends Zend_Controller_Action
 {
 	/**
 	 * 400 error on index action
-	 * 
+	 *
 	 * For bad API implementations, indicates that the fetch action should be called;
 	 * a 300-series redirect is possible but not preferred, and the _forward()
 	 * internal redirect is also not used.
@@ -38,11 +38,11 @@ class Api_PlaylistsController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$this->getResponse()->setHttpResponseCode(400)
 		->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', TRUE)
-		->setBody(iconv('UTF-8', 'UTF-16LE', 'API method does not exist; try /api/playlists/fetch/'));	
+		->setBody(iconv('UTF-8', 'UTF-16LE', 'API method does not exist; try /api/playlists/fetch/'));
 	}
 	/**
 	 * Fetches an unplayed playlist from the database
-	 * 
+	 *
 	 * If this is not possible, redirects the client to the generate action.
 	 */
 	public function fetchAction()
@@ -61,6 +61,37 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			$PlaylistsModel = new Api_Model_Playlists();
 			// get the data
 			$raw_data = $PlaylistsModel->fetch($sys_name);
+			if($raw_data === FALSE) {
+				$this->_forward('generate');
+				return;
+			}
+			// mark it as played in the db
+			$PlaylistsModel->updatePlayed($raw_data[0]);
+			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
+			->setBody(iconv('UTF-8', 'UTF-16LE', serialize($raw_data[2])));
+		} else {
+			$this->getResponse()->setHttpResponseCode(401)
+			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
+			->setBody(iconv('UTF-8', 'UTF-16LE', 'Playlists inaccessible; access denied.'));
+		}
+	}
+	public function generateAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$Authenticator = new Api_Model_Authenticator();
+		
+		// load our parameters from POST/GET
+		$sys_name = $this->_getParam('sys_name');
+		$signature = $this->_getParam('sig');
+		
+		if ($Authenticator->verify($sys_name, $signature)) {
+			// we don't need $signature or the Authenticator model anymore
+			unset($signature, $Authenticator);
+			// let's prepare the playlists
+			$PlaylistsModel = new Api_Model_Playlists();
+			$playlist_id = $PlaylistsModel->generatePlaylist($sys_name);
+			// get the data
+			$raw_data = $PlaylistsModel->fetch($sys_name, $playlist_id);
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
 			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)

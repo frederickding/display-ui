@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Headlines model, uses database
  *
@@ -36,6 +36,7 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	public function fetch($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
+		$this->db->setFetchMode(Zend_Db::FETCH_COLUMN);
 		$query = $this->db->select()
 					->from(array('h' => 'dui_headlines'), 'title')
 					->joinInner(array('c' => 'dui_clients'),
@@ -46,9 +47,9 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 					->order('RAND()')
 					->limit($_number);
 		if(!is_null($_type)) {
-			$query = $query->where($this->db->quoteIdentifier('h.type').' = ?', $_type);
+			$query = $query->where('h.type = ?', $_type);
 		}
-		return $query->query(Zend_Db::FETCH_COLUMN)->fetchAll(Zend_Db::FETCH_COLUMN);
+		return $query->query()->fetchAll();
 	}
 	/**
 	 * Retrieves the headlines from the database, creates a | delimited string
@@ -60,6 +61,7 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	public function fetchConcatenated($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
+		$this->db->setFetchMode(Zend_Db::FETCH_COLUMN);
 		$query = $this->db->select()
 					->from(array('h' => 'dui_headlines'), 'title')
 					->joinInner(array('c' => 'dui_clients'),
@@ -70,9 +72,9 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 					->order('RAND()')
 					->limit($_number);
 		if(!is_null($_type)) {
-			$query = $query->where($this->db->quoteIdentifier('h.type').' = ?', $_type);
+			$query = $query->where('h.type = ?', $_type);
 		}
-		$headlines = $query->query(Zend_Db::FETCH_COLUMN)->fetchAll(Zend_Db::FETCH_COLUMN);
+		$headlines = $query->query()->fetchAll();
 		$result = '';
 		foreach($headlines as $headline) {
 			$result .= $headline . '  |  ';

@@ -21,7 +21,7 @@
  * @license http://code.google.com/p/display-ui/wiki/License Apache License 2.0
  * @version $Id$
  */
- /**
+/**
  * Provides logic for the Playlists API
  */
 class Api_Model_Playlists extends Default_Model_DatabaseAbstract
@@ -29,35 +29,40 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	/**
 	 * Retrieves one playlist at random from the known, stored playlists
 	 * @param string $_sys_name
+	 * @param int $_id
 	 * @return array
 	 */
-	public function fetch($_sys_name)
+	public function fetch ($_sys_name, $_id = NULL)
 	{
 		$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
-		$query = $this->db->select()
+		if(is_null($_id)) {
+			$query = $this->db->select()
 				->from(array('p' => 'dui_playlists'),
-					array('id', 'generated', 'content'))
-				->joinInner(array('c' => 'dui_clients'),
-					'p.client = c.id', '')
+					array('id' , 'generated' , 'content'))
+				->joinInner(array('c' => 'dui_clients'), 'p.client = c.id', '')
 				->where('p.played IS NULL')
 				->where('c.sys_name = ? OR p.client IS NULL', $_sys_name)
-				->order('RAND()')
+				->order('RAND()')->limit(1);
+		} else {
+			$query = $this->db->select()
+				->from(array('p' => 'dui_playlists'),
+					array('id' , 'generated' , 'content'))
+				->where('p.played IS NULL')
+				->where('p.id = ?', $_id)
 				->limit(1);
+		}
 		$result = $query->query()->fetch();
 		/* $query = $this->db->quoteInto('SELECT p.`id`, p.`generated`, p.`content`
-			FROM `dui_playlists` AS p 
-			INNER JOIN `dui_clients` AS c ON (p.`client`=c.`id`) 
-			WHERE p.`played` IS NULL 
-			AND (c.`sys_name` = ? OR p.`client` IS NULL) 
+			FROM `dui_playlists` AS p
+			INNER JOIN `dui_clients` AS c ON (p.`client`=c.`id`)
+			WHERE p.`played` IS NULL
+			AND (c.`sys_name` = ? OR p.`client` IS NULL)
 			ORDER BY RAND() LIMIT 1', $_sys_name);
 		$result = $this->db->fetchRow($query); */
-		if(is_string($result->content)) {
-			return array(
-				$result->id,
-				$result->generated,
-				unserialize($result->content)
-			);
-		} else return FALSE;
+		if (is_string($result->content)) {
+			return array($result->id , $result->generated , unserialize($result->content));
+		} else
+			return FALSE;
 	}
 	/**
 	 * Marks a playlist in the database as played
@@ -65,16 +70,78 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	 * @param int $_id
 	 * @return int The number of rows affected
 	 */
-	public function updatePlayed($_id)
+	public function updatePlayed ($_id)
 	{
 		$_id = (int) $_id;
 		$query = array(
 			'played' => new Zend_Db_Expr('UTC_TIMESTAMP()')
 		);
-		return $this->db->update('dui_playlists', $query, 'id = '.$_id);
+		return $this->db->update('dui_playlists', $query, 'id = ' . $_id);
 	}
-	public function getMedia($_sys_name, $_number = 20)
+	/**
+	 * Gets media from the media table
+	 * @param string $_sys_name
+	 * @param int $_number
+	 * @return array The results of the query
+	 */
+	private function getMedia ($_sys_name, $_number = 20)
 	{
-		
+		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
+		$query = $this->db->select()
+				->from(array('m' => 'dui_media'),
+					array('id' , 'type' , 'content' , 'data' => '(data IS NULL)'))
+				->joinInner(array('c' => 'dui_clients'),
+					'm.clients REGEXP CONCAT(\'(^|[0-9]*,)\', c.id, \'(,|$)\')', '')
+				/* (^|[0-9]*,)###(,|$) searches in comma-delimited clients column
+				INNER JOIN `dui_clients` AS c ON ( m.`clients`
+				REGEXP CONCAT( '(^|[0-9]*,)', c.`id` , '(,|$)' ) ) */
+				->where('c.sys_name = ?', $_sys_name)
+				->order('m.weight DESC')
+				->limit($_number);
+		$result = $query->query()->fetchAll();
+		return $result;
+	}
+	/**
+	 * Builds a playlist, stores it in the database
+	 * @param $_sys_name
+	 * @param $_number
+	 * @return int
+	 */
+	public function generatePlaylist ($_sys_name, $_number = 20)
+	{
+		$_number = (int) $_number;
+		$playlist = array();
+		$media = $this->getMedia($_sys_name, $_number);
+		// randomize the media a little bit
+		shuffle($media);
+		/* array is now something like
+		 * [0] => array(4) { ['id'] => 3, ['type'] => 'video', ['content'] => '...', ['data'] => 1 }
+		 * [1] => array(4) { ['id'] => 1, ['type'] => 'image', ['content'] => '...', ['data'] => 0 }
+		 */
+		// build a $playlist
+		foreach ($media as $medium) {
+			$medium['content'] = explode(';', $medium['content']);
+			/* first element is now filename / path
+			 * second element is MIME type
+			 * third element if it exists is duration
+			 */
+			// set a default duration of 20 seconds
+			if (! $medium['content'][2]) $medium['content'][2] = 20;
+			$playlist[] = array(
+				'type' => $medium['type'] ,
+				'storage' => ($medium['data']) ? 'database' : 'filesystem' ,
+				'filename' => $medium['content'][0] ,
+				'duration' => ($medium['type'] == 'video') ? 'file' : $medium['content'][2] ,
+				'media-id' => $medium['id']
+			);
+		}
+		$client_id = $this->db->fetchOne('SELECT id FROM dui_clients WHERE sys_name = ? LIMIT 1', $_sys_name);
+		// TODO: insert into DB
+		$this->db->insert('dui_playlists', array(
+			'generated' => new Zend_Db_Expr('UTC_TIMESTAMP()') ,
+			'client' => $client_id,
+			'content' => serialize($playlist)
+		));
+		return $this->db->lastInsertId('dui_playlists');
 	}
 }
