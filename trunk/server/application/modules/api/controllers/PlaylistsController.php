@@ -55,16 +55,17 @@ class Api_PlaylistsController extends Zend_Controller_Action
 		$signature = $this->_getParam('sig');
 		
 		if ($Authenticator->verify($sys_name, $signature)) {
-			// we don't need $signature or the Authenticator model anymore
-			unset($signature, $Authenticator);
+			// we don't need the Authenticator model anymore
+			unset($Authenticator);
 			// let's prepare the playlists
 			$PlaylistsModel = new Api_Model_Playlists();
 			// get the data
 			$raw_data = $PlaylistsModel->fetch($sys_name);
 			// if it was not successfully fetched, generate a playlist instead
 			if($raw_data === FALSE) {
-				$this->_helper->redirector->gotoSimple('generate', 'playlists', 'api');
-				return;
+				$this->_helper->redirector->gotoUrlAndExit(
+					'api/playlists/generate/?sys_name='.$sys_name.'&sig='.$signature,
+					array('code' => '307'));
 			}
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
