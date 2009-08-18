@@ -61,8 +61,9 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			$PlaylistsModel = new Api_Model_Playlists();
 			// get the data
 			$raw_data = $PlaylistsModel->fetch($sys_name);
+			// if it was not successfully fetched, generate a playlist instead
 			if($raw_data === FALSE) {
-				$this->_forward('generate');
+				$this->_helper->redirector->gotoSimple('generate', 'playlists', 'api');
 				return;
 			}
 			// mark it as played in the db
