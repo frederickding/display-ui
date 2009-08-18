@@ -175,7 +175,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				), $item['duration']
 			);
 		}
-		foreach($playlist_objects[] as $item) {
+		foreach($playlist_objects as $item) {
 			$binary .= $item->__toString();
 		}
 		return $binary;
