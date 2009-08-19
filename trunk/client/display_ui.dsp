@@ -98,6 +98,14 @@ SOURCE=.\display_ui.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\FormattedTextDraw.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\playlist.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\sha1.cpp
 # End Source File
 # Begin Source File
@@ -115,6 +123,14 @@ SOURCE=.\debug.h
 # Begin Source File
 
 SOURCE=.\display_ui.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\FreeImage.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\playlist.h
 # End Source File
 # Begin Source File
 

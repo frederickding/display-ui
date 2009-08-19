@@ -5,15 +5,15 @@
 
 typedef struct _weather_t{
 	int condition;
-	wchar_t temp[6];
-	wchar_t *description;
+	char temp[6];
+	char *description;
 }weather_t;
 
 typedef struct _weather_fc_t{
 	int condition;
-	wchar_t temp_hi[6];
-	wchar_t temp_lo[6];
-	wchar_t *description;
+	char temp_hi[6];
+	char temp_lo[6];
+	char *description;
 }weather_fc_t;
 
 void weather_init();
@@ -22,5 +22,29 @@ unsigned long weather_update(void *p);
 weather_t *weather_getcurrent();
 weather_fc_t **weather_getforecast();
 
+FIBITMAP *weather_getimage_current();
+FIBITMAP *weather_getimage_fc(int num);
+
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
