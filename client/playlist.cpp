@@ -25,8 +25,11 @@
 #include <time.h>
 
 #include "display_ui.h"
+#include "freeimage.h"
 #include "playlist.h"
 #include "debug.h"
+
+#pragma pack(1)
 
 typedef struct _playlist_f_t{
 	byte num_elements;
@@ -36,23 +39,25 @@ typedef struct _playlist_f_t{
 typedef struct _playlist_element_f_t{
 	byte type;
 	byte secs;
-	short trans;
-	// int id;
+	byte trans;
+	int id;
 	int len; // 12 + 8 + filename len * 2
 	byte data[1];
 }playlist_element_f_t;
 
 typedef struct _image_element_f_t{
+	byte type;
 	short width, height;
 	int filename_len;
 	char filename[1];
 }image_element_f_t;
 
+#pragma pack()
 
 playlist_t g_playlist;
 
 
-void playlist_load(){
+void playlist_load(HWND hwnd){
 
 	FILE *fp = fopen("data\\playlist.dat", "r");
 	
@@ -83,16 +88,37 @@ void playlist_load(){
 				// image
 				image_element_f_t *current_img = (image_element_f_t *) current->data;
 				image_element_t *new_img = (image_element_t *) malloc(sizeof(image_element_t));
-				new_img->filename = (wchar_t *) malloc((current_img->filename_len + 1) * 2);
-				memset(new_img->filename, 0, (current_img->filename_len + 1) * 2);
+				memset(new_img, 0, sizeof(image_element_t));
+				new_img->filename = (char *) malloc(current_img->filename_len + 1);
+				memset(new_img->filename, 0, current_img->filename_len + 1);
 
 				new_img->width = current_img->width;
 				new_img->height = current_img->height;
-				memcpy(new_img->filename, current_img->filename, current_img->filename_len * 2);
-				debug_print("width: %d, height: %d, filename: %ws\n", new_img->width, new_img->height, new_img->filename);
+				memcpy(new_img->filename, current_img->filename, current_img->filename_len);
+				debug_print("width: %d, height: %d, filename: %s\n", new_img->width, new_img->height, new_img->filename);
 				
+				new_img->type = current_img->type;
+				new_img->fbmp_image = FreeImage_Load((FREE_IMAGE_FORMAT)current_img->type, new_img->filename, NULL);
+				if(current_img->type == FIF_PNG) FreeImage_PreMultiplyWithAlpha(new_img->fbmp_image);
+				
+
+				HDC hdcWin = GetDC(hwnd);
+				new_img->hdc = CreateCompatibleDC(hdcWin);
+				new_img->hbm = CreateCompatibleBitmap(hdcWin, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image));
+				SelectObject(new_img->hdc, new_img->hbm);
+				
+				// Draw the image once to the DC to avoid having to redraw every time a frame is rendered
+				StretchDIBits(new_img->hdc, 0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
+					0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
+					FreeImage_GetBits(new_img->fbmp_image), FreeImage_GetInfo(new_img->fbmp_image), DIB_RGB_COLORS, SRCCOPY);
+				ReleaseDC(hwnd, hdcWin);
+
+				new_img->bf.BlendOp = AC_SRC_OVER;
+				new_img->bf.BlendFlags = 0;
+				new_img->bf.SourceConstantAlpha = 255;
+				new_img->bf.AlphaFormat = (new_img->type == FIF_PNG ? AC_SRC_ALPHA : AC_SRC_OVER);
+
 				new_elem->data = new_img;
-				
 			}
 			
 			if(i == 0) g_playlist.first = new_elem;
@@ -101,11 +127,30 @@ void playlist_load(){
 			new_elem->next = g_playlist.first;
 			current = (playlist_element_f_t *) ((unsigned long)current + (unsigned long)current->len);
 
-			debug_print("%08lX -- %08lX\n", raw_playlist, current);
+			debug_print("%08lX -- %08lX .. %d\n", raw_playlist, new_elem, new_elem->type);
 		}
 
 		free(raw_playlist);
 		fclose(fp);
 	}	
+}
 
+void playlist_unload(){
+	playlist_element_t *current = g_playlist.first;
+
+	for(int i = 0; i < g_playlist.num_elements; i++){
+		debug_print("unload: %d -- %08lX\n", current->type, current);
+		if(current->type == 1){
+			image_element_t *current_img = (image_element_t *) current->data;
+			debug_print("unload: %s\n", current_img->filename);
+			if(current_img->fbmp_image) FreeImage_Unload(current_img->fbmp_image);
+			if(current_img->filename) free(current_img->filename);
+			//DeleteObject(current_img->hbm);
+			DeleteDC(current_img->hdc);
+			free(current_img);
+		}
+		playlist_element_t *tmp = current;
+		current = current->next;
+		free(tmp);
+	}
 }
