@@ -58,5 +58,7 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 		$return['filename'] = $content[0];
 		$return['mime'] = $content[1];
 		$return['data'] = $result[0]['data'];
+		
+		return $return;
 	}
 }
