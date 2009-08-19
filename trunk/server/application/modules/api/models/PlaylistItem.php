@@ -64,7 +64,7 @@ class Api_Model_PlaylistItem
 	 */
 	public function __construct($media_id, $type, $content, $duration = 20, $trans = 0)
 	{
-		$this->media_id = $media_id;
+		$this->media_id = (int) $media_id;
 		if(1 <= $type && $type <= 3) {
 			$this->type = (int) $type;
 		} else die('Bad type for Api_Playlist_Item.');
@@ -77,7 +77,6 @@ class Api_Model_PlaylistItem
 		} elseif($this->type == self::TEXT_TYPE) {
 			$this->filename = $content['filename'];
 		}
-		return $this;
 	}
 	/**
 	 * Produces a binary string containing all necessary item data
