@@ -136,7 +136,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				'duration' => ($medium['type'] == 'video') ? 'file' : $medium['content'][2] ,
 				'width' => substr($medium['content'][4], 0, strpos($medium['content'][4], 'x')) ,
 				'height' => strstr($medium['content'][4], 'x') ,
-				'media-id' => $medium['id']
+				'media-id' => (int) $medium['id']
 			);
 		}
 		$client_id = $this->db->fetchOne('SELECT id FROM dui_clients WHERE sys_name = ? LIMIT 1', $_sys_name);
