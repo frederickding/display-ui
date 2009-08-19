@@ -36,11 +36,10 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	public function fetch($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
-		$this->db->setFetchMode(Zend_Db::FETCH_COLUMN);
 		$query = $this->db->select()
 					->from(array('h' => 'dui_headlines'), 'title')
 					->joinInner(array('c' => 'dui_clients'),
-						'h.client = c.id OR h.client IS NULL', '')
+						'h.client = c.id OR h.client IS NULL', array())
 					->where('h.active = 1')
 					->where('h.expires > UTC_TIMESTAMP()')
 					->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
@@ -49,7 +48,7 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 		if(!is_null($_type)) {
 			$query = $query->where('h.type = ?', $_type);
 		}
-		return $query->query()->fetchAll();
+		return $query->query()->fetchAll(Zend_Db::FETCH_COLUMN);
 	}
 	/**
 	 * Retrieves the headlines from the database, creates a | delimited string
@@ -61,11 +60,10 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	public function fetchConcatenated($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
-		$this->db->setFetchMode(Zend_Db::FETCH_COLUMN);
 		$query = $this->db->select()
 					->from(array('h' => 'dui_headlines'), 'title')
 					->joinInner(array('c' => 'dui_clients'),
-						'h.client = c.id OR h.client IS NULL', '')
+						'h.client = c.id OR h.client IS NULL', array())
 					->where('h.active = 1')
 					->where('h.expires > UTC_TIMESTAMP()')
 					->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
@@ -74,7 +72,7 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 		if(!is_null($_type)) {
 			$query = $query->where('h.type = ?', $_type);
 		}
-		$headlines = $query->query()->fetchAll();
+		$headlines = $query->query()->fetchAll(Zend_Db::FETCH_COLUMN);
 		$result = '';
 		foreach($headlines as $headline) {
 			$result .= $headline . '  |  ';
