@@ -51,13 +51,13 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 				->query()
 				->fetch();
 		
-		$content = explode(';', $result[0]['content']);
+		$content = explode(';', $result['content']);
 		// $mime_type = $content[1];
 		
 		$return = array();
 		$return['filename'] = $content[0];
 		$return['mime'] = $content[1];
-		$return['data'] = $result[0]['data'];
+		$return['data'] = $result['data'];
 		
 		return $return;
 	}
