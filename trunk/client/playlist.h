@@ -18,12 +18,17 @@ typedef struct _playlist_t{
 }playlist_t;
 
 typedef struct _image_element_t{
+	byte type;
 	int width, height;
-	wchar_t *filename;
+	FIBITMAP *fbmp_image;
+	HDC hdc;
+	HBITMAP hbm;
+	BLENDFUNCTION bf;
+	char *filename;
 }image_element_t;
 
 
-void playlist_load();
+void playlist_load(HWND hwnd);
+void playlist_unload();
 
 #endif
-
