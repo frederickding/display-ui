@@ -33,7 +33,7 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 	 */
 	public function isStoredDb($_id)
 	{
-		return (bool) $this->db->fetchOne('SELECT data IS NULL AS data'
+		return (bool) $this->db->fetchOne('SELECT data IS NOT NULL AS data'
 			.' FROM dui_media WHERE id = ? LIMIT 1', $_id);
 	}
 	/**
