@@ -25,13 +25,18 @@
 #include <time.h>
 
 #include "display_ui.h"
+#include "freeimage.h"
 #include "weather.h"
 #include "debug.h"
 
 
+FIBITMAP *fbmp_weather_current = NULL;
+FIBITMAP *fbmp_weather_fc[2] = {NULL, NULL};
 
 weather_t current;
 weather_fc_t **forecast = (weather_fc_t **) 0;
+bool initialized = false;
+
 
 void weather_init() {
 	forecast = (weather_fc_t **) malloc(sizeof(weather_fc_t *) * 2);
@@ -39,6 +44,8 @@ void weather_init() {
 	forecast[1] = (weather_fc_t *) malloc(sizeof(weather_fc_t));
 	memset(forecast[0], 0, sizeof(weather_fc_t));
 	memset(forecast[1], 0, sizeof(weather_fc_t));
+
+	initialized = true;
 
 	// weather_update(NULL);
 }
@@ -58,23 +65,21 @@ unsigned long weather_update(void *p){
 			int temp = 0;
 			fscanf(fp, "%d", &current.condition);
 			fscanf(fp, "%d", &temp);
-
-			// stupid gdi+ needs widechars.
-			swprintf(current.temp, L"%d°C", temp);
+			
+			// YESSSS no more widechar crap. GDI owns.
+			sprintf(current.temp, "%d°C", temp);
 
 			int length;
 			fscanf(fp, "%d ", &length);
 			if(current.description) free(current.description);
-			current.description = (wchar_t *) malloc((length + 1) * 2);
+			current.description = (char *) malloc(length + 2);
 
-			char *tmp = (char *) malloc(length + 1);
-			memset(tmp, 0, length + 1);
-			memset(current.description, 0, (length + 1) * 2);
-			fgets(tmp, length + 1, fp);
+			memset(current.description, 0, length + 2);
+			fgets(current.description, length + 1, fp);
 
-			debug_print("desc: %s\n", tmp);
-
-			mbstowcs(current.description, (const char *) tmp, strlen(tmp));
+			debug_print("desc: %08lX (%d)\n", current.description, length);
+			
+			
 
 			fclose(fp);
 
@@ -85,6 +90,14 @@ unsigned long weather_update(void *p){
 			ptm = localtime(&rawtime);
 			sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%d%c.png", current.condition, (ptm->tm_hour < 6 || ptm->tm_hour > 19) ? 'n' : 'd');
 			URLDownloadToFile(NULL, imgurl, "img\\current.png", 0, NULL);
+
+			if(fbmp_weather_current){
+				FreeImage_Unload(fbmp_weather_current);
+			}	
+			fbmp_weather_current = FreeImage_Load(FIF_PNG, "img\\current.png", NULL);
+			FreeImage_Rescale(fbmp_weather_current, 188, 135, FILTER_BILINEAR);
+			FreeImage_PreMultiplyWithAlpha(fbmp_weather_current);
+		
 
 		} else {
 			return 1;
@@ -102,24 +115,19 @@ unsigned long weather_update(void *p){
 				fscanf(fp, "%d", &temp_hi);
 				fscanf(fp, "%d", &temp_lo);
 
-				// stupid gdi+ needs widechars.
-				swprintf(forecast[i]->temp_hi, L"%d°", temp_hi);
-				swprintf(forecast[i]->temp_lo, L"%d", temp_lo);
+
+				sprintf(forecast[i]->temp_hi, "%d°", temp_hi);
+				sprintf(forecast[i]->temp_lo, "%d", temp_lo);
 
 				int length;
 				fscanf(fp, "%d ", &length);
 				if(forecast[i]->description) free(forecast[i]->description);
-				forecast[i]->description = (wchar_t *) malloc((length + 1) * 2);
+				forecast[i]->description = (char *) malloc(length + 1);
 
-				// MessageBox(NULL, NULL, NULL, NULL);
-				char *tmp = (char *) malloc(length + 1);
-				memset(tmp, 0, length + 1);
-				memset(forecast[i]->description, 0, (length + 1) * 2);
-				fgets(tmp, length + 1, fp);
+				memset(forecast[i]->description, 0, length + 1);
+				fgets(forecast[i]->description, length + 1, fp);
 
-				debug_print("desc: %s\n", tmp);
-
-				mbstowcs(forecast[i]->description, (const char *) tmp, strlen(tmp));
+				debug_print("high: %s, low: %s, desc: %s\n", forecast[i]->temp_hi, forecast[i]->temp_lo, forecast[i]->description);
 
 				char imgurl[48];
 				char filename[19];
@@ -127,6 +135,13 @@ unsigned long weather_update(void *p){
 				sprintf(filename, "img\\forecast_%d.png", i);
 				debug_print("%s -> %s\n", imgurl, filename);
 				URLDownloadToFile(NULL, imgurl, filename, 0, NULL);
+
+				if(fbmp_weather_fc[i]){
+					FreeImage_Unload(fbmp_weather_fc[i]);
+				}	
+				fbmp_weather_fc[i] = FreeImage_Load(FIF_PNG, filename, NULL);
+				FreeImage_Rescale(fbmp_weather_fc[i], 188, 135, FILTER_BILINEAR);
+				FreeImage_PreMultiplyWithAlpha(fbmp_weather_fc[i]);
 			}
 			fclose(fp);
 
@@ -142,9 +157,24 @@ unsigned long weather_update(void *p){
 }
 
 weather_t *weather_getcurrent() {
-	return &current;
+	if(initialized)
+		return &current;
+	return NULL;
 }
 
 weather_fc_t **weather_getforecast() {
-	return forecast;
+	if(initialized)
+		return forecast;
+	return NULL;
+}
+
+
+FIBITMAP *weather_getimage_current(){
+	return fbmp_weather_current;
+}
+
+FIBITMAP *weather_getimage_fc(int num){
+	if(num > 1) return NULL;
+
+	return fbmp_weather_fc[num];
 }
