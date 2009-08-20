@@ -37,8 +37,8 @@ class Api_PlaylistsController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$this->getResponse()->setHttpResponseCode(400)
-		->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', TRUE)
-		->setBody(iconv('UTF-8', 'UTF-16LE', 'API method does not exist; try /api/playlists/fetch/'));
+		->setHeader('Content-Type', 'text/plain', TRUE)
+		->setBody('API method does not exist; try /api/playlists/fetch/');
 	}
 	/**
 	 * Fetches an unplayed playlist from the database
@@ -74,8 +74,8 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			->setBody($PlaylistsModel->buildBinary($raw_data[2]));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
-			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', TRUE)
-			->setBody(iconv('UTF-8', 'UTF-16LE', 'Playlists inaccessible; access denied.'));
+			->setHeader('Content-Type', 'text/plain', TRUE)
+			->setBody('Playlists inaccessible; access denied.');
 		}
 	}
 	public function generateAction()
@@ -102,8 +102,8 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			->setBody($PlaylistsModel->buildBinary($raw_data[2]));
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
-			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', TRUE)
-			->setBody(iconv('UTF-8', 'UTF-16LE', 'Playlists inaccessible; access denied.'));
+			->setHeader('Content-Type', 'text/plain', TRUE)
+			->setBody('Playlists inaccessible; access denied.');
 		}
 	}
 }
