@@ -51,12 +51,12 @@ class Api_HeadlinesController extends Zend_Controller_Action {
 			$HeadlinesModel = new Api_Model_Headlines();
 			// target format: HEADLINE | HEADLINE | HEADLINE ...
 			$headlines = $HeadlinesModel->fetchConcatenated($number, $sys_name, $type);
-			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', $headlines));
+			$this->getResponse()->setHeader('Content-Type', 'text/plain; charset=UTF-8', true)
+			->setBody($headlines);
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
-			->setHeader('Content-Type', 'text/plain; charset=UTF-16LE', true)
-			->setBody(iconv('UTF-8', 'UTF-16LE', 'Headlines inaccessible; access denied.'));
+			->setHeader('Content-Type', 'text/plain; charset=UTF-8', true)
+			->setBody('Headlines inaccessible; access denied.');
 		}
 	}
 }
