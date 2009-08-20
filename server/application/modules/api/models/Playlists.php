@@ -152,7 +152,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	{
 		$_playlist = unserialize($_playlist);
 		$playlist_objects = array();
-		$binary = pack('c', count($_playlist));
+		$binary = pack('v', count($_playlist));
 		foreach($_playlist as $item) {
 			switch($item['type']) {
 				case 'image':
