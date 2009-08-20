@@ -45,8 +45,6 @@ class Api_Model_PlaylistItem
 	 * @var int
 	 */
 	private $transition = 0;
-	private $width = 0;
-	private $height = 0;
 	private $filename = '';
 	/**
 	 * The ID of the item from the dui_media table
@@ -71,8 +69,6 @@ class Api_Model_PlaylistItem
 		$this->duration = $duration;
 		$this->transition = (int) $trans;
 		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
-			$this->width = $content['width'];
-			$this->height = $content['height'];
 			$this->filename = $content['filename'];
 		} elseif($this->type == self::TEXT_TYPE) {
 			$this->filename = $content['filename'];
@@ -84,11 +80,10 @@ class Api_Model_PlaylistItem
 	 */
 	public function __toString()
 	{
-		$binary = pack('ccvV', $this->type, $this->duration, $this->transition, $this->media_id);
-		if($this->type == self::IMAGE_TYPE) {
-			$binary .= pack('VvvV', 20 + 2*strlen($this->filename),
-						$this->width, $this->height, strlen($this->filename));
-			$binary .= iconv('UTF-8', 'UTF-16LE', $this->filename);
+		$binary = pack('cccV', $this->type, $this->duration, $this->transition, $this->media_id);
+		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
+			$binary .= pack('VV', 11 + 4 + strlen($this->filename), strlen($this->filename));
+			$binary .= $this->filename;
 		}
 		return $binary;
 	}
