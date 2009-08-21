@@ -14,6 +14,8 @@ void video_render(HWND hwnd, HDC hdc, video_element_t *video);
 HRESULT video_getduration(LONGLONG *duration);
 HRESULT video_getposition(LONGLONG *position);
 
+bool video_isloaded();
+
 void video_init();
 void video_shutdown();
 

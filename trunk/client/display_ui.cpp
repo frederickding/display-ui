@@ -83,7 +83,7 @@ void *bmp_bytes;
 
 void update(void *p) {
 	weather_update(p);
-	if(download("http://du.geekie.org/server/api/headlines?sys_name=1&sig=%s", "data\\headlines.dat") == S_OK) {
+	if(download("http://du.geekie.org/server/api/headlines/fetch/?sys_name=1&sig=%s", "data\\headlines.dat") == S_OK) {
 
 		FILE *fp = fopen("data\\headlines.dat", "r");
 
@@ -219,21 +219,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hOld   = SelectObject(hdcMem, hbmMem);
 		
 		StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
-		StretchDIBits(hdcMem, 0, 0, 1280, 112, 0, 0, 1280, 112, FreeImage_GetBits(fbmp_header), FreeImage_GetInfo(fbmp_header), DIB_RGB_COLORS, SRCCOPY);
 		
-		// Draw date & time
 		
 		char *days[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-		char *days_abbr[7] = {"Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"};
+		char *days_abbr[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 		
 		time_t rawtime;
 		tm *ptm;
 		char datetimestr[17];
+
+		memset(datetimestr, 0, 17);
 		time (&rawtime);
 		ptm = localtime(&rawtime);
+
 		
-		memset(datetimestr, 0, 17);
-		strftime(datetimestr, 16, "%b %d, %Y", ptm);
+		SetBkMode(hdcMem, TRANSPARENT); 
+		SetTextColor(hdcMem, color_white);
 		
 		HFONT font_dejavusans_bold_20 = MakeFont("DejaVu Sans", true, false, false, 20);
 		HFONT font_dejavusans_bold_24 = MakeFont("DejaVu Sans", true, false, false, 24);
@@ -243,18 +244,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HFONT font_dejavusans_cond_bold_32 = MakeFont("DejaVu Sans Condensed", true, false, false, 32);
 		HFONT font_dejavusans_cond_bold_42 = MakeFont("DejaVu Sans Condensed", true, false, false, 42);
 		HFONT font_dejavusans_cond_bold_58 = MakeFont("DejaVu Sans Condensed", true, false, false, 58);
-
-		SetBkMode(hdcMem, TRANSPARENT); 
-		SetTextColor(hdcMem, color_white);
-        SelectObject(hdcMem, font_dejavusans_bold_20);
-        TextOut(hdcMem, 720, 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
-        SelectObject(hdcMem, font_dejavusans_cond_bold_32);
-        TextOut(hdcMem, 717, 50, datetimestr, strlen(datetimestr));
 		
-		memset(datetimestr, 0, 17);
-		strftime(datetimestr, 16, "%H:%M:%S", ptm);
-        SelectObject(hdcMem, font_dejavusans_cond_bold_58);
-        TextOut(hdcMem, 1000, 27, datetimestr, strlen(datetimestr));
 		
 		
 		if(g_current_elem){
@@ -282,6 +272,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				if(timeleft == 0){
 					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+					StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
 					timeleft = g_current_elem->secs * 25;
 					imgalpha = 55;
 				}else{
@@ -307,7 +298,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				if(iter == 0) {
 					debug_print("loading video.........\n");
-					StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
 					video_load(hWnd, video);
 					g_video_painting = true;
 				}
@@ -473,6 +463,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			textBound.right = 1225 + 48; textBound.bottom = 455 + 20;
 			DrawTextA(hdcMem, forecast[1]->temp_lo, strlen(forecast[1]->temp_lo), &textBound, DT_RIGHT);
 		}
+		
+		
+		StretchDIBits(hdcMem, 0, 0, 1280, 112, 0, 0, 1280, 112, FreeImage_GetBits(fbmp_header), FreeImage_GetInfo(fbmp_header), DIB_RGB_COLORS, SRCCOPY);
+
+		memset(datetimestr, 0, 17);
+		strftime(datetimestr, 16, "%b %d, %Y", ptm);
+		SetBkMode(hdcMem, TRANSPARENT); 
+		SetTextColor(hdcMem, color_white);
+        SelectObject(hdcMem, font_dejavusans_bold_20);
+        TextOut(hdcMem, 720, 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
+        SelectObject(hdcMem, font_dejavusans_cond_bold_32);
+        TextOut(hdcMem, 717, 50, datetimestr, strlen(datetimestr));
+		
+		memset(datetimestr, 0, 17);
+		strftime(datetimestr, 16, "%H:%M:%S", ptm);
+        SelectObject(hdcMem, font_dejavusans_cond_bold_58);
+        TextOut(hdcMem, 1000, 27, datetimestr, strlen(datetimestr));
+
+
+		HPEN pen = CreatePen(PS_DASH, 2, RGB(100, 100, 100));
+		SelectObject(hdcMem, pen);
+		MoveToEx(hdcMem, 980, 112, NULL);
+		LineTo(hdcMem, 980, 664);
+		DeleteObject(pen);
 
 		// Headlines
 		static int xpos = 1280;
