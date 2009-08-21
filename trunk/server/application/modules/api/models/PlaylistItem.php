@@ -82,7 +82,7 @@ class Api_Model_PlaylistItem
 	{
 		$binary = pack('cccV', $this->type, $this->duration, $this->transition, $this->media_id);
 		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
-			$binary .= pack('VV', 11 + 4 + strlen($this->filename), strlen($this->filename));
+			$binary .= pack('Vv', 11 + 2 + strlen($this->filename), strlen($this->filename));
 			$binary .= $this->filename;
 		}
 		return $binary;
