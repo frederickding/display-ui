@@ -15,6 +15,8 @@ IMediaControl *g_iMedCtrl		= NULL;
 IMediaEvent *g_iMedEvt			= NULL;
 IMediaSeeking *g_iMedSeek		= NULL;
 
+bool g_video_loaded = false;
+
 IVMRWindowlessControl *video_getpointer_VMRwc(){
 	return g_iVMRwc;
 }
@@ -102,8 +104,8 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 		// Build the graph. For example:
 		//g_iGraphBldr->RenderFile(L"C:\\Program Files\\Microsoft Platform SDK\\Samples\\Multimedia\\DirectShow\\Media\\Video\\skiing.avi", 0);
 
-		g_iGraphBldr->RenderFile(video->filename, 0);
-		//g_iGraphBldr->RenderFile(L"C:\\downloaded\\[Shamisen] Melancholy of Haruhi-chan - 13 (XviD 704x400 4E9016C4).avi", 0);
+		//g_iGraphBldr->RenderFile(video->filename, 0);
+		g_iGraphBldr->RenderFile(L"C:\\downloaded\\[Mazui]_Suzumiya_Haruhi_no_Yuuutsu_(2009)_-_21_[6CF2660F].mkv", 0);
 		
 		// Find the native video size.
 		long width, height; 
@@ -118,9 +120,13 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 			SetRect(&rc_src, 0, 0, width, height); 
 			
 			// Set the destination rectangle.
-			SetRect(&rc_dst, 980/2 - width/2, 553/2 - height/2 + 112, 
+			if(width < 640){
+				SetRect(&rc_dst, 980/2 - width/2, 553/2 - height/2 + 112, 
 				980/2 + width/2, 553/2 + height/2 + 112); 
-			
+			}else{
+				SetRect(&rc_dst, 0, 112, 979, 664);	
+			}
+
 			// Set the video position.
 			hr = g_iVMRwc->SetVideoPosition(&rc_src, &rc_dst); 
 
@@ -132,6 +138,8 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 
 			debug_print("starting video...");
 			g_iMedCtrl->Run();
+
+			g_video_loaded = true;
 		}
 	}else{
 		printf("InitWindowslessVMR failed: %08lX\n", hr);
@@ -151,6 +159,8 @@ void video_unload(video_element_t *video){
 	g_iMedCtrl = NULL;
 	g_iMedEvt = NULL;
 	g_iMedSeek = NULL;
+
+	g_video_loaded = false;
 }
 
 void video_render(HWND hwnd, HDC hdc, video_element_t *video){
@@ -165,6 +175,9 @@ HRESULT video_getposition(LONGLONG *current){
 	return g_iMedSeek->GetCurrentPosition(current);
 }
 
+bool video_isloaded(){
+	return g_video_loaded;
+}
 
 void video_init(){
 	//HRESULT hr;
