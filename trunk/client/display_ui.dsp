@@ -110,6 +110,10 @@ SOURCE=.\sha1.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\video.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\weather.cpp
 # End Source File
 # End Group
@@ -135,6 +139,10 @@ SOURCE=.\playlist.h
 # Begin Source File
 
 SOURCE=.\sha1.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\video.h
 # End Source File
 # Begin Source File
 

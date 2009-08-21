@@ -14,6 +14,7 @@ int debug_print(char *format, ...){
 	va_list args; va_start(args, format);	
 	int i = vsprintf(buf, format, args);
 	fprintf(log, buf);	
+	fflush(log);
 	va_end(args);
 	return i;
 }

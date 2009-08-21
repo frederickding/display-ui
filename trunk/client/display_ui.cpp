@@ -22,25 +22,39 @@
 #define _WIN32_IE 0x0501
 
 #include <windows.h>
-#include <gdiplus.h>
-#include <gdiplusgraphics.h>
 #include <urlmon.h>
 #include <wchar.h>
 #include <stdio.h>
 #include <time.h>
+
+#include <Qedit.h>
+#include <dshow.h>
+
+
+// because dshow.h does REALLY stupid stuff
+// (see line 7673 of strsafe.h. WTF, microsoft)
+#undef sprintf
+#undef strcat
+#define sprintf sprintf
+#define strcat strcat
 
 #include "display_ui.h"
 #include "freeimage.h"
 #include "debug.h"
 #include "weather.h"
 #include "playlist.h"
+#include "video.h"
 #include "sha1.h"
 
 
-#pragma comment (lib, "gdiplus.lib")
 #pragma comment(lib, "urlmon.lib") 
 #pragma comment(lib, "freeimage.lib") 
-#pragma comment(lib, "msimg32.lib") 
+#pragma comment(lib, "msimg32.lib")
+#pragma comment(lib, "strmiids.lib")
+#pragma comment(lib, "strmbase.lib")
+
+#define FRAMES_PER_SEC 25 // should be a multiple of 1000!
+#define FRAME_INTERVAL 1000 / FRAMES_PER_SEC
 
 #define MakeFont(name, bold, italic, underline, size) CreateFont(-size, \
 			0, 0, 0, (bold ? FW_BOLD : FALSE), (italic ? FW_BOLD : FALSE), (underline ? FW_BOLD : FALSE), FALSE, ANSI_CHARSET, \
@@ -55,15 +69,12 @@ VOID RepaintHeadlines(HDC hdc);
 VOID RepaintHeader(HDC hdc);
 VOID RepaintContent(HDC hdc);
 
-ULONG_PTR gdiplusToken;
 LPVOID pHeaderImage;
 
 char *headline_txt = "The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit.";
 
-Gdiplus::Image *content_bg;
-Gdiplus::Bitmap *bmp;
-
 int ticks = 0;
+bool g_video_painting = false;
 
 char *sig; // request signature (api key + date)
 
@@ -103,11 +114,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 {
 	HWND hWnd;
 	WNDCLASSEX wc;
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 	
-	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -145,7 +154,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	g_current_elem = g_playlist.first;
 
 	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
-	
+
 	// enter the main loop:
 
 	MSG msg;
@@ -182,7 +191,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		FreeImage_Initialise(true);
 		SetTimer(hWnd, 1, 1000, NULL);
 		SetTimer(hWnd, 2, 900000, NULL);
-		SetTimer(hWnd, 3, 20, NULL);
+		SetTimer(hWnd, 3, FRAME_INTERVAL, NULL);
 			
 		fbmp_header = FreeImage_Load(FIF_JPEG, "img\\header.jpg", JPEG_DEFAULT);
 		fbmp_bg = FreeImage_Load(FIF_JPEG, "img\\content-bg.jpg", JPEG_DEFAULT);
@@ -198,11 +207,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
+
 		
 		BeginPaint(hWnd, &ps);
 
 		static int timeleft = 100;
-		static int imgalpha = 200;
+		static int imgalpha = 205;
+		
 
 		hdcMem = CreateCompatibleDC(ps.hdc);
 		hbmMem = CreateCompatibleBitmap(ps.hdc, 1280, 720);
@@ -244,21 +255,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		memset(datetimestr, 0, 17);
 		strftime(datetimestr, 16, "%H:%M:%S", ptm);
         SelectObject(hdcMem, font_dejavusans_cond_bold_58);
-        TextOut(hdcMem, 975, 27, datetimestr, strlen(datetimestr));
+        TextOut(hdcMem, 1000, 27, datetimestr, strlen(datetimestr));
 		
 		
 		if(g_current_elem){
+		//	debug_print("%08lX\n", g_current_elem);
 			if(g_current_elem->type == 1){
-				if(timeleft == 0){
-					if(g_current_elem->next) g_current_elem = g_current_elem->next;
-					timeleft = g_current_elem->secs * 20;
-					imgalpha = 20;
-				}else{ 
-					timeleft--;
-					if(timeleft < 10){
-						imgalpha -= 5;
-					}else if(imgalpha < 255) imgalpha += 5;
-				}
+				
 				
 				
 				
@@ -278,12 +281,61 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, 
 					FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->bf);
 				
+				if(timeleft == 0){
+					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+					timeleft = g_current_elem->secs * 25;
+					imgalpha = 55;
+				}else{
+					timeleft--;
+					if(timeleft < 15){
+						imgalpha -= 15;
+					}else if(imgalpha < 255) imgalpha += 10;
+				}
+
 				//SetTextColor(image->hdc, RGB(0, 0, 0));
 				//TextOut(image->hdc, 100, 100, "asdf", 4);
 				//BitBlt(hdcMem, 0, 112, 	FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, SRCCOPY);
 			//	DeleteObject(image->hbm);
 			//	DeleteDC(image->hdc);
 				
+			}else if(g_current_elem->type == 2){
+				static int iter = 0;
+				LONGLONG position;
+				LONGLONG duration;
+				//debug_print("video\n");
+
+				video_element_t *video = (video_element_t *) g_current_elem->data;
+				
+				if(iter == 0) {
+					debug_print("loading video.........\n");
+					video_load(hWnd, video);
+					g_video_painting = true;
+				}
+				
+				video_getduration(&duration);
+				video_getposition(&position);
+				
+	
+				video_render(hWnd, hdcMem, video);
+
+				
+				video_getduration(&duration);
+				video_getposition(&position);
+				debug_print("%lld / %lld\n", position, duration);
+				
+				iter++;
+
+				if(position >= duration){
+					debug_print("video end reached.\n");
+					video_unload(video);
+					g_video_painting = false;
+					iter = 0;
+					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+				}
+
+				//video->iVMRwc->RepaintVideo(hWnd, hdcMem);
+
+
 			}
 		}
 		
@@ -295,7 +347,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// Paint weather panel
 			
 
-			//fbmp_weatherbg = FreeImage_Composite(fbmp_weathergrad, TRUE, NULL, fbmp_weatherbg);
+			//fbmp_weatherbg = FreeImage_Composite(fbmp_weatergrad, TRUE, NULL, fbmp_weatherbg);
 			StretchDIBits(hdcMem, 980, 110, 300, 225, 0, 0, 300, 225, FreeImage_GetBits(fbmp_weatherbg), FreeImage_GetInfo(fbmp_weatherbg), DIB_RGB_COLORS, SRCCOPY);
 
 			FreeImage_SetTransparent(fbmp_weather_cur, true);
@@ -438,10 +490,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		StretchDIBits(hdcMem, 0, 664, 160, 56, 0, 0, 160, 56, FreeImage_GetBits(fbmp_headlines1), FreeImage_GetInfo(fbmp_headlines1), DIB_RGB_COLORS, SRCCOPY);
 
 
-		//int a = SetDIBitsToDevice(hdcMem, 0, 111, 980, 553, 0, 0, 0, 553, content_bg_bytes, &bmi, DIB_RGB_COLORS);
+		//int a = StretchDIBits(ps.hdc, 0, 0, 1280, 720, 0, 0, 1280, 720, content_bg_bytes, &bmi, DIB_RGB_COLORS);
 		//debug_print("ret: %d, err: %d\n", a, GetLastError());
-		BitBlt(ps.hdc, 0, 0, 1280, 720, hdcMem, 0, 0, SRCCOPY);
 
+		BitBlt(ps.hdc, 0, 0, 1280, 720, hdcMem, 0, 0, SRCCOPY);
+		
+	//	video_element_t *video = (video_element_t *) g_current_elem->data;
+	//			
 		
 		DeleteObject(font_dejavusans_bold_20);
 		DeleteObject(font_dejavusans_bold_24);
@@ -473,7 +528,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		} else if(wParam == 3) {
 			RECT rt, rt2;
 			rt.top = 111; rt.left = 0; rt.right = 980; rt.bottom = 664;
-			InvalidateRect(hWnd, &rt, false);
+			if(!g_video_painting) InvalidateRect(hWnd, &rt, false);
 			rt2.top = 664; rt2.left = 0; rt2.right = 1280; rt2.bottom = 720;
 			InvalidateRect(hWnd, &rt2, false);
 
@@ -491,7 +546,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_ERASEBKGND:
 		break;
 	case WM_DESTROY:
-		Gdiplus::GdiplusShutdown(gdiplusToken);
 		
 		playlist_unload();
 
@@ -508,6 +562,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		free(sig);
 		free(bmp_bytes);
 		weather_exit();
+		video_shutdown();
 		//bmp->~Bitmap();
 		//content_bg->~Image();
 		PostQuitMessage(0);
