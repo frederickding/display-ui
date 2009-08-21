@@ -50,12 +50,12 @@ typedef struct _playlist_element_f_t{
 }playlist_element_f_t;
 
 typedef struct _image_element_f_t{
-	int filename_len;
+	short filename_len;
 	char filename[1];
 }image_element_f_t;
 
 typedef struct _video_element_f_t{
-	int filename_len;
+	short filename_len;
 	char filename[1];
 }video_element_f_t;
 

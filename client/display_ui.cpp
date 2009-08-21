@@ -51,7 +51,6 @@
 #pragma comment(lib, "freeimage.lib") 
 #pragma comment(lib, "msimg32.lib")
 #pragma comment(lib, "strmiids.lib")
-#pragma comment(lib, "strmbase.lib")
 
 #define FRAMES_PER_SEC 25 // should be a multiple of 1000!
 #define FRAME_INTERVAL 1000 / FRAMES_PER_SEC
@@ -308,6 +307,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				if(iter == 0) {
 					debug_print("loading video.........\n");
+					StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
 					video_load(hWnd, video);
 					g_video_painting = true;
 				}
@@ -618,3 +618,4 @@ int download(char *url, char *dest_file){
 
 	return ret;
 }
+
