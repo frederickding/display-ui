@@ -104,8 +104,8 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 		// Build the graph. For example:
 		//g_iGraphBldr->RenderFile(L"C:\\Program Files\\Microsoft Platform SDK\\Samples\\Multimedia\\DirectShow\\Media\\Video\\skiing.avi", 0);
 
-		//g_iGraphBldr->RenderFile(video->filename, 0);
-		g_iGraphBldr->RenderFile(L"C:\\downloaded\\[Mazui]_Suzumiya_Haruhi_no_Yuuutsu_(2009)_-_21_[6CF2660F].mkv", 0);
+		g_iGraphBldr->RenderFile(video->filename, 0);
+		//g_iGraphBldr->RenderFile(L"C:\\downloaded\\[Mazui]_Suzumiya_Haruhi_no_Yuuutsu_(2009)_-_21_[6CF2660F].mkv", 0);
 		
 		// Find the native video size.
 		long width, height; 
