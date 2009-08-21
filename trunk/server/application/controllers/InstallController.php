@@ -54,11 +54,11 @@ class InstallController extends Zend_Controller_Action
 	{
 		$this->view->base_uri = $this->base_uri;
 		$this->view->tests = array();
-		
+
 		// if session page isn't 1, don't proceed
 		if(!($this->session->page >= 1))
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
-		
+
 		// if PHP version is greater than 5.2.0, TRUE (pass)
 		$this->view->tests[0] = phpversion() >= '5.2.0';
 		// hash is necessary
@@ -82,9 +82,12 @@ class InstallController extends Zend_Controller_Action
 		$this->view->tests[8] = ((bool) ini_get('safe_mode')) ? FALSE : TRUE;
 		// Output buffering
 		$this->view->tests[9] = ((bool) ini_get('output_buffering')) ? FALSE : TRUE;
-		
+		// writable media storage
+		$this->view->tests[10] = is_writable(MEDIA_DIR);
+
 		if(!$this->view->tests[0] || !$this->view->tests[1] ||
-			!$this->view->tests[8] || !$this->view->tests[9]) {
+			!$this->view->tests[8] || !$this->view->tests[9] || !$this->view->tests[7] ||
+			!$this->view->tests[10]) {
 			$this->view->fail = 100;
 		} elseif(!$this->view->tests[2] XOR !$this->view->tests[3]) {
 			$this->view->fail = 2;
@@ -110,11 +113,11 @@ class InstallController extends Zend_Controller_Action
 	public function configAction ()
 	{
 		$this->view->base_uri = $this->base_uri;
-		
+
 		// if session page isn't 2, don't proceed
 		if($this->session->page < 2)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
-		
+
 		$this->_helper->viewRenderer->setNoRender();
 		if (file_exists(CONFIG_DIR . '/configuration.ini')) {
 			// the configuration is already set up
@@ -188,8 +191,8 @@ class InstallController extends Zend_Controller_Action
 				if($db->test()!=1) {
 					// connection is no good
 					$this->view->uhoh = TRUE;
-					$this->render('databaseform');					
-				} elseif($db->installStructure()) { 
+					$this->render('databaseform');
+				} elseif($db->installStructure()) {
 					// connection works and structure has been set up
 					// we can write database connection to file
 					$db->writeConfig();
@@ -251,7 +254,7 @@ class InstallController extends Zend_Controller_Action
 	public function doneAction()
 	{
 		$this->view->base_uri = $this->base_uri;
-		
+
 		// if session page isn't 5, don't proceed
 		if($this->session->page < 5)
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
