@@ -16,6 +16,7 @@ IMediaEvent *g_iMedEvt			= NULL;
 IMediaSeeking *g_iMedSeek		= NULL;
 
 bool g_video_loaded = false;
+volatile bool g_video_initialized = false;
 
 IVMRWindowlessControl *video_getpointer_VMRwc(){
 	return g_iVMRwc;
@@ -85,8 +86,12 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 	HRESULT hr;
 	
 	debug_print("loading video...\n");
+	
+	if(!g_video_initialized){
+		video_init();
+	}
 
-	CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, (void **)&g_iGraphBldr);
+	hr = CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, (void **)&g_iGraphBldr);
 	if(FAILED(hr)){
 		debug_print("CoCreateInstance failed: hr = %08lX\n", hr);
 		
@@ -104,7 +109,7 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 		// Build the graph. For example:
 		//g_iGraphBldr->RenderFile(L"C:\\Program Files\\Microsoft Platform SDK\\Samples\\Multimedia\\DirectShow\\Media\\Video\\skiing.avi", 0);
 
-		g_iGraphBldr->RenderFile(video->filename, 0);
+		g_iGraphBldr->RenderFile(video->filename_w, 0);
 		//g_iGraphBldr->RenderFile(L"C:\\downloaded\\[Mazui]_Suzumiya_Haruhi_no_Yuuutsu_(2009)_-_21_[6CF2660F].mkv", 0);
 		
 		// Find the native video size.
@@ -124,7 +129,7 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 				SetRect(&rc_dst, 980/2 - width/2, 553/2 - height/2 + 112, 
 				980/2 + width/2, 553/2 + height/2 + 112); 
 			}else{
-				SetRect(&rc_dst, 0, 112, 979, 664);	
+				SetRect(&rc_dst, 0, 112, 979, 665);	
 			}
 
 			// Set the video position.
@@ -179,11 +184,15 @@ bool video_isloaded(){
 	return g_video_loaded;
 }
 
+bool video_isinit(){
+	return g_video_initialized;
+}
+
 void video_init(){
 	//HRESULT hr;
 	CoInitialize(NULL);
 	
-	
+	g_video_initialized = true;
 
 	debug_print("video initialized.\n");
 }

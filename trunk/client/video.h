@@ -15,6 +15,7 @@ HRESULT video_getduration(LONGLONG *duration);
 HRESULT video_getposition(LONGLONG *position);
 
 bool video_isloaded();
+bool video_isinit();
 
 void video_init();
 void video_shutdown();

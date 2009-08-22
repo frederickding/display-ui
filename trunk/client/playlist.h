@@ -5,9 +5,10 @@
 
 typedef struct _playlist_element_t{
 	byte type;
-	int secs;
-	int trans;
-	
+	byte secs;
+	byte trans;
+	int id;
+
 	void *data;
 	_playlist_element_t *next;
 	_playlist_element_t *prev;
@@ -20,11 +21,12 @@ typedef struct _playlist_t{
 
 typedef struct _image_element_t{
 	byte type;
+	bool loaded;
 	FIBITMAP *fbmp_image;
 	HDC hdc;
 	HBITMAP hbm;
 	BLENDFUNCTION bf;
-	char *filename;
+	char filename[22];
 }image_element_t;
 
 typedef struct _video_element_t{
@@ -44,10 +46,11 @@ typedef struct _video_element_t{
 // 	IMediaEvent *iMedEvt;
 // 	IMediaSeeking *iMedSeek;
 	
-	
-	wchar_t *filename;
+	char filename[22];
+	wchar_t filename_w[22];
 }video_element_t;
 
+//void playlist_dumpitems();
 
 void playlist_load(HWND hwnd);
 void playlist_unload();

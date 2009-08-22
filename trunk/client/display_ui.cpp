@@ -52,7 +52,7 @@
 #pragma comment(lib, "msimg32.lib")
 #pragma comment(lib, "strmiids.lib")
 
-#define FRAMES_PER_SEC 25 // should be a multiple of 1000!
+#define FRAMES_PER_SEC 25 // should be a factor of 1000!
 #define FRAME_INTERVAL 1000 / FRAMES_PER_SEC
 
 #define MakeFont(name, bold, italic, underline, size) CreateFont(-size, \
@@ -83,6 +83,7 @@ void *bmp_bytes;
 
 void update(void *p) {
 	weather_update(p);
+	playlist_load((HWND) p);
 	if(download("http://du.geekie.org/server/api/headlines/fetch/?sys_name=1&sig=%s", "data\\headlines.dat") == S_OK) {
 
 		FILE *fp = fopen("data\\headlines.dat", "r");
@@ -150,8 +151,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	sig = (char *) malloc(41);
 	generate_sig();
 	weather_init();
-	g_current_elem = g_playlist.first;
-
+	//playlist_load(hWnd);
+	
 	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
 
 	// enter the main loop:
@@ -199,7 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		fbmp_headlines1 = FreeImage_Load(FIF_JPEG, "img\\headlines-1.jpg", JPEG_DEFAULT);
 		fbmp_headlines2 = FreeImage_Load(FIF_JPEG, "img\\headlines-2.jpg", JPEG_DEFAULT);
 		
-	playlist_load(hWnd);
+//	playlist_load(hWnd);
 
 		//SetTimer(hWnd, 4, 50, NULL);
 		break;
@@ -210,7 +211,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		BeginPaint(hWnd, &ps);
 
-		static int timeleft = 100;
+		static int timeleft = 0xffff;
 		static int imgalpha = 205;
 		
 
@@ -246,16 +247,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HFONT font_dejavusans_cond_bold_58 = MakeFont("DejaVu Sans Condensed", true, false, false, 58);
 		
 		
-		
+		//debug_print("%08lX\n", g_current_elem);
+		if(!g_current_elem){
+			g_current_elem = g_playlist.first;
+		}
+
 		if(g_current_elem){
-		//	debug_print("%08lX\n", g_current_elem);
 			if(g_current_elem->type == 1){
 				
-				
-				
-				
 				image_element_t *image = (image_element_t *) g_current_elem->data;
-				
+				//debug_print("%d", image->loaded);
+				if(image->loaded){
+					//debug_print("asdf\n");
+					if(timeleft == 0xffff) timeleft = g_current_elem->secs * FRAMES_PER_SEC / 4;
+					image->bf.SourceConstantAlpha = imgalpha;
+					
+					AlphaBlend(hdcMem, 980/2 - FreeImage_GetWidth(image->fbmp_image)/2, 112 + 553/2 - FreeImage_GetHeight(image->fbmp_image)/2, 
+						FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, 
+						FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->bf);
+					
+					if(timeleft == 0){
+						if(g_current_elem->next) g_current_elem = g_current_elem->next;
+						debug_print("%08lX\n", g_current_elem);
+						StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
+						timeleft = 0xffff;
+						imgalpha = 55;
+					}else{
+						timeleft--;
+						if(timeleft < 15){
+							imgalpha -= 15;
+						}else if(imgalpha < 255) imgalpha += 10;
+					}
+				}
+
 		/*		HDC temp = CreateCompatibleDC(hdcMem);
 				HBITMAP temp_bmp = CreateCompatibleBitmap(hdc, FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image));
 				SelectObject(temp, temp_bmp);
@@ -264,23 +288,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//	image->hbm = CreateCompatibleBitmap(image->hdc, FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image));
 			//	SelectObject(image->hdc, image->hbm);
 				
-				image->bf.SourceConstantAlpha = imgalpha;
-
-				AlphaBlend(hdcMem, 980/2 - FreeImage_GetWidth(image->fbmp_image)/2, 112 + 553/2 - FreeImage_GetHeight(image->fbmp_image)/2, 
-					FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, 
-					FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->bf);
 				
-				if(timeleft == 0){
-					if(g_current_elem->next) g_current_elem = g_current_elem->next;
-					StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
-					timeleft = g_current_elem->secs * 25;
-					imgalpha = 55;
-				}else{
-					timeleft--;
-					if(timeleft < 15){
-						imgalpha -= 15;
-					}else if(imgalpha < 255) imgalpha += 10;
-				}
 
 				//SetTextColor(image->hdc, RGB(0, 0, 0));
 				//TextOut(image->hdc, 100, 100, "asdf", 4);
@@ -288,10 +296,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//	DeleteObject(image->hbm);
 			//	DeleteDC(image->hdc);
 				
-			}else if(g_current_elem->type == 2){
+			}else if(g_current_elem->type == 3){
 				static int iter = 0;
 				LONGLONG position;
 				LONGLONG duration;
+				//if(g_current_elem->next) g_current_elem = g_current_elem->next;
+
 				//debug_print("video\n");
 
 				video_element_t *video = (video_element_t *) g_current_elem->data;
@@ -301,31 +311,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					video_load(hWnd, video);
 					g_video_painting = true;
 				}
-				
-				video_getduration(&duration);
-				video_getposition(&position);
-				
-	
-				video_render(hWnd, hdcMem, video);
-
-				
-				video_getduration(&duration);
-				video_getposition(&position);
-				debug_print("%lld / %lld\n", position, duration);
-				
-				iter++;
-
-				if(position >= duration){
-					debug_print("video end reached.\n");
-					video_unload(video);
-					g_video_painting = false;
-					iter = 0;
-					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+				if(video_isloaded()){
+					video_getduration(&duration);
+					video_getposition(&position);
+					
+					
+					video_render(hWnd, hdcMem, video);
+					
+					
+					video_getduration(&duration);
+					video_getposition(&position);
+					//debug_print("%lld / %lld\n", position, duration);
+					
+					iter++;
+					
+					if(position >= duration){
+						debug_print("video end reached.\n");
+						video_unload(video);
+						g_video_painting = false;
+						iter = 0;
+						if(g_current_elem->next) g_current_elem = g_current_elem->next;
+						debug_print("%08lX\n", g_current_elem);
+						//playlist_dumpitems();
+					}
 				}
+				
 
 				//video->iVMRwc->RepaintVideo(hWnd, hdcMem);
-
-
 			}
 		}
 		
