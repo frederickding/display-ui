@@ -27,6 +27,15 @@
 #include <Qedit.h>
 #include <dshow.h>
 
+// because dshow.h does REALLY stupid stuff
+// (see line 7673 of strsafe.h. WTF, microsoft)
+#undef sprintf
+#undef swprintf
+#undef strcat
+//#define sprintf sprintf
+//#define swprintf swprintf
+//#define strcat strcat
+
 #include "display_ui.h"
 #include "freeimage.h"
 #include "playlist.h"
@@ -50,192 +59,216 @@ typedef struct _playlist_element_f_t{
 }playlist_element_f_t;
 
 typedef struct _image_element_f_t{
-	short filename_len;
-	char filename[1];
+	char ext[1];
 }image_element_f_t;
 
 typedef struct _video_element_f_t{
-	short filename_len;
-	char filename[1];
+	char ext[1];
 }video_element_f_t;
 
 #pragma pack()
 
+typedef struct _playlist_thread_elem_t{
+	playlist_element_t *elem;
+	HWND hwnd;
+}playlist_thread_elem_t;
 
 
 playlist_t g_playlist;
 
+bool file_exists(const char * filename){
+    if (FILE * file = fopen(filename, "r")){
+        fclose(file);
+        return true;
+    }
+    return false;
+}
+
+
+
+void playlist_image_doload(void *p){
+	playlist_thread_elem_t *th_image = (playlist_thread_elem_t *) p;
+	playlist_element_t *element = th_image->elem;
+	image_element_t *new_img = (image_element_t *) element->data;
+
+	char download_src[69 + 15];
+	memset(download_src, 0, 69 + 15);
+	
+	debug_print("downloading image... %s\n", new_img->filename);
+
+	sprintf(download_src, "http://du.geekie.org/server/api/media/download/?sys_name=1&sig=%%s&id=%d", element->id);
+	
+	//debug_print("downloading ... [%s] -> [%s]\n", download_src, download_dest);
+	if(!file_exists(new_img->filename)){
+		if(download(download_src, new_img->filename) != S_OK){
+			debug_print("image download failed! %s\n", download_src);
+			return;
+		}
+	}
+	
+	new_img->type = FreeImage_GetFileType(new_img->filename, 0);
+	if(new_img->type == FIF_UNKNOWN){
+		new_img->type = FreeImage_GetFIFFromFilename(new_img->filename);
+	}
+	new_img->fbmp_image = FreeImage_Load((FREE_IMAGE_FORMAT)new_img->type, new_img->filename, NULL);
+	if(new_img->type == FIF_PNG) FreeImage_PreMultiplyWithAlpha(new_img->fbmp_image);
+	debug_print("new_img->fbmp_image = %08lX\n", new_img->fbmp_image);
+
+	HDC hdcWin = GetDC(th_image->hwnd);
+	new_img->hdc = CreateCompatibleDC(hdcWin);
+	new_img->hbm = CreateCompatibleBitmap(hdcWin, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image));
+	SelectObject(new_img->hdc, new_img->hbm);
+	
+	// Draw the image once to the DC to avoid having to redraw every time a frame is rendered
+	StretchDIBits(new_img->hdc, 0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
+		0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
+		FreeImage_GetBits(new_img->fbmp_image), FreeImage_GetInfo(new_img->fbmp_image), DIB_RGB_COLORS, SRCCOPY);
+	ReleaseDC(th_image->hwnd, hdcWin);
+	
+	new_img->bf.BlendOp = AC_SRC_OVER;
+	new_img->bf.BlendFlags = 0;
+	new_img->bf.SourceConstantAlpha = 255;
+	new_img->bf.AlphaFormat = (new_img->type == FIF_PNG ? AC_SRC_ALPHA : AC_SRC_OVER);
+	
+	free(p);
+	debug_print("image loaded.\n");
+	new_img->loaded = true;
+}
+
+void playlist_video_doload(void *p){
+	playlist_thread_elem_t *th_vid = (playlist_thread_elem_t *) p;
+	playlist_element_t *element = th_vid->elem;
+	video_element_t *new_vid = (video_element_t *) element->data;
+	
+	char download_src[69 + 15];
+	memset(download_src, 0, 69 + 15);
+
+	debug_print("downloading video... %s\n", new_vid->filename);
+	
+	sprintf(download_src, "http://du.geekie.org/server/api/media/download/?sys_name=1&sig=%%s&id=%d", element->id);
+	//debug_print("downloading ... [%s] -> [%s]\n", download_src, download_dest);
+	free(p);
+	if(!file_exists(new_vid->filename)){
+		if(download(download_src, new_vid->filename) != S_OK){
+			debug_print("image download failed! %s\n", download_src);
+			return;
+		}
+	}
+
+	
+}
+
+void playlist_dumpitems(){
+	playlist_element_t *current = g_playlist.first;
+
+	do{
+		debug_print("[playlist_dumpitems] current: %08lX\n", current);
+		debug_print("[playlist_dumpitems] type: %d\n", current->type);
+		debug_print("[playlist_dumpitems] ID: %d\n", current->id);
+		if(current->type == 1){
+			image_element_t *img = (image_element_t *)current->data;
+			debug_print("[playlist_dumpitems] img filename: %s\n", img->filename);
+		}else if(current->type == 3){
+			video_element_t *vid = (video_element_t *)current->data;
+			debug_print("[playlist_dumpitems] vid filename: %s\n", vid->filename);
+		}
+		current = current->next;
+	}while(current != g_playlist.first);
+}
 
 void playlist_load(HWND hwnd){
-
-	FILE *fp = fopen("data\\playlist.dat", "r");
 	
-	if(fp){
-		fseek(fp, 0, SEEK_END);
-		int size = ftell(fp);
-		fseek(fp, 0, SEEK_SET);
+	if(download("http://du.geekie.org/server/api/playlists/fetch/?sys_name=1&sig=%s", "data\\playlist.dat") == S_OK) {
+		FILE *fp = fopen("data\\playlist.dat", "r");
+		
+		if(fp){
+			fseek(fp, 0, SEEK_END);
+			int size = ftell(fp);
+			fseek(fp, 0, SEEK_SET);
 
-		char *raw_playlist = (char *) malloc(size);
+			char *raw_playlist = (char *) malloc(size);
 
-		fread(raw_playlist, 1, size, fp);
-		
-		playlist_f_t *playlist = (playlist_f_t *) raw_playlist;
-		g_playlist.num_elements = playlist->num_elements;
-		debug_print("number of elements: %d **\n", g_playlist.num_elements);
-		
-		playlist_element_f_t *current = (playlist_element_f_t *) playlist->data;		
-		
-		playlist_element_t *prev_elem = NULL;
-		for(int i = 0; i < playlist->num_elements; i++){
-			debug_print("element type: %d\nsecs: %d\nlen: %x\n", current->type, current->secs, current->len);
-			playlist_element_t *new_elem = (playlist_element_t *) malloc(sizeof(playlist_element_t));
-			new_elem->type = current->type;
-			new_elem->secs = current->secs;
-			new_elem->trans = current->trans;
+			fread(raw_playlist, 1, size, fp);
 			
-			if(new_elem->type == 1){
-				// image
-				image_element_f_t *current_img = (image_element_f_t *) current->data;
-				image_element_t *new_img = (image_element_t *) malloc(sizeof(image_element_t));
-				memset(new_img, 0, sizeof(image_element_t));
-				new_img->filename = (char *) malloc(current_img->filename_len + 1);
-				memset(new_img->filename, 0, current_img->filename_len + 1);
-
+			playlist_f_t *playlist = (playlist_f_t *) raw_playlist;
+			g_playlist.num_elements = playlist->num_elements;
+			debug_print("number of elements: %d **\n", g_playlist.num_elements);
+			
+			playlist_element_f_t *current = (playlist_element_f_t *) playlist->data;		
+			
+			playlist_element_t *prev_elem = NULL;
+			for(int i = 0; i < playlist->num_elements; i++){
+				debug_print("element type: %d\nsecs: %d\nlen: %x\n", current->type, current->secs, current->len);
+				playlist_element_t *new_elem = (playlist_element_t *) malloc(sizeof(playlist_element_t));
+				new_elem->type = current->type;
+				new_elem->secs = current->secs;
+				new_elem->trans = current->trans;
+				new_elem->id = current->id;
 				
-				memcpy(new_img->filename, current_img->filename, current_img->filename_len);
-				debug_print("filename: %s\n", new_img->filename);
-				
-				new_img->type = FreeImage_GetFileType(new_img->filename, 0);
-				if(new_img->type == FIF_UNKNOWN){
-					new_img->type = FreeImage_GetFIFFromFilename(new_img->filename);
-				}
-				new_img->fbmp_image = FreeImage_Load((FREE_IMAGE_FORMAT)new_img->type, new_img->filename, NULL);
-				if(new_img->type == FIF_PNG) FreeImage_PreMultiplyWithAlpha(new_img->fbmp_image);
-				
+				if(new_elem->type == 1){
+					// image
+					image_element_f_t *current_img = (image_element_f_t *) current->data;
+					image_element_t *new_img = (image_element_t *) malloc(sizeof(image_element_t));
 
-				HDC hdcWin = GetDC(hwnd);
-				new_img->hdc = CreateCompatibleDC(hdcWin);
-				new_img->hbm = CreateCompatibleBitmap(hdcWin, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image));
-				SelectObject(new_img->hdc, new_img->hbm);
-				
-				// Draw the image once to the DC to avoid having to redraw every time a frame is rendered
-				StretchDIBits(new_img->hdc, 0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
-					0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
-					FreeImage_GetBits(new_img->fbmp_image), FreeImage_GetInfo(new_img->fbmp_image), DIB_RGB_COLORS, SRCCOPY);
-				ReleaseDC(hwnd, hdcWin);
+					memset(new_img, 0, sizeof(image_element_t));
+					sprintf(new_img->filename, "media\\%d.%s", current->id, current_img->ext);
 
-				new_img->bf.BlendOp = AC_SRC_OVER;
-				new_img->bf.BlendFlags = 0;
-				new_img->bf.SourceConstantAlpha = 255;
-				new_img->bf.AlphaFormat = (new_img->type == FIF_PNG ? AC_SRC_ALPHA : AC_SRC_OVER);
-
-				new_elem->data = new_img;
-
-			}else if(new_elem->type == 2){
-				video_element_f_t *current_vid = (video_element_f_t *) current->data;
-				video_element_t *new_vid = (video_element_t *) malloc(sizeof(video_element_t));
-				memset(new_vid, 0, sizeof(video_element_t));
-				new_vid->filename = (wchar_t *) malloc((current_vid->filename_len + 1) * 2);
-				memset(new_vid->filename, 0, (current_vid->filename_len + 1) * 2);
-				
-				mbstowcs(new_vid->filename, current_vid->filename, current_vid->filename_len);
-				
-				debug_print("filename: %ws\n", new_vid->filename);
-				
-				long streams;
-				HRESULT hr;
-				
-				if(video_getpointer_VMRwc() == NULL){
-					debug_print("initializing video..\n");
-					video_init();
-				}
-				
-				new_elem->data = new_vid;
-
-				debug_print(" -- %d asdf\n", __LINE__);
-				
-				//video_load(hwnd, new_vid);
-
-
-				/*
-				hr = CoCreateInstance(CLSID_MediaDet, NULL, CLSCTX_INPROC, IID_IMediaDet, (void**)&new_vid->iMedDet);
-				if(FAILED(hr)){
-					debug_print("CoCreateInstance failed: hr = %08lX\n", hr);
-					continue;
-				}
-				BSTR bstrFileName = L"C:\\downloaded\\[Shamisen] Melancholy of Haruhi-chan - 13 (XviD 704x400 4E9016C4).avi";
-					//L"C:\\Program Files\\Microsoft Platform SDK\\Samples\\Multimedia\\DirectShow\\Media\\Video\\skiing.avi";
-				
-				new_vid->iMedDet->put_Filename(bstrFileName);
-				new_vid->iMedDet->get_OutputStreams(&streams);
-				bool bFound = false;
-
-
-				for (int i = 0; i < streams; i++){
-					GUID major_type;
-					hr = new_vid->iMedDet->put_CurrentStream(i);
-					if (SUCCEEDED(hr))
-						hr = new_vid->iMedDet->get_StreamType(&major_type);
-					if (FAILED(hr))
-						break;
-					if (major_type == MEDIATYPE_Video)
-					{
-						bFound = true;
-						break;
-					}
-				}
-				if (!bFound){
-					debug_print("faaaaaaaiill");
-					return;
-				}
-
-				AM_MEDIA_TYPE mt;
-				new_vid->iMedDet->get_StreamMediaType(&mt);
-				if ((mt.formattype == FORMAT_VideoInfo) &&
-					(mt.cbFormat >= sizeof(VIDEOINFOHEADER))){
-					VIDEOINFOHEADER *pVih = (VIDEOINFOHEADER*)(mt.pbFormat);
-					new_vid->width = pVih->bmiHeader.biWidth;
-					new_vid->height = pVih->bmiHeader.biHeight;
+					debug_print("filename: %s\n", new_img->filename);
 					
-					// We want the absolute m_Height, don't care about orientation.
-					if (new_vid->width < 0) new_vid->height *= -1;
+					playlist_thread_elem_t *i = (playlist_thread_elem_t *) malloc(sizeof(playlist_thread_elem_t));
+					i->hwnd = hwnd; i->elem = new_elem;
+					
+					new_elem->data = new_img;
+					
+					//playlist_image_doload((void *) &i);
+					CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_image_doload, (void *)i, 0, NULL);
+					
+
+
+				}else if(new_elem->type == 3){
+					video_element_f_t *current_vid = (video_element_f_t *) current->data;
+					video_element_t *new_vid = (video_element_t *) malloc(sizeof(video_element_t));
+					memset(new_vid, 0, sizeof(video_element_t));
+					
+					
+					sprintf(new_vid->filename, "media\\%d.%s", current->id, current_vid->ext);
+					mbstowcs(new_vid->filename_w, new_vid->filename, strlen(new_vid->filename));
+					//swprintf(new_vid->filename_w, L"media\\%d.%s", current->id, current_vid->ext);
+					
+					debug_print("filename: %s\nwfilename: %ws\n", new_vid->filename, new_vid->filename_w);
+					
+					
+					
+					playlist_thread_elem_t *i = (playlist_thread_elem_t *) malloc(sizeof(playlist_thread_elem_t));
+					i->hwnd = hwnd; i->elem = new_elem;
+
+					new_elem->data = new_vid;
+
+					//playlist_video_doload((void *)&i);
+					CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_video_doload, (void *)i, 0, NULL);
+					
+					debug_print(" -- %d asdf\n", __LINE__);
+					
+					//video_load(hwnd, new_vid);
+
 				}
-				else{
-					hr = VFW_E_INVALIDMEDIATYPE; // Should not happen, in theory.
-				}
-				//FreeMediaType(mt);
 				
-				double stream_length;
-				new_vid->iMedDet->get_FrameRate(&new_vid->fps);
-				new_vid->iMedDet->get_StreamLength(&stream_length);
-				//new_vid->framebuf = malloc(4 * new_vid->width * new_vid->height);
-				//new_vid->frame_datasize = 4 * new_vid->width * new_vid->height;
-				new_vid->num_frames = new_vid->fps * stream_length;
+				if(i == 0) g_playlist.first = new_elem;
+				if(prev_elem) prev_elem->next = new_elem;
+				prev_elem = new_elem;
+				new_elem->next = g_playlist.first;
+				current = (playlist_element_f_t *) ((unsigned long)current + (unsigned long)current->len);
 				
- 				new_vid->iMedDet->EnterBitmapGrabMode(0);
- 				new_vid->iMedDet->GetSampleGrabber(&new_vid->iSplGrab);
 
-			//	new_vid->iSplGrab->SetBufferSamples(true);
-			//	new_vid->iSplGrab->SetOneShot(true);
-
-				debug_print("frame rate: %f , length: %f\n", new_vid->fps, stream_length);
-*/
-
+				debug_print("%08lX -- %08lX .. %d\n", raw_playlist, new_elem, new_elem->type);
 			}
-			
-			if(i == 0) g_playlist.first = new_elem;
-			if(prev_elem) prev_elem->next = new_elem;
-			prev_elem = new_elem;
-			new_elem->next = g_playlist.first;
-			current = (playlist_element_f_t *) ((unsigned long)current + (unsigned long)current->len);
-			
 
-			debug_print("%08lX -- %08lX .. %d\n", raw_playlist, new_elem, new_elem->type);
-		}
-
-		free(raw_playlist);
-		fclose(fp);
+			free(raw_playlist);
+			fclose(fp);
+		}	
 	}	
+
+	playlist_dumpitems();
 }
 
 void playlist_unload(){
