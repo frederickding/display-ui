@@ -31,4 +31,4 @@ The Display UI client is built in C/C++ and GDI, and has only been tested with t
 || *RAM* || 512 MB || 1 GB or greater ||
 || *Internet Connection* || Dial-up (56.6 Kbps) || Broadband ||
 || *Screen Resolution* || 1280x720 or greater ||
-|| *Other Requirements* || DejaVu Sans font, and condensed variant ||
+|| *Other Requirements* || DejaVu Sans font, and condensed variant<br />Codecs capable of running videos (H.264, XviD, etc.) ||
