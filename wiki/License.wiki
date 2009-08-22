@@ -11,6 +11,7 @@ Display UI makes use of open source libraries. These include:
   * [http://framework.zend.com/ Zend Framework], [http://framework.zend.com/license licensed under the New BSD License]
   * [http://freeimage.sourceforge.net/ The FreeImage Project], an open source image library, [http://www.opensource.org/licenses/gpl-3.0.html licensed under the GNU GPL, version 3]
   * [http://curl.haxx.se/libcurl/ libcurl], the multi-protocol file transfer library, licensed under a MIT/X-style license (see the curl license below)
+_We only use libraries with compatible licenses; the Free Software Foundation considers the Apache License 2.0, the New BSD License and the X11 License to be compatible with the GNU GPL v3 – and hence compatible with each other._
 
 = Apache License 2.0 =
 <table border="0" cellpadding="2">
