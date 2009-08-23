@@ -24,6 +24,8 @@ typedef struct _playlist_t{
 
 typedef struct _image_element_t{
 	byte type;
+	long width, height;
+
 	FIBITMAP *fbmp_image;
 	HDC hdc;
 	HBITMAP hbm;

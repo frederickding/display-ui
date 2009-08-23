@@ -106,7 +106,7 @@ unsigned long weather_update(void *p, bool download_new){
 				FreeImage_Unload(fbmp_weather_current);
 			}	
 			fbmp_weather_current = FreeImage_Load(FIF_PNG, "img\\current.png", NULL);
-			FreeImage_Rescale(fbmp_weather_current, 188, 135, FILTER_BICUBIC);
+			FreeImage_Rescale(fbmp_weather_current, 250, 180, FILTER_BICUBIC);
 			FreeImage_PreMultiplyWithAlpha(fbmp_weather_current);
 		
 

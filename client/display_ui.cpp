@@ -150,8 +150,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		/* use this for full-screen:
 		-GetSystemMetrics(SM_CXFRAME), -GetSystemMetrics(SM_CYCAPTION) - 
 			GetSystemMetrics(SM_CYFRAME),    // the starting x and y positions should be 0 */
-		1280 + 2*(GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXEDGE)),
-		720 + 2 * (GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYEDGE)) + GetSystemMetrics(SM_CYCAPTION),    // 760 for now to account for title bar
+		SCREEN_WIDTH + 2*(GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXEDGE)),
+		SCREEN_HEIGHT + 2 * (GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYEDGE)) + GetSystemMetrics(SM_CYCAPTION),    // 760 for now to account for title bar
 		NULL,
 		NULL,
 		hInstance,
@@ -205,13 +205,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetTimer(hWnd, 1, 1000, NULL);
 		SetTimer(hWnd, 2, 900000, NULL);
 		SetTimer(hWnd, 3, FRAME_INTERVAL, NULL);
-			
+		
+#if SCREEN_WIDTH == 1366
+		fbmp_header			= FreeImage_Load(FIF_JPEG, "img\\header-1366.jpg", JPEG_DEFAULT);
+		fbmp_bg				= FreeImage_Load(FIF_JPEG, "img\\content-bg-1366.jpg", JPEG_DEFAULT);
+		fbmp_headlines2		= FreeImage_Load(FIF_JPEG, "img\\headlines-2-1366.jpg", JPEG_DEFAULT);
+#else
 		fbmp_header			= FreeImage_Load(FIF_JPEG, "img\\header.jpg", JPEG_DEFAULT);
 		fbmp_bg				= FreeImage_Load(FIF_JPEG, "img\\content-bg.jpg", JPEG_DEFAULT);
+		fbmp_headlines2		= FreeImage_Load(FIF_JPEG, "img\\headlines-2.jpg", JPEG_DEFAULT);
+#endif		
 		fbmp_weatherbg		= FreeImage_Load(FIF_PNG, "img\\partlycloudy.png", PNG_DEFAULT);
 		fbmp_weathergrad	= FreeImage_Load(FIF_PNG, "img\\weathergrad.png", PNG_DEFAULT);
 		fbmp_headlines1		= FreeImage_Load(FIF_JPEG, "img\\headlines-1.jpg", JPEG_DEFAULT);
-		fbmp_headlines2		= FreeImage_Load(FIF_JPEG, "img\\headlines-2.jpg", JPEG_DEFAULT);
 		fbmp_loading		= FreeImage_Load(FIF_PNG, "img\\loading.png", PNG_DEFAULT);
 		
 		FreeImage_PreMultiplyWithAlpha(fbmp_loading);
@@ -278,9 +284,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if(timeleft == 0xffff) timeleft = g_current_elem->secs * FRAMES_PER_SEC / 8;
 					image->bf.SourceConstantAlpha = imgalpha;
 					
-					AlphaBlend(hdcMem, CONTENT_WIDTH/2 - FreeImage_GetWidth(image->fbmp_image)/2, CONTENT_TOP + CONTENT_HEIGHT/2 - FreeImage_GetHeight(image->fbmp_image)/2, 
-						FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, 
-						FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->bf);
+					AlphaBlend(hdcMem, CONTENT_WIDTH/2 - image->width/2, CONTENT_TOP + CONTENT_HEIGHT/2 - image->height/2, 
+						image->width, image->height, image->hdc, 0, 0, image->width, image->height, image->bf);
 					
 					if(timeleft == 0){
 						if(g_current_elem->next) g_current_elem = g_current_elem->next;
@@ -370,7 +375,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				bf.AlphaFormat = AC_SRC_ALPHA;
 
 				StretchDIBits(hdcTemp, 0, 0, 400, 225, 0, 0, 400, 225, FreeImage_GetBits(fbmp_loading), FreeImage_GetInfo(fbmp_loading), DIB_RGB_COLORS, SRCCOPY);
-				AlphaBlend(hdcMem, 290, 276, 400, 225, hdcTemp, 0, 0, 400, 225, bf);
+				AlphaBlend(hdcMem, CONTENT_WIDTH/2 - 200, CONTENT_TOP + CONTENT_HEIGHT/2 - 225/2, 400, 225, hdcTemp, 0, 0, 400, 225, bf);
 				
 				if(g_current_elem->type == 1){
 					image_element_t *img = (image_element_t *)g_current_elem->data;
@@ -386,8 +391,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				debug_print("%s\n", msg);
 
 				RECT textBound;
-				textBound.left = 300; textBound.top = 370;
-				textBound.right = 680; textBound.bottom = 490;
+				textBound.left = CONTENT_WIDTH/2 - 200 + 10; textBound.top = CONTENT_TOP + CONTENT_HEIGHT/2 - 225/2 + 95;
+				textBound.right = CONTENT_WIDTH/2 + 190; textBound.bottom = CONTENT_TOP + CONTENT_HEIGHT/2 + 395/2;
 				DrawTextA(hdcMem, msg, strlen(msg), &textBound, DT_LEFT);
 
 				DeleteObject(hbmTemp);
@@ -410,7 +415,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 
 			//fbmp_weatherbg = FreeImage_Composite(fbmp_weatergrad, TRUE, NULL, fbmp_weatherbg);
-			StretchDIBits(hdcMem, 980, 110, 300, 225, 0, 0, 300, 225, FreeImage_GetBits(fbmp_weatherbg), FreeImage_GetInfo(fbmp_weatherbg), DIB_RGB_COLORS, SRCCOPY);
+			StretchDIBits(hdcMem, CONTENT_WIDTH, CONTENT_TOP - 1, 300, 225, 0, 0, 300, 225, 
+				FreeImage_GetBits(fbmp_weatherbg), FreeImage_GetInfo(fbmp_weatherbg), DIB_RGB_COLORS, SRCCOPY);
 
 			FreeImage_SetTransparent(fbmp_weather_cur, true);
 
@@ -429,7 +435,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				StretchDIBits(temp, 0, 0, 250, 180, 0, 0, 250, 180, FreeImage_GetBits(fbmp_weather_cur), 
 					FreeImage_GetInfo(fbmp_weather_cur), DIB_RGB_COLORS, SRCCOPY);
-				AlphaBlend(hdcMem, 990, 120, 250, 180, temp, 0, 0, 250, 180, bf);
+				AlphaBlend(hdcMem, CONTENT_WIDTH + 10, CONTENT_TOP + 8, 250, 180, temp, 0, 0, 250, 180, bf);
 				//BitBlt(hdcMem, 990, 180, 1280, 720, temp, 0, 0, SRCCOPY);
 				DeleteObject(temp_bmp);
 				DeleteDC(temp);
@@ -438,14 +444,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 			// Display temperatures
 			RECT textBound;
-			textBound.left = 1110; textBound.top = 120;
-			textBound.right = 1260; textBound.bottom = 180;
+			textBound.left = CONTENT_WIDTH + 30; textBound.top = CONTENT_TOP + 8;
+			textBound.right = SCREEN_WIDTH - 20; textBound.bottom = CONTENT_TOP + 68;
 			SelectObject(hdcMem, font_dejavusans_cond_bold_42);
 			DrawTextA(hdcMem, current->temp, strlen(current->temp), &textBound, DT_RIGHT);
 			
 			
-			textBound.left = 975; textBound.top = 260;
-			textBound.right = 975 + 295; textBound.bottom = 260 + 75;
+			textBound.left = CONTENT_WIDTH - 5; textBound.top = CONTENT_TOP + 148;
+			textBound.right = CONTENT_WIDTH - 5 + 295; textBound.bottom = CONTENT_TOP + 148 + 75;
 			SelectObject(hdcMem, font_dejavusans_cond_bold_32);
 			//SetTextAlign(hdcMem,  TA_RIGHT);
 			if(current->description){
@@ -470,17 +476,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//FreeImage_Rescale(fbmp_weather_fc0, 188, 135, FILTER_BILINEAR);
 			//FreeImage_Rescale(fbmp_weather_fc1, 188, 135, FILTER_BILINEAR);
 
-			StretchDIBits(hdcMem, 980, 335, 300, 150, 0, 0, 300, 150, FreeImage_GetBits(fbmp_weathergrad), FreeImage_GetInfo(fbmp_weathergrad), DIB_RGB_COLORS, SRCCOPY);
+			StretchDIBits(hdcMem, CONTENT_WIDTH, CONTENT_TOP + 223, 300, 150, 0, 0, 300, 150, FreeImage_GetBits(fbmp_weathergrad), FreeImage_GetInfo(fbmp_weathergrad), DIB_RGB_COLORS, SRCCOPY);
 			
 			SelectObject(hdcMem, font_dejavusans_bold_24);
 			RECT textBound;
-			textBound.left = 980; textBound.top = 340;
-			textBound.right = 980 + 145; textBound.bottom = 340 + 30;
+			textBound.left = CONTENT_WIDTH; textBound.top = CONTENT_TOP + 228;
+			textBound.right = CONTENT_WIDTH + 145; textBound.bottom = CONTENT_TOP + 228 + 30;
+
 			DrawTextA(hdcMem, days_abbr[ptm->tm_wday == 6 ? 0 : ptm->tm_wday + 1], 
 					strlen(days_abbr[ptm->tm_wday == 6 ? 0 : ptm->tm_wday + 1]), &textBound, DT_RIGHT);
 			
-			textBound.left = 1130; textBound.top = 340;
-			textBound.right = 1130+ 145; textBound.bottom = 340 + 30;
+			textBound.left = CONTENT_WIDTH + 150; textBound.top = CONTENT_TOP + 228;
+			textBound.right = CONTENT_WIDTH + 150 + 145; textBound.bottom = CONTENT_TOP + 228 + 30;
+
 			DrawTextA(hdcMem, days_abbr[ptm->tm_wday == 6 ? 1 : (ptm->tm_wday == 5 ? 0 : ptm->tm_wday + 2)], 
 					strlen(days_abbr[ptm->tm_wday == 6 ? 1 : (ptm->tm_wday == 5 ? 0 : ptm->tm_wday + 2)]), &textBound, DT_RIGHT);
 
@@ -503,7 +511,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					FreeImage_GetBits(fbmp_weather_fc0), FreeImage_GetInfo(fbmp_weather_fc0), DIB_RGB_COLORS, SRCCOPY);
 				StretchDIBits(temp, 150, 0, 188, 135, 0, 0, FreeImage_GetWidth(fbmp_weather_fc1), FreeImage_GetHeight(fbmp_weather_fc1), 
 					FreeImage_GetBits(fbmp_weather_fc1), FreeImage_GetInfo(fbmp_weather_fc1), DIB_RGB_COLORS, SRCCOPY);
-				AlphaBlend(hdcMem, 980, 340, 300, 150, temp, 0, 0, 300, 150, bf);
+	
+				AlphaBlend(hdcMem, CONTENT_WIDTH, CONTENT_TOP + 228, 300, 150, temp, 0, 0, 300, 150, bf);
 				//BitBlt(hdcMem, 990, 180, 1280, 720, temp, 0, 0, SRCCOPY);
 				DeleteObject(temp_bmp);
 				DeleteDC(temp);
@@ -512,71 +521,73 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			char high[8];
 
 			sprintf(high, "hi %s", forecast[0]->temp_hi);
-			textBound.left = 980; textBound.top = 440;
-			textBound.right = 980 + 120; textBound.bottom = 440 + 40;
+			textBound.left = CONTENT_WIDTH; textBound.top = CONTENT_TOP + 328;
+			textBound.right = CONTENT_WIDTH + 120; textBound.bottom = CONTENT_TOP + 328 + 40;
 			SelectObject(hdcMem, font_dejavusans_cond_bold_32);
 			DrawTextA(hdcMem, high, strlen(high), &textBound, DT_RIGHT);
 
 			sprintf(high, "hi %s", forecast[1]->temp_hi);
-			textBound.left = 1130; textBound.top = 440;
-			textBound.right = 1130 + 120; textBound.bottom = 440 + 40;
+			textBound.left = CONTENT_WIDTH + 150; textBound.top = CONTENT_TOP + 328;
+			textBound.right = CONTENT_WIDTH + 150 + 120; textBound.bottom = CONTENT_TOP + 328 + 40;
 			DrawTextA(hdcMem, high, strlen(high), &textBound, DT_RIGHT);
 
 			SelectObject(hdcMem, font_dejavusans_cond_12);
-			TextOut(hdcMem, 1104, 443, "low", strlen("low"));
-			TextOut(hdcMem, 1254, 443, "low", strlen("low"));
+			TextOut(hdcMem, CONTENT_WIDTH + 124, CONTENT_TOP + 331, "low", strlen("low"));
+			TextOut(hdcMem, CONTENT_WIDTH + 124 + 150, CONTENT_TOP + 331, "low", strlen("low"));
 
-			textBound.left = 1075; textBound.top = 455;
-			textBound.right = 1075 + 48; textBound.bottom = 455 + 20;
+			textBound.left = CONTENT_WIDTH + 95; textBound.top = CONTENT_HEIGHT + 343;
+			textBound.right = CONTENT_WIDTH + 95 + 48; textBound.bottom = CONTENT_HEIGHT + 343 + 20;
 			SelectObject(hdcMem, font_dejavusans_cond_18);
 			DrawTextA(hdcMem, forecast[0]->temp_lo, strlen(forecast[0]->temp_lo), &textBound, DT_RIGHT);
 
-			textBound.left = 1225; textBound.top = 455;
-			textBound.right = 1225 + 48; textBound.bottom = 455 + 20;
+			textBound.left = CONTENT_WIDTH + 95 + 150; textBound.top = CONTENT_HEIGHT + 343;;
+			textBound.right = CONTENT_WIDTH + 95 + 150 + 48; textBound.bottom = CONTENT_HEIGHT + 343; + 20;
 			DrawTextA(hdcMem, forecast[1]->temp_lo, strlen(forecast[1]->temp_lo), &textBound, DT_RIGHT);
 		}
 		
 		
-		StretchDIBits(hdcMem, 0, 0, 1280, 112, 0, 0, 1280, 112, FreeImage_GetBits(fbmp_header), FreeImage_GetInfo(fbmp_header), DIB_RGB_COLORS, SRCCOPY);
+		StretchDIBits(hdcMem, 0, 0, SCREEN_WIDTH, CONTENT_TOP, 0, 0, SCREEN_WIDTH, CONTENT_TOP, 
+			FreeImage_GetBits(fbmp_header), FreeImage_GetInfo(fbmp_header), DIB_RGB_COLORS, SRCCOPY);
 
 		memset(datetimestr, 0, 17);
 		strftime(datetimestr, 16, "%b %d, %Y", ptm);
 		SetBkMode(hdcMem, TRANSPARENT); 
 		SetTextColor(hdcMem, color_white);
         SelectObject(hdcMem, font_dejavusans_bold_20);
-        TextOut(hdcMem, 720, 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
+        TextOut(hdcMem, CONTENT_WIDTH - 260, 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
         SelectObject(hdcMem, font_dejavusans_cond_bold_32);
-        TextOut(hdcMem, 717, 50, datetimestr, strlen(datetimestr));
+        TextOut(hdcMem, CONTENT_WIDTH - 263, 50, datetimestr, strlen(datetimestr));
 		
 		memset(datetimestr, 0, 17);
 		strftime(datetimestr, 16, "%H:%M:%S", ptm);
         SelectObject(hdcMem, font_dejavusans_cond_bold_58);
-        TextOut(hdcMem, 1000, 27, datetimestr, strlen(datetimestr));
+        TextOut(hdcMem, CONTENT_WIDTH + 20, 27, datetimestr, strlen(datetimestr));
 
 
 		HPEN pen = CreatePen(PS_DASH, 2, RGB(100, 100, 100));
 		SelectObject(hdcMem, pen);
-		MoveToEx(hdcMem, 980, 112, NULL);
-		LineTo(hdcMem, 980, 664);
+		MoveToEx(hdcMem, CONTENT_WIDTH, CONTENT_TOP, NULL);
+		LineTo(hdcMem, CONTENT_WIDTH, CONTENT_BOTTOM);
 		DeleteObject(pen);
 
-		StretchDIBits(hdcMem, 160, 664, 1120, 56, 0, 0, 1120, 56, FreeImage_GetBits(fbmp_headlines2), FreeImage_GetInfo(fbmp_headlines2), DIB_RGB_COLORS, SRCCOPY);
+		StretchDIBits(hdcMem, 160, CONTENT_BOTTOM, SCREEN_WIDTH - 160, 56, 0, 0, SCREEN_WIDTH - 160, 56, 
+			FreeImage_GetBits(fbmp_headlines2), FreeImage_GetInfo(fbmp_headlines2), DIB_RGB_COLORS, SRCCOPY);
 		
 
 		SelectObject(hdcMem, font_dejavusans_cond_bold_24);
-		TextOut(hdcMem, g_headline_x, 664 + 16, headline_txt, strlen(headline_txt));
+		TextOut(hdcMem, g_headline_x, CONTENT_BOTTOM + 16, headline_txt, strlen(headline_txt));
 		
 		SIZE extents;
 		GetTextExtentPoint32(hdcMem, headline_txt, strlen(headline_txt), &extents);
-		if(g_headline_x + extents.cx < 160) g_headline_x = 1280;
+		if(g_headline_x + extents.cx < 160) g_headline_x = SCREEN_WIDTH;
 
-		StretchDIBits(hdcMem, 0, 664, 160, 56, 0, 0, 160, 56, FreeImage_GetBits(fbmp_headlines1), FreeImage_GetInfo(fbmp_headlines1), DIB_RGB_COLORS, SRCCOPY);
+		StretchDIBits(hdcMem, 0, CONTENT_BOTTOM, 160, 56, 0, 0, 160, 56, FreeImage_GetBits(fbmp_headlines1), FreeImage_GetInfo(fbmp_headlines1), DIB_RGB_COLORS, SRCCOPY);
 
 
 		//int a = StretchDIBits(ps.hdc, 0, 0, 1280, 720, 0, 0, 1280, 720, content_bg_bytes, &bmi, DIB_RGB_COLORS);
 		//debug_print("ret: %d, err: %d\n", a, GetLastError());
 
-		BitBlt(ps.hdc, 0, 0, 1280, 720, hdcMem, 0, 0, SRCCOPY);
+		BitBlt(ps.hdc, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hdcMem, 0, 0, SRCCOPY);
 		
 	//	video_element_t *video = (video_element_t *) g_current_elem->data;
 	//			
@@ -600,7 +611,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		if(wParam == 1) {
 			RECT rt;
-			rt.top = 0; rt.left = 0; rt.right = 1280; rt.bottom = 112;
+			rt.top = 0; rt.left = 0; rt.right = SCREEN_WIDTH; rt.bottom = CONTENT_TOP;
 			InvalidateRect(hWnd, &rt, false);
 			//g_ticks++;
 			return 0;
@@ -610,9 +621,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		} else if(wParam == 3) {
 			RECT rt, rt2;
-			rt.top = 111; rt.left = 0; rt.right = 980; rt.bottom = 664;
+			rt.top = CONTENT_TOP; rt.left = 0; rt.right = CONTENT_WIDTH; rt.bottom = CONTENT_BOTTOM;
 			if(!g_video_painting) InvalidateRect(hWnd, &rt, false);
-			rt2.top = 664; rt2.left = 0; rt2.right = 1280; rt2.bottom = 720;
+			rt2.top = CONTENT_BOTTOM; rt2.left = 0; rt2.right = SCREEN_WIDTH; rt2.bottom = SCREEN_HEIGHT;
 			InvalidateRect(hWnd, &rt2, false);
 			g_headline_x -= 2;
 			g_ticks++;

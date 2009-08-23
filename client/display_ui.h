@@ -1,13 +1,20 @@
 #ifndef display_ui_header
 #define display_ui_header
 
+// NOTE: If you change the following values, you must supply header and footer images
+// of the appropriate size in the img directory! Necessary files:
+//    - header.jpg (SCREEN_WIDTH x 112)
+//    - headlines-2.jpg (SCREEN_WIDTH - 160 x 56)
+//    - content-bg.jpg (CONTENT_WIDTH x CONTENT_HEIGHT)
+
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-#define CONTENT_WIDTH SCREEN_WIDTH - 300
-#define CONTENT_HEIGHT SCREEN_HEIGHT - 112 - 56
+#define CONTENT_WIDTH (SCREEN_WIDTH - 300)
+#define CONTENT_HEIGHT (SCREEN_HEIGHT - 112 - 56)
 
 #define CONTENT_TOP 112
+#define CONTENT_BOTTOM (CONTENT_TOP + CONTENT_HEIGHT)
 
 void generate_sig();
 
