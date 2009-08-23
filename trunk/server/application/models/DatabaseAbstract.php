@@ -45,7 +45,7 @@ abstract class Default_Model_DatabaseAbstract
 	 */
 	public function connectDatabase()
 	{
-		if (! is_null($this->db)) {
+		if (is_null($this->db)) {
 			$config = new Zend_Config_Ini(CONFIG_DIR . '/database.ini');
 			try {
 				$this->db = Zend_Db::factory($config->production->server->db->driver, array(
