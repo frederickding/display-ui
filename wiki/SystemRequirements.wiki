@@ -30,4 +30,5 @@ The Display UI client is built in C/C++ and GDI, and has only been tested with t
 || *RAM* || 256 MB || 1 GB or greater ||
 || *Internet Connection* || Dial-up (56.6 Kbps) || Broadband ||
 || *Screen Resolution* || 1280x720 ||
+|| *Graphics Card* || DirectX support || DirectX 9.0b or better recommended ||
 || *Other Requirements* || [http://dejavu-fonts.org/wiki/index.php?title=Main_Page DejaVu] Sans font family || Windows Media Format 11 Runtime or Windows Media Player 11<br />Codecs for H.264 and XviD (we recommend the [http://cccp-project.net/ Combined Community Codec Pack]) ||
