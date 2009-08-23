@@ -123,20 +123,41 @@ void playlist_image_doload(void *p){
 		new_img->type = FreeImage_GetFIFFromFilename(new_img->filename);
 	}
 	new_img->fbmp_image = FreeImage_Load((FREE_IMAGE_FORMAT)new_img->type, new_img->filename, NULL);
+	
+	long width = FreeImage_GetWidth(new_img->fbmp_image);
+	long height = FreeImage_GetHeight(new_img->fbmp_image);
+	
+	if(width > CONTENT_WIDTH){
+		debug_print("image too large! resizing\n");
+		height = CONTENT_WIDTH * height / width;
+		width = CONTENT_WIDTH;
+		FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
+		debug_print("new dimensions: %d x %d\n", width, height);
+	}else if(height > CONTENT_HEIGHT){
+		width = CONTENT_HEIGHT * width / height;
+		height = CONTENT_HEIGHT;
+		FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
+	}
+	
 	if(new_img->type == FIF_PNG) FreeImage_PreMultiplyWithAlpha(new_img->fbmp_image);
 	debug_print("new_img->fbmp_image = %08lX\n", new_img->fbmp_image);
 
 	HDC hdcWin = GetDC(th_image->hwnd);
 	new_img->hdc = CreateCompatibleDC(hdcWin);
-	new_img->hbm = CreateCompatibleBitmap(hdcWin, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image));
+	
+	
+	
+	new_img->hbm = CreateCompatibleBitmap(hdcWin, width, height);
 	SelectObject(new_img->hdc, new_img->hbm);
 	
 	// Draw the image once to the DC to avoid having to redraw every time a frame is rendered
-	StretchDIBits(new_img->hdc, 0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
-		0, 0, FreeImage_GetWidth(new_img->fbmp_image), FreeImage_GetHeight(new_img->fbmp_image), 
+	StretchDIBits(new_img->hdc, 0, 0, width, height, 0, 0, width, height, 
 		FreeImage_GetBits(new_img->fbmp_image), FreeImage_GetInfo(new_img->fbmp_image), DIB_RGB_COLORS, SRCCOPY);
+
 	ReleaseDC(th_image->hwnd, hdcWin);
 	
+	new_img->width = width;
+	new_img->height = height;
 	new_img->bf.BlendOp = AC_SRC_OVER;
 	new_img->bf.BlendFlags = 0;
 	new_img->bf.SourceConstantAlpha = 255;

@@ -4,6 +4,7 @@
 #include <Qedit.h>
 #include <dshow.h>
 
+#include "display_ui.h"
 #include "debug.h"
 #include "playlist.h"
 #include "video.h"
@@ -126,10 +127,10 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 			
 			// Set the destination rectangle.
 			if(width < 640){
-				SetRect(&rc_dst, 980/2 - width/2, 553/2 - height/2 + 112, 
-				980/2 + width/2, 553/2 + height/2 + 112); 
+				SetRect(&rc_dst, CONTENT_WIDTH/2 - width/2, CONTENT_TOP + CONTENT_HEIGHT/2 - height/2, 
+					CONTENT_WIDTH/2 + width/2, CONTENT_TOP + CONTENT_HEIGHT/2 + height/2); 
 			}else{
-				SetRect(&rc_dst, 0, 112, 979, 665);	
+				SetRect(&rc_dst, 0, CONTENT_TOP, CONTENT_WIDTH - 1, CONTENT_BOTTOM + 1);	
 			}
 
 			// Set the video position.
