@@ -44,22 +44,33 @@ class Api_MediaController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$Authenticator = new Api_Model_Authenticator();
-		
+
 		// load our parameters from POST/GET
 		$sys_name = $this->_getParam('sys_name');
 		$signature = $this->_getParam('sig');
 		$medium = $this->_getParam('id');
-		
+
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// we don't need the Authenticator model anymore
 			unset($Authenticator);
-			
+
 			$MediaModel = new Api_Model_Media();
 			if($MediaModel->isStoredDb($medium)) {
+				// get it from the database
 				$query = $MediaModel->retrieveFromDb($medium);
 				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
 				->setHeader('Content-Disposition', 'attachment; filename='.$query['filename'], TRUE)
 				->setBody($query['data']);
+			} elseif(($query = $MediaModel->retrieveFromFile($medium)) !== FALSE) {
+				// get it from the filesystem
+				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
+				->setHeader('Content-Disposition', 'attachment; filename='.basename($query['filename']), TRUE)
+				->clearBody();
+				readfile(MEDIA_DIR.'/'.$query['filename']);
+			} else {
+					$this->getResponse()->setHttpResponseCode(404)
+					->setHeader('Content-Type', 'text/plain', TRUE)
+					->setBody('Media item could not be found.');
 			}
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)

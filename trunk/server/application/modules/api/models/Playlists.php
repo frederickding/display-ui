@@ -140,7 +140,6 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			);
 		}
 		$client_id = $this->db->fetchOne('SELECT id FROM dui_clients WHERE sys_name = ? LIMIT 1', $_sys_name);
-		// TODO: insert into DB
 		$this->db->insert('dui_playlists', array(
 			'generated' => new Zend_Db_Expr('UTC_TIMESTAMP()') ,
 			'client' => $client_id,
