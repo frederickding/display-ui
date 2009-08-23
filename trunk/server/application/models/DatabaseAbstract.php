@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Abstract Database class extended by models requiring the database
  *
@@ -35,7 +35,7 @@ abstract class Default_Model_DatabaseAbstract
 	 * Connects to the database
 	 * This behaviour can be overridden by a child class constructor
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		// connect to the database to test
 		$this->connectDatabase();
@@ -45,42 +45,44 @@ abstract class Default_Model_DatabaseAbstract
 	 */
 	public function connectDatabase()
 	{
-		$config = new Zend_Config_Ini(CONFIG_DIR.'/database.ini');
-		try {
-			$this->db = Zend_Db::factory($config->production->server->db->driver, array(
-				'host'		=>	$config->production->server->db->hostname,
-				'username'	=>	$config->production->server->db->username,
-				'password'	=>	$config->production->server->db->password,
-				'dbname'	=>	$config->production->server->db->name,
-				'charset'	=>	'utf8'
-			));
-			$this->db->getConnection();
-			unset($config);
-		} catch (Zend_Db_Adapter_Exception $e) {
-			$this->db = FALSE;
-			die('Could not connect to database');
-			// couldn't connect
-		} catch (Zend_Exception $e) {
-			$this->db = FALSE;
-			die('Could not connect to database');
-			// couldn't load Adapter class
+		if (! is_null($this->db)) {
+			$config = new Zend_Config_Ini(CONFIG_DIR . '/database.ini');
+			try {
+				$this->db = Zend_Db::factory($config->production->server->db->driver, array(
+					'host' => $config->production->server->db->hostname ,
+					'username' => $config->production->server->db->username ,
+					'password' => $config->production->server->db->password ,
+					'dbname' => $config->production->server->db->name ,
+					'charset' => 'utf8'
+				));
+				$this->db->getConnection();
+				unset($config);
+			} catch (Zend_Db_Adapter_Exception $e) {
+				$this->db = FALSE;
+				die('Could not connect to database');
+				// couldn't connect
+			} catch (Zend_Exception $e) {
+				$this->db = FALSE;
+				die('Could not connect to database');
+				// couldn't load Adapter class
+			}
 		}
 	}
 	/**
 	 * Tests whether the database is connected, and disconnects it
-	 * @return 
+	 * @return bool
 	 */
-	public function disconnectDatabase()
+	public function disconnectDatabase ()
 	{
-		if($this->db !== FALSE) {
-			if($this->db->isConnected() && $this->db->closeConnection())
-				return TRUE;
-		} return FALSE;
+		if ($this->db !== FALSE) {
+			if ($this->db->isConnected() && $this->db->closeConnection()) return TRUE;
+		}
+		return FALSE;
 	}
 	/**
 	 * Upon destructing this object, disconnect the database
 	 */
-	public function __destruct()
+	public function __destruct ()
 	{
 		$this->disconnectDatabase();
 	}
