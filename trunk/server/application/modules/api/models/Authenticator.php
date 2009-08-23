@@ -24,7 +24,7 @@
 /**
  * Authenticates API requests
  */
-class Api_Model_Authenticator
+class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 {
 	/**
 	 * Stores today's date in YYYY-MM-DD format, GMT
@@ -49,6 +49,7 @@ class Api_Model_Authenticator
 		$this->_secret = $config->production->server->install->secret;
 		unset($config);
 		$this->_date = gmdate('Y-m-d');
+		parent::__construct();
 	}
 	/**
 	 * Authentication parameters verification method
@@ -62,10 +63,12 @@ class Api_Model_Authenticator
 	public function verify ($sys_name = '', $signature = '')
 	{
 		// Make sure required parameters are provided
-		if (! $sys_name || ! $signature || strlen($signature) != 40) return false;
+		if (! $sys_name || ! $signature || strlen($signature) != 40) return FALSE;
 		// Check whether a valid API key matches the provided key
-		elseif (sha1($this->apiKey($sys_name) . $this->_date) == $signature) return true;
-		else return false;
+		elseif (sha1($this->apiKey($sys_name) . $this->_date) == $signature) {
+			$this->updateActivity($sys_name);
+			return TRUE;
+		} else return FALSE;
 	}
 	/**
 	 * API key generator method
@@ -77,7 +80,15 @@ class Api_Model_Authenticator
 	public function apiKey ($sys_name = '')
 	{
 		// Make sure required parameter is provided
-		if (! $sys_name) return false;
+		if (! $sys_name) return FALSE;
 		return hash_hmac('sha256', $sys_name, $this->_secret);
+	}
+	public function updateActivity ($sys_name)
+	{
+		$result = $this->db->update('dui_clients',
+			array('last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')),
+			$this->db->quoteInto('sys_name = ?', $sys_name));
+		if($result == 1) return TRUE;
+		else return FALSE;
 	}
 }
