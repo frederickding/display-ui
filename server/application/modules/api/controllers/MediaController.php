@@ -59,12 +59,12 @@ class Api_MediaController extends Zend_Controller_Action
 				// get it from the database
 				$query = $MediaModel->retrieveFromDb($medium);
 				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
-				->setHeader('Content-Disposition', 'attachment; filename='.$query['filename'], TRUE)
+				->setHeader('Content-Disposition', 'attachment; filename="'.$query['filename'].'"', TRUE)
 				->setBody($query['data']);
 			} elseif(($query = $MediaModel->retrieveFromFile($medium)) !== FALSE) {
 				// get it from the filesystem
 				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
-				->setHeader('Content-Disposition', 'attachment; filename='.basename($query['filename']), TRUE)
+				->setHeader('Content-Disposition', 'attachment; filename="'.basename($query['filename']).'"', TRUE)
 				->clearBody();
 				readfile(MEDIA_DIR.'/'.$query['filename']);
 			} else {
