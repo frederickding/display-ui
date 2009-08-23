@@ -65,7 +65,6 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 		if (! $sys_name || ! $signature || strlen($signature) != 40) return FALSE;
 		// Check whether a valid API key matches the provided key
 		elseif (sha1($this->apiKey($sys_name) . $this->_date) == $signature) {
-			$this->connectDatabase();
 			$this->updateActivity($sys_name);
 			return TRUE;
 		} else return FALSE;
@@ -85,6 +84,7 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 	}
 	public function updateActivity ($sys_name)
 	{
+		$this->connectDatabase();
 		$result = $this->db->update('dui_clients',
 			array('last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')),
 			$this->db->quoteInto('sys_name = ?', $sys_name));
