@@ -49,7 +49,6 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 		$this->_secret = $config->production->server->install->secret;
 		unset($config);
 		$this->_date = gmdate('Y-m-d');
-		parent::__construct();
 	}
 	/**
 	 * Authentication parameters verification method
@@ -66,6 +65,7 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 		if (! $sys_name || ! $signature || strlen($signature) != 40) return FALSE;
 		// Check whether a valid API key matches the provided key
 		elseif (sha1($this->apiKey($sys_name) . $this->_date) == $signature) {
+			$this->connectDatabase();
 			$this->updateActivity($sys_name);
 			return TRUE;
 		} else return FALSE;
