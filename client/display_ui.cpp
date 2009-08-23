@@ -20,7 +20,8 @@
  */
 
 #define _WIN32_IE 0x0501
-//#define CURL_STATICLIB
+
+#define FULLSCREEN
 
 #include <windows.h>
 #include <urlmon.h>
@@ -141,21 +142,50 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	sig = (char *) malloc(41);
 	generate_sig();
 
-
-	hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
-		"WindowClass1",
-		"Display UI Client", // perhaps could be customizable through Registry
-		WS_OVERLAPPEDWINDOW,    // fullscreen values
-		200, 200,
 		/* use this for full-screen:
 		-GetSystemMetrics(SM_CXFRAME), -GetSystemMetrics(SM_CYCAPTION) - 
 			GetSystemMetrics(SM_CYFRAME),    // the starting x and y positions should be 0 */
-		SCREEN_WIDTH + 2*(GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXEDGE)),
-		SCREEN_HEIGHT + 2 * (GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYEDGE)) + GetSystemMetrics(SM_CYCAPTION),    // 760 for now to account for title bar
+	
+#ifdef FULLSCREEN
+	
+	DEVMODE dmScreenSettings;            
+	memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+	dmScreenSettings.dmSize = sizeof(dmScreenSettings);   
+	dmScreenSettings.dmPelsWidth = SCREEN_WIDTH;      
+	dmScreenSettings.dmPelsHeight = SCREEN_HEIGHT;         
+	dmScreenSettings.dmBitsPerPel = 32;      
+	dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+	
+	if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL){
+		MessageBox(NULL, "Could not change screen resolution!", "Error", MB_ICONERROR);
+	}
+
+	hWnd = CreateWindowEx(0,
+		"WindowClass1",
+		"Display UI Client", // perhaps could be customizable through Registry
+		WS_POPUP | WS_VISIBLE,    // fullscreen values
+		0, 0,//-GetSystemMetrics(SM_CXFRAME), -GetSystemMetrics(SM_CYFRAME),
+		//-GetSystemMetrics(SM_CXBORDER) -GetSystemMetrics(SM_CXEDGE), - GetSystemMetrics(SM_CYBORDER) - GetSystemMetrics(SM_CYEDGE),
+		SCREEN_WIDTH,// + 2*GetSystemMetrics(SM_CXFRAME),
+		SCREEN_HEIGHT,// + 2*GetSystemMetrics(SM_CYFRAME),
 		NULL,
 		NULL,
 		hInstance,
 		NULL);
+#endif
+#ifndef FULLSCREEN
+	hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+		"WindowClass1",
+		"Display UI Client", // perhaps could be customizable through Registry
+		WS_POPUPWINDOW | WS_VISIBLE,    // fullscreen values
+		200, 200,
+		SCREEN_WIDTH + GetSystemMetrics(SM_CXFRAME) + 2*(GetSystemMetrics(SM_CXEDGE)),
+		SCREEN_HEIGHT + GetSystemMetrics(SM_CYSIZEFRAME) + 2*(GetSystemMetrics(SM_CYEDGE)) + GetSystemMetrics(SM_CYCAPTION),
+		NULL,
+		NULL,
+		hInstance,
+		NULL);
+#endif
 	
 	weather_update(hWnd, false);
 	load_headlines();
@@ -636,6 +666,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		g_ticks++;
 		return 0;
 		} */
+		break;
+	case WM_KEYDOWN:
+		if(wParam == 'q' || wParam == 'Q'){
+			SendMessage(hWnd, WM_DESTROY, 0, 0);
+		}
 		break;
 	case WM_ERASEBKGND:
 		break;
