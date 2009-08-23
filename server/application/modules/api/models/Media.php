@@ -50,15 +50,34 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 				->limit(1)
 				->query()
 				->fetch();
-		
 		$content = explode(';', $result['content']);
 		// $mime_type = $content[1];
-		
 		$return = array();
 		$return['filename'] = $content[0];
 		$return['mime'] = $content[1];
 		$return['data'] = $result['data'];
-		
+		return $return;
+	}
+	/**
+	 * Gets the data about a file stored in the filesystem
+	 * @param $_id
+	 * @return array|bool Returns false on file non-existent
+	 */
+	public function retrieveFromFile($_id)
+	{
+		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
+		$result = $this->db->select()
+				->from('dui_media', array('content'))
+				->where('id = ?', $_id)
+				->limit(1)
+				->query()
+				->fetch();
+		$content = explode(';', $result['content']);
+		// $mime_type = $content[1];
+		if(!file_exists(MEDIA_DIR.'/'.$content[0])) return FALSE;
+		$return = array();
+		$return['filename'] = $content[0];
+		$return['mime'] = $content[1];
 		return $return;
 	}
 }

@@ -80,6 +80,7 @@ class Api_Model_PlaylistItem
 	 */
 	public function __toString()
 	{
+		// TODO: add a byte (or bit) somewhere to force redownload
 		$binary = pack('cccV', $this->type, $this->duration, $this->transition, $this->media_id);
 		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
 			// 11 for the item/type headers and 5 for the extension
