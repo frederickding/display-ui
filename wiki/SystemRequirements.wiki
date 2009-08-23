@@ -9,13 +9,12 @@ The Display UI server is powered by PHP, and requires the following components, 
    * Hash extension
    * cURL (or sockets)
    * PDO (or MySQLi)
-   * iconv functionality
    * Safe mode off
    * Output buffering off
   * Apache 2.2
   * MySQL 5.0
 
-The server software _must be able to write to the filesystem_, especially the `application/configs` and cache directories.
+The server software _must be able to write to the filesystem_, especially the `application/configs` and media directories. The locations of both directories can be configured manually.
 
 Additionally, we recommend a setup with the following configuration:
   * Alternative PHP Cache
@@ -28,7 +27,7 @@ The Display UI client is built in C/C++ and GDI, and has only been tested with t
 ||  || *Minimum Requirements* || *Recommended Requirements* ||
 || *Operating System* || Windows XP or newer ||
 || *Processor* || 1 GHz || 1.7 GHz or greater ||
-|| *RAM* || 512 MB || 1 GB or greater ||
+|| *RAM* || 256 MB || 1 GB or greater ||
 || *Internet Connection* || Dial-up (56.6 Kbps) || Broadband ||
 || *Screen Resolution* || 1280x720 ||
-|| *Other Requirements* || DejaVu Sans font, and condensed variant<br />Codecs capable of running videos (H.264, XviD, etc.) ||
+|| *Other Requirements* || [http://dejavu-fonts.org/wiki/index.php?title=Main_Page DejaVu] Sans font family || Windows Media Format 11 Runtime or Windows Media Player 11<br />Codecs for H.264 and XviD (we recommend the [http://cccp-project.net/ Combined Community Codec Pack]) ||
