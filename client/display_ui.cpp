@@ -20,6 +20,7 @@
  */
 
 #define _WIN32_IE 0x0501
+//#define CURL_STATICLIB
 
 #include <windows.h>
 #include <urlmon.h>
@@ -30,6 +31,8 @@
 #include <Qedit.h>
 #include <dshow.h>
 
+#include <curl\curl.h>
+
 
 // because dshow.h does REALLY stupid stuff
 // (see line 7673 of strsafe.h. WTF, microsoft)
@@ -38,6 +41,7 @@
 #define sprintf sprintf
 #define strcat strcat
 
+#include "resource.h"
 #include "display_ui.h"
 #include "freeimage.h"
 #include "debug.h"
@@ -47,10 +51,13 @@
 #include "sha1.h"
 
 
-#pragma comment(lib, "urlmon.lib") 
+//#pragma comment(lib, "urlmon.lib") 
 #pragma comment(lib, "freeimage.lib") 
 #pragma comment(lib, "msimg32.lib")
 #pragma comment(lib, "strmiids.lib")
+#pragma comment(lib, "libcurl.lib")
+#pragma comment(lib, "ws2_32")
+#pragma comment(lib, "winmm")
 
 #define FRAMES_PER_SEC 25 // should be a factor of 1000!
 #define FRAME_INTERVAL 1000 / FRAMES_PER_SEC
@@ -61,18 +68,14 @@
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-int loadImages();
-void destroyImages();
-VOID OnPaint(HDC hdc);
-VOID RepaintHeadlines(HDC hdc);
-VOID RepaintHeader(HDC hdc);
-VOID RepaintContent(HDC hdc);
+void load_headlines();
 
 LPVOID pHeaderImage;
 
 char *headline_txt = "The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit.";
 
-int ticks = 0;
+int g_ticks = 0;
+int g_headline_x = 1280;
 bool g_video_painting = false;
 
 char *sig; // request signature (api key + date)
@@ -82,27 +85,30 @@ playlist_element_t *g_current_elem;
 void *bmp_bytes;
 
 void update(void *p) {
-	weather_update(p);
-	playlist_load((HWND) p);
-	if(download("http://du.geekie.org/server/api/headlines/fetch/?sys_name=1&sig=%s", "data\\headlines.dat") == S_OK) {
+	weather_update(p, true);
 
-		FILE *fp = fopen("data\\headlines.dat", "r");
+	if(dui_download("http://du.geekie.org/server/api/headlines/fetch/?sys_name=1&sig=%s", "data\\headlines.dat") == CURLE_OK) {
+		load_headlines();
+	}
+}
 
-		if(fp) {
-			if(headline_txt) {
-				free(headline_txt);
-			}
-			fseek(fp, 0, SEEK_END);
-			int size = ftell(fp);
-			fseek(fp, 0, SEEK_SET);
-
-
-			headline_txt = (char *) malloc(size + 2);
-			memset(headline_txt, 0, size + 2);
-			fread(headline_txt, 1, size, fp);
-
-			fclose(fp);
+void load_headlines(){
+	FILE *fp = fopen("data\\headlines.dat", "r");
+	
+	if(fp) {
+		if(headline_txt) {
+			free(headline_txt);
 		}
+		fseek(fp, 0, SEEK_END);
+		int size = ftell(fp);
+		fseek(fp, 0, SEEK_SET);
+		
+		
+		headline_txt = (char *) malloc(size + 2);
+		memset(headline_txt, 0, size + 2);
+		fread(headline_txt, 1, size, fp);
+		
+		fclose(fp);
 	}
 }
 
@@ -125,11 +131,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)COLOR_GRAYTEXT;    // not needed any more
 	wc.lpszClassName = "WindowClass1";
-//	wc.hIcon  = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
+	wc.hIcon  = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
 	
 	RegisterClassEx(&wc);
 	
 	debug_init();
+	weather_init();
+	
+	sig = (char *) malloc(41);
+	generate_sig();
+
 
 	hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
 		"WindowClass1",
@@ -145,14 +156,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		NULL,
 		hInstance,
 		NULL);
+	
+	weather_update(hWnd, false);
+	load_headlines();
 
 	ShowWindow(hWnd, nCmdShow);
 
-	sig = (char *) malloc(41);
-	generate_sig();
-	weather_init();
 	//playlist_load(hWnd);
 	
+	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_load, (void *)hWnd, 0, NULL);
 	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
 
 	// enter the main loop:
@@ -184,6 +196,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static FIBITMAP *fbmp_weathergrad	= NULL;
 	static FIBITMAP *fbmp_headlines1	= NULL;
 	static FIBITMAP *fbmp_headlines2	= NULL;
+	static FIBITMAP *fbmp_loading		= NULL;
 
 
 	switch (message) {
@@ -193,13 +206,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetTimer(hWnd, 2, 900000, NULL);
 		SetTimer(hWnd, 3, FRAME_INTERVAL, NULL);
 			
-		fbmp_header = FreeImage_Load(FIF_JPEG, "img\\header.jpg", JPEG_DEFAULT);
-		fbmp_bg = FreeImage_Load(FIF_JPEG, "img\\content-bg.jpg", JPEG_DEFAULT);
-		fbmp_weatherbg = FreeImage_Load(FIF_PNG, "img\\partlycloudy.png", PNG_DEFAULT);
-		fbmp_weathergrad = FreeImage_Load(FIF_PNG, "img\\weathergrad.png", PNG_DEFAULT);
-		fbmp_headlines1 = FreeImage_Load(FIF_JPEG, "img\\headlines-1.jpg", JPEG_DEFAULT);
-		fbmp_headlines2 = FreeImage_Load(FIF_JPEG, "img\\headlines-2.jpg", JPEG_DEFAULT);
+		fbmp_header			= FreeImage_Load(FIF_JPEG, "img\\header.jpg", JPEG_DEFAULT);
+		fbmp_bg				= FreeImage_Load(FIF_JPEG, "img\\content-bg.jpg", JPEG_DEFAULT);
+		fbmp_weatherbg		= FreeImage_Load(FIF_PNG, "img\\partlycloudy.png", PNG_DEFAULT);
+		fbmp_weathergrad	= FreeImage_Load(FIF_PNG, "img\\weathergrad.png", PNG_DEFAULT);
+		fbmp_headlines1		= FreeImage_Load(FIF_JPEG, "img\\headlines-1.jpg", JPEG_DEFAULT);
+		fbmp_headlines2		= FreeImage_Load(FIF_JPEG, "img\\headlines-2.jpg", JPEG_DEFAULT);
+		fbmp_loading		= FreeImage_Load(FIF_PNG, "img\\loading.png", PNG_DEFAULT);
 		
+		FreeImage_PreMultiplyWithAlpha(fbmp_loading);
 //	playlist_load(hWnd);
 
 		//SetTimer(hWnd, 4, 50, NULL);
@@ -216,10 +231,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 
 		hdcMem = CreateCompatibleDC(ps.hdc);
-		hbmMem = CreateCompatibleBitmap(ps.hdc, 1280, 720);
+		hbmMem = CreateCompatibleBitmap(ps.hdc, SCREEN_WIDTH, SCREEN_HEIGHT);
 		hOld   = SelectObject(hdcMem, hbmMem);
 		
-		StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
+		StretchDIBits(hdcMem, 0, CONTENT_TOP, CONTENT_WIDTH, CONTENT_HEIGHT, 
+			0, 0, CONTENT_WIDTH, CONTENT_HEIGHT, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
 		
 		
 		char *days[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -253,23 +269,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 
 		if(g_current_elem){
-			if(g_current_elem->type == 1){
-				
-				image_element_t *image = (image_element_t *) g_current_elem->data;
-				//debug_print("%d", image->loaded);
-				if(image->loaded){
+			if(g_current_elem->ready){
+				if(g_current_elem->type == 1){
+					
+					image_element_t *image = (image_element_t *) g_current_elem->data;
+					//debug_print("%d", image->loaded);
 					//debug_print("asdf\n");
-					if(timeleft == 0xffff) timeleft = g_current_elem->secs * FRAMES_PER_SEC / 4;
+					if(timeleft == 0xffff) timeleft = g_current_elem->secs * FRAMES_PER_SEC / 8;
 					image->bf.SourceConstantAlpha = imgalpha;
 					
-					AlphaBlend(hdcMem, 980/2 - FreeImage_GetWidth(image->fbmp_image)/2, 112 + 553/2 - FreeImage_GetHeight(image->fbmp_image)/2, 
+					AlphaBlend(hdcMem, CONTENT_WIDTH/2 - FreeImage_GetWidth(image->fbmp_image)/2, CONTENT_TOP + CONTENT_HEIGHT/2 - FreeImage_GetHeight(image->fbmp_image)/2, 
 						FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, 
 						FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->bf);
 					
 					if(timeleft == 0){
 						if(g_current_elem->next) g_current_elem = g_current_elem->next;
 						debug_print("%08lX\n", g_current_elem);
-						StretchDIBits(hdcMem, 0, 111, 980, 553, 0, 0, 980, 553, FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
+						StretchDIBits(hdcMem, 0, CONTENT_TOP, CONTENT_WIDTH, CONTENT_HEIGHT, 0, 0, CONTENT_WIDTH, CONTENT_HEIGHT, 
+							FreeImage_GetBits(fbmp_bg), FreeImage_GetInfo(fbmp_bg), DIB_RGB_COLORS, SRCCOPY);
 						timeleft = 0xffff;
 						imgalpha = 55;
 					}else{
@@ -278,66 +295,109 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							imgalpha -= 15;
 						}else if(imgalpha < 255) imgalpha += 10;
 					}
-				}
 
-		/*		HDC temp = CreateCompatibleDC(hdcMem);
-				HBITMAP temp_bmp = CreateCompatibleBitmap(hdc, FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image));
-				SelectObject(temp, temp_bmp);
-*/
-			//	image->hdc = CreateCompatibleDC(hdcMem);
-			//	image->hbm = CreateCompatibleBitmap(image->hdc, FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image));
-			//	SelectObject(image->hdc, image->hbm);
-				
-				
+			/*		HDC temp = CreateCompatibleDC(hdcMem);
+					HBITMAP temp_bmp = CreateCompatibleBitmap(hdc, FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image));
+					SelectObject(temp, temp_bmp);
+	*/
+				//	image->hdc = CreateCompatibleDC(hdcMem);
+				//	image->hbm = CreateCompatibleBitmap(image->hdc, FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image));
+				//	SelectObject(image->hdc, image->hbm);
+					
+					
 
-				//SetTextColor(image->hdc, RGB(0, 0, 0));
-				//TextOut(image->hdc, 100, 100, "asdf", 4);
-				//BitBlt(hdcMem, 0, 112, 	FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, SRCCOPY);
-			//	DeleteObject(image->hbm);
-			//	DeleteDC(image->hdc);
-				
-			}else if(g_current_elem->type == 3){
-				static int iter = 0;
-				LONGLONG position;
-				LONGLONG duration;
-				//if(g_current_elem->next) g_current_elem = g_current_elem->next;
+					//SetTextColor(image->hdc, RGB(0, 0, 0));
+					//TextOut(image->hdc, 100, 100, "asdf", 4);
+					//BitBlt(hdcMem, 0, 112, 	FreeImage_GetWidth(image->fbmp_image), FreeImage_GetHeight(image->fbmp_image), image->hdc, 0, 0, SRCCOPY);
+				//	DeleteObject(image->hbm);
+				//	DeleteDC(image->hdc);
+					
+				}else if(g_current_elem->type == 3){
+					static int iter = 0;
+					LONGLONG position;
+					LONGLONG duration;
+					//if(g_current_elem->next) g_current_elem = g_current_elem->next;
 
-				//debug_print("video\n");
+					//debug_print("video\n");
 
-				video_element_t *video = (video_element_t *) g_current_elem->data;
-				
-				if(iter == 0) {
-					debug_print("loading video.........\n");
-					video_load(hWnd, video);
-					g_video_painting = true;
-				}
-				if(video_isloaded()){
-					video_getduration(&duration);
-					video_getposition(&position);
+					video_element_t *video = (video_element_t *) g_current_elem->data;
 					
-					
-					video_render(hWnd, hdcMem, video);
-					
-					
-					video_getduration(&duration);
-					video_getposition(&position);
-					//debug_print("%lld / %lld\n", position, duration);
-					
-					iter++;
-					
-					if(position >= duration){
-						debug_print("video end reached.\n");
-						video_unload(video);
-						g_video_painting = false;
-						iter = 0;
-						if(g_current_elem->next) g_current_elem = g_current_elem->next;
-						debug_print("%08lX\n", g_current_elem);
-						//playlist_dumpitems();
+					if(iter == 0) {
+						debug_print("loading video.........\n");
+						video_load(hWnd, video);
+						g_video_painting = true;
 					}
-				}
-				
+					if(video_isloaded()){
+						video_getduration(&duration);
+						video_getposition(&position);
+						
+						
+						video_render(hWnd, hdcMem, video);
+						
+						
+						video_getduration(&duration);
+						video_getposition(&position);
+						//debug_print("%lld / %lld\n", position, duration);
+						
+						iter++;
+						
+						if(position >= duration){
+							debug_print("video end reached.\n");
+							video_unload(video);
+							g_video_painting = false;
+							iter = 0;
+							if(g_current_elem->next) g_current_elem = g_current_elem->next;
+							debug_print("%08lX\n", g_current_elem);
+							//playlist_dumpitems();
+						}
+					}
+					
 
-				//video->iVMRwc->RepaintVideo(hWnd, hdcMem);
+					//video->iVMRwc->RepaintVideo(hWnd, hdcMem);
+				}
+			}else{
+				char msg[64];
+				static int t = 0;
+				
+				HDC hdcTemp = CreateCompatibleDC(hdcMem);
+				HBITMAP hbmTemp = CreateCompatibleBitmap(ps.hdc, 400, 225);
+				SelectObject(hdcTemp, hbmTemp);
+				
+				BLENDFUNCTION bf;
+				bf.BlendOp = AC_SRC_OVER;
+				bf.BlendFlags = 0;
+				bf.SourceConstantAlpha = 255;
+				bf.AlphaFormat = AC_SRC_ALPHA;
+
+				StretchDIBits(hdcTemp, 0, 0, 400, 225, 0, 0, 400, 225, FreeImage_GetBits(fbmp_loading), FreeImage_GetInfo(fbmp_loading), DIB_RGB_COLORS, SRCCOPY);
+				AlphaBlend(hdcMem, 290, 276, 400, 225, hdcTemp, 0, 0, 400, 225, bf);
+				
+				if(g_current_elem->type == 1){
+					image_element_t *img = (image_element_t *)g_current_elem->data;
+					sprintf(msg, "File: %s\n%d bytes downloaded.", img->filename, (int)g_current_elem->progress_now);
+				}else if(g_current_elem->type == 3){
+					video_element_t *vid = (video_element_t *)g_current_elem->data;
+					sprintf(msg, "File: %s\n%d bytes downloaded.", vid->filename, (int)g_current_elem->progress_now);
+				}else{
+					sprintf(msg, "%d bytes downloaded.", (int)g_current_elem->progress_now);
+				}
+				SelectObject(hdcMem, font_dejavusans_cond_bold_24);
+				
+				debug_print("%s\n", msg);
+
+				RECT textBound;
+				textBound.left = 300; textBound.top = 370;
+				textBound.right = 680; textBound.bottom = 490;
+				DrawTextA(hdcMem, msg, strlen(msg), &textBound, DT_LEFT);
+
+				DeleteObject(hbmTemp);
+				DeleteDC(hdcTemp);
+
+				if(t++ / FRAMES_PER_SEC >= 5){
+					// 5 seconds and the playlist item wasn't loaded; move on to next one
+					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+					t = 0;
+				}
 			}
 		}
 		
@@ -500,18 +560,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		LineTo(hdcMem, 980, 664);
 		DeleteObject(pen);
 
-		// Headlines
-		static int xpos = 1280;
 		StretchDIBits(hdcMem, 160, 664, 1120, 56, 0, 0, 1120, 56, FreeImage_GetBits(fbmp_headlines2), FreeImage_GetInfo(fbmp_headlines2), DIB_RGB_COLORS, SRCCOPY);
 		
-		xpos -= 2;
 
 		SelectObject(hdcMem, font_dejavusans_cond_bold_24);
-		TextOut(hdcMem, xpos, 664 + 16, headline_txt, strlen(headline_txt));
+		TextOut(hdcMem, g_headline_x, 664 + 16, headline_txt, strlen(headline_txt));
 		
 		SIZE extents;
 		GetTextExtentPoint32(hdcMem, headline_txt, strlen(headline_txt), &extents);
-		if(xpos + extents.cx < 160) xpos = 1280;
+		if(g_headline_x + extents.cx < 160) g_headline_x = 1280;
 
 		StretchDIBits(hdcMem, 0, 664, 160, 56, 0, 0, 160, 56, FreeImage_GetBits(fbmp_headlines1), FreeImage_GetInfo(fbmp_headlines1), DIB_RGB_COLORS, SRCCOPY);
 
@@ -545,7 +602,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			RECT rt;
 			rt.top = 0; rt.left = 0; rt.right = 1280; rt.bottom = 112;
 			InvalidateRect(hWnd, &rt, false);
-			//ticks++;
+			//g_ticks++;
 			return 0;
 		} else if(wParam == 2) {
 			CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
@@ -557,15 +614,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if(!g_video_painting) InvalidateRect(hWnd, &rt, false);
 			rt2.top = 664; rt2.left = 0; rt2.right = 1280; rt2.bottom = 720;
 			InvalidateRect(hWnd, &rt2, false);
-
-			ticks++;
+			g_headline_x -= 2;
+			g_ticks++;
 			return 0;
 		}
 		/* else if(wParam == 4) {
 		RECT rt;
 		rt.top = 111; rt.left = 0; rt.right = 980; rt.bottom = 664;
 		InvalidateRect(hWnd, &rt, false);
-		ticks++;
+		g_ticks++;
 		return 0;
 		} */
 		break;
@@ -581,6 +638,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		FreeImage_Unload(fbmp_weathergrad);
 		FreeImage_Unload(fbmp_headlines1);
 		FreeImage_Unload(fbmp_headlines2);
+		FreeImage_Unload(fbmp_loading);
 		FreeImage_DeInitialise();
 		
 
@@ -634,14 +692,105 @@ void make_url(char *dest, char *format){
 	sprintf(dest, format, sig);
 }
 
-int download(char *url, char *dest_file){
-	char *full_url = (char *) malloc(strlen(url) + 39);
-	make_url(full_url, url);
 
-	debug_print("%s\n", full_url);
-	int ret = URLDownloadToFile(NULL, full_url, dest_file, 0, NULL);
+
+size_t writefunc(void *ptr, size_t size, size_t nmemb, void *stream){
+	/*int ret = 0;
+	int tmp = nmemb * size;
+	while(nmemb > 0){
+		if(nmemb > 4096){
+			nmemb -= 4096;
+			ret += fwrite(ptr, size, 4096, (FILE *)stream);
+		}else{
+			ret += fwrite(ptr, size, nmemb, (FILE *)stream);
+			nmemb = 0;
+		}
+	}
+	//debug_print("[curl/writefunc] ret: %d; size: %d\n", ret, tmp);
+	fflush((FILE *) stream);*/
+	unsigned long ret = 0;
+	WriteFile((HANDLE)stream, ptr, size * nmemb, &ret, NULL);
+	return ret;
+}
+
+int download_curl(char *url, char *dest_file, bool show_progress, void *callback, void *arg){
+	CURL *curl;
+	CURLcode res = (CURLcode)-1;
+
+	curl = curl_easy_init();
+
+	if(curl){
+		//FILE *fp = fopen(dest_file, "wb");
+		HANDLE file = CreateFile(dest_file, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if(file){
+			
+			debug_print("[download_curl] URL: %s\n", url);
+			debug_print("[download_curl] dest file: %s\n", dest_file);
+
+			curl_easy_setopt(curl, CURLOPT_URL, url);
+			curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; Display UI Client)");
+			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+			curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+
+			if(show_progress){
+				curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+				curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, callback);
+				curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, arg);
+			}	
+			
+			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+			
+			// write to the destination file
+			curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+			res = curl_easy_perform(curl);
+			//fclose(fp);
+			if(res != CURLE_OK) debug_print("[download_curl] error %d\n", res);
+			//debug_print("[download_curl] finished dl! %s\n", dest_file);
+			//fwrite(full_url, 1, strlen(full_url), fp);
+			CloseHandle(file);
+			curl_easy_cleanup(curl);
+			
+		}else{
+			curl_easy_cleanup(curl);
+			debug_print("[download_curl] failed to open file for writing!\n");
+			return -1;
+		}
+		
+	}else{
+		debug_print("[download_curl] failed to initialize cURL!\n");
+		return -1;
+	}
+	
+	return res;
+}
+
+int download_curl(char *url, char *dest_file){
+	return download_curl(url, dest_file, false, NULL, NULL);
+}
+
+int dui_download(char *url, char *dest_file, bool show_progress, void *callback, void *arg){
+
+	char *full_url = (char *) malloc(strlen(url) + 39);
+	char *temp_dest = (char *) malloc(strlen(dest_file) + 5);
+	make_url(full_url, url);
+	sprintf(temp_dest, "%s.tmp", dest_file);
+	
+	debug_print("%s .. %s\n", temp_dest, dest_file);
+
+	int ret = download_curl(full_url, temp_dest, show_progress, callback, arg);
+		//URLDownloadToFile(NULL, full_url, temp_dest, 0, NULL);//download_curl(full_url, dest_file);
+
+
+	if(ret == CURLE_OK){
+		MoveFileEx(temp_dest, dest_file, MOVEFILE_REPLACE_EXISTING);
+	}
+
 	free(full_url);
+	free(temp_dest);
 
 	return ret;
 }
 
+int dui_download(char *url, char *dest_file){
+	return dui_download(url, dest_file, false, NULL, NULL);
+}

@@ -98,10 +98,6 @@ SOURCE=.\display_ui.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\FormattedTextDraw.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\playlist.cpp
 # End Source File
 # Begin Source File
@@ -138,6 +134,10 @@ SOURCE=.\playlist.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\resource.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\sha1.h
 # End Source File
 # Begin Source File
@@ -152,6 +152,10 @@ SOURCE=.\weather.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=.\resource.rc
+# End Source File
 # End Group
 # End Target
 # End Project

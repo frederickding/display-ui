@@ -68,7 +68,7 @@ HRESULT InitWindowlessVMR(
         // Set the window. 
         hr = pVmr->QueryInterface(IID_IVMRWindowlessControl, (void**)&pWc);
         if( SUCCEEDED(hr)) { 
-            hr = pWc->SetVideoClippingWindow(hwndApp); 
+            hr = pWc->SetVideoClippingWindow(hwndApp);
             if (SUCCEEDED(hr)){
                 *ppWc = pWc; // Return this as an AddRef'd pointer. 
             }else{

@@ -8,10 +8,13 @@ typedef struct _playlist_element_t{
 	byte secs;
 	byte trans;
 	int id;
-
+	
+	bool ready;
+	double progress_total;
+	double progress_now;
+	
 	void *data;
 	_playlist_element_t *next;
-	_playlist_element_t *prev;
 }playlist_element_t;
 
 typedef struct _playlist_t{
@@ -21,7 +24,6 @@ typedef struct _playlist_t{
 
 typedef struct _image_element_t{
 	byte type;
-	bool loaded;
 	FIBITMAP *fbmp_image;
 	HDC hdc;
 	HBITMAP hbm;

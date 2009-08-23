@@ -18,7 +18,7 @@ typedef struct _weather_fc_t{
 
 void weather_init();
 void weather_exit();
-unsigned long weather_update(void *p);
+unsigned long weather_update(void *p, bool download_new);
 weather_t *weather_getcurrent();
 weather_fc_t **weather_getforecast();
 

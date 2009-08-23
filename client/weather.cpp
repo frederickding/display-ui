@@ -18,11 +18,14 @@
  *
  * $Id$
  */
+//#define CURL_STATICLIB
 
 #include <windows.h>
 #include <urlmon.h>
 #include <stdio.h>
 #include <time.h>
+
+#include <curl\curl.h>
 
 #include "display_ui.h"
 #include "freeimage.h"
@@ -46,7 +49,7 @@ void weather_init() {
 	memset(forecast[1], 0, sizeof(weather_fc_t));
 
 	initialized = true;
-
+	
 	// weather_update(NULL);
 }
 
@@ -56,8 +59,14 @@ void weather_exit() {
 	if(forecast) free(forecast);
 }
 
-unsigned long weather_update(void *p){
-	if(download("http://du.geekie.org/server/api/weather/current/?sys_name=1&sig=%s&location=CAXX0401", "data\\weather\\weather_c.dat") == S_OK) {
+unsigned long weather_update(void *p, bool download_new){
+	
+	int result = -1;
+
+	if(download_new){
+		result = dui_download("http://du.geekie.org/server/api/weather/current/?sys_name=1&sig=%s&location=CAXX0401", "data\\weather\\weather_c.dat");
+	}
+	if(result == CURLE_OK || !download_new) {
 
 		FILE *fp = fopen("data\\weather\\weather_c.dat", "r");
 
@@ -89,13 +98,15 @@ unsigned long weather_update(void *p){
 			time (&rawtime);
 			ptm = localtime(&rawtime);
 			sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%d%c.png", current.condition, (ptm->tm_hour < 6 || ptm->tm_hour > 19) ? 'n' : 'd');
-			URLDownloadToFile(NULL, imgurl, "img\\current.png", 0, NULL);
+			
+			download_curl(imgurl, "img\\current.png");
+			//URLDownloadToFile(NULL, imgurl, "img\\current.png", 0, NULL);
 
 			if(fbmp_weather_current){
 				FreeImage_Unload(fbmp_weather_current);
 			}	
 			fbmp_weather_current = FreeImage_Load(FIF_PNG, "img\\current.png", NULL);
-			FreeImage_Rescale(fbmp_weather_current, 188, 135, FILTER_BILINEAR);
+			FreeImage_Rescale(fbmp_weather_current, 188, 135, FILTER_BICUBIC);
 			FreeImage_PreMultiplyWithAlpha(fbmp_weather_current);
 		
 
@@ -104,7 +115,11 @@ unsigned long weather_update(void *p){
 		}
 	}
 
-	if(download("http://du.geekie.org/server/api/weather/forecast/?sys_name=1&sig=%s&location=CAXX0401&day=2", "data\\weather\\weather_fc.dat") == S_OK) {
+	if(download_new){
+		result = dui_download("http://du.geekie.org/server/api/weather/forecast/?sys_name=1&sig=%s&location=CAXX0401&day=2", "data\\weather\\weather_fc.dat");
+	}
+
+	if(result == CURLE_OK || !download_new) {
 		FILE *fp = fopen("data\\weather\\weather_fc.dat", "r");
 
 		if(fp) {
@@ -133,14 +148,16 @@ unsigned long weather_update(void *p){
 				char filename[19];
 				sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%dd.png", forecast[i]->condition);
 				sprintf(filename, "img\\forecast_%d.png", i);
-				debug_print("%s -> %s\n", imgurl, filename);
-				URLDownloadToFile(NULL, imgurl, filename, 0, NULL);
+				//debug_print("%s -> %s\n", imgurl, filename);
+				
+				download_curl(imgurl, filename);
+				//URLDownloadToFile(NULL, imgurl, filename, 0, NULL);
 
 				if(fbmp_weather_fc[i]){
 					FreeImage_Unload(fbmp_weather_fc[i]);
 				}	
 				fbmp_weather_fc[i] = FreeImage_Load(FIF_PNG, filename, NULL);
-				FreeImage_Rescale(fbmp_weather_fc[i], 188, 135, FILTER_BILINEAR);
+				FreeImage_Rescale(fbmp_weather_fc[i], 188, 135, FILTER_BICUBIC);
 				FreeImage_PreMultiplyWithAlpha(fbmp_weather_fc[i]);
 			}
 			fclose(fp);
