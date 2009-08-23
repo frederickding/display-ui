@@ -30,7 +30,7 @@ abstract class Default_Model_DatabaseAbstract
 	 * Stores an instance of the database adapter
 	 * @var Zend_Db_Adapter_Abstract
 	 */
-	protected $db;
+	protected $db = NULL;
 	/**
 	 * Connects to the database
 	 * This behaviour can be overridden by a child class constructor
