@@ -535,13 +535,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TextOut(hdcMem, CONTENT_WIDTH + 124, CONTENT_TOP + 331, "low", strlen("low"));
 			TextOut(hdcMem, CONTENT_WIDTH + 124 + 150, CONTENT_TOP + 331, "low", strlen("low"));
 
-			textBound.left = CONTENT_WIDTH + 95; textBound.top = CONTENT_HEIGHT + 343;
-			textBound.right = CONTENT_WIDTH + 95 + 48; textBound.bottom = CONTENT_HEIGHT + 343 + 20;
+			textBound.left = CONTENT_WIDTH + 95; textBound.top = CONTENT_TOP + 343;
+			textBound.right = CONTENT_WIDTH + 95 + 48; textBound.bottom = CONTENT_TOP + 343 + 20;
 			SelectObject(hdcMem, font_dejavusans_cond_18);
 			DrawTextA(hdcMem, forecast[0]->temp_lo, strlen(forecast[0]->temp_lo), &textBound, DT_RIGHT);
 
-			textBound.left = CONTENT_WIDTH + 95 + 150; textBound.top = CONTENT_HEIGHT + 343;;
-			textBound.right = CONTENT_WIDTH + 95 + 150 + 48; textBound.bottom = CONTENT_HEIGHT + 343; + 20;
+			textBound.left = CONTENT_WIDTH + 95 + 150; textBound.top = CONTENT_TOP + 343;
+			textBound.right = CONTENT_WIDTH + 95 + 150 + 48; textBound.bottom = CONTENT_TOP + 343 + 20;
 			DrawTextA(hdcMem, forecast[1]->temp_lo, strlen(forecast[1]->temp_lo), &textBound, DT_RIGHT);
 		}
 		
