@@ -45,7 +45,7 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 	{
 		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
 		$result = $this->db->select()
-				->from('dui_media', array('content', 'data'))
+				->from('dui_media', array('content', 'data', 'data_size' => 'OCTET_LENGTH(data)'))
 				->where('id = ?', $_id)
 				->limit(1)
 				->query()
@@ -56,6 +56,7 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 		$return['filename'] = $content[0];
 		$return['mime'] = $content[1];
 		$return['data'] = $result['data'];
+		$return['filesize'] = $result['data_size'];
 		return $return;
 	}
 	/**
@@ -76,8 +77,9 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 		// $mime_type = $content[1];
 		if(!file_exists(MEDIA_DIR.'/'.$content[0])) return FALSE;
 		$return = array();
-		$return['filename'] = $content[0];
+		$return['filename'] = MEDIA_DIR.'/'.$content[0];
 		$return['mime'] = $content[1];
+		$return['filesize'] = filesize($return['filename']);
 		return $return;
 	}
 }
