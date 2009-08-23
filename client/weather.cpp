@@ -104,9 +104,13 @@ unsigned long weather_update(void *p, bool download_new){
 
 			if(fbmp_weather_current){
 				FreeImage_Unload(fbmp_weather_current);
+				fbmp_weather_current = NULL;
 			}	
 			fbmp_weather_current = FreeImage_Load(FIF_PNG, "img\\current.png", NULL);
-			FreeImage_Rescale(fbmp_weather_current, 250, 180, FILTER_BICUBIC);
+
+			FIBITMAP *temp_img = fbmp_weather_current;
+			fbmp_weather_current = FreeImage_Rescale(fbmp_weather_current, 250, 180, FILTER_BICUBIC);
+			FreeImage_Unload(temp_img);
 			FreeImage_PreMultiplyWithAlpha(fbmp_weather_current);
 		
 
@@ -155,9 +159,14 @@ unsigned long weather_update(void *p, bool download_new){
 
 				if(fbmp_weather_fc[i]){
 					FreeImage_Unload(fbmp_weather_fc[i]);
+					fbmp_weather_fc[i] = NULL;
 				}	
 				fbmp_weather_fc[i] = FreeImage_Load(FIF_PNG, filename, NULL);
-				FreeImage_Rescale(fbmp_weather_fc[i], 188, 135, FILTER_BICUBIC);
+
+				FIBITMAP *temp_img = fbmp_weather_fc[i];
+				fbmp_weather_fc[i] = FreeImage_Rescale(fbmp_weather_fc[i], 188, 135, FILTER_BICUBIC);
+				FreeImage_Unload(temp_img);
+
 				FreeImage_PreMultiplyWithAlpha(fbmp_weather_fc[i]);
 			}
 			fclose(fp);

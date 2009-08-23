@@ -131,12 +131,16 @@ void playlist_image_doload(void *p){
 		debug_print("image too large! resizing\n");
 		height = CONTENT_WIDTH * height / width;
 		width = CONTENT_WIDTH;
-		FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
-		debug_print("new dimensions: %d x %d\n", width, height);
+		FIBITMAP *temp = new_img->fbmp_image;
+		new_img->fbmp_image = FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
+		FreeImage_Unload(temp);
+		debug_print("new dimensions: %d x %d ... \n", width, height);
 	}else if(height > CONTENT_HEIGHT){
 		width = CONTENT_HEIGHT * width / height;
 		height = CONTENT_HEIGHT;
-		FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
+		FIBITMAP *temp = new_img->fbmp_image;
+		new_img->fbmp_image = FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
+		FreeImage_Unload(temp);
 	}
 	
 	if(new_img->type == FIF_PNG) FreeImage_PreMultiplyWithAlpha(new_img->fbmp_image);

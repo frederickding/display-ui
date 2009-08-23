@@ -21,7 +21,8 @@
 
 #define _WIN32_IE 0x0501
 
-#define FULLSCREEN
+//#define FULLSCREEN
+#define SKIPVIDEO
 
 #include <windows.h>
 #include <urlmon.h>
@@ -174,13 +175,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		NULL);
 #endif
 #ifndef FULLSCREEN
-	hWnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+	hWnd = CreateWindowEx(0,
 		"WindowClass1",
 		"Display UI Client", // perhaps could be customizable through Registry
 		WS_POPUPWINDOW | WS_VISIBLE,    // fullscreen values
-		200, 200,
-		SCREEN_WIDTH + GetSystemMetrics(SM_CXFRAME) + 2*(GetSystemMetrics(SM_CXEDGE)),
-		SCREEN_HEIGHT + GetSystemMetrics(SM_CYSIZEFRAME) + 2*(GetSystemMetrics(SM_CYEDGE)) + GetSystemMetrics(SM_CYCAPTION),
+		GetSystemMetrics(SM_CXSCREEN)/2 - SCREEN_WIDTH/2, GetSystemMetrics(SM_CYSCREEN)/2 - SCREEN_HEIGHT/2,
+		SCREEN_WIDTH,// + GetSystemMetrics(SM_CXFRAME) + 2*(GetSystemMetrics(SM_CXEDGE)),
+		SCREEN_HEIGHT,// + GetSystemMetrics(SM_CYSIZEFRAME) + 2*(GetSystemMetrics(SM_CYEDGE)) + GetSystemMetrics(SM_CYCAPTION),
 		NULL,
 		NULL,
 		hInstance,
@@ -348,6 +349,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//	DeleteDC(image->hdc);
 					
 				}else if(g_current_elem->type == 3){
+#ifdef SKIPVIDEO
+					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+#endif
+#ifndef SKIPVIDEO
 					static int iter = 0;
 					LONGLONG position;
 					LONGLONG duration;
@@ -386,8 +391,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							//playlist_dumpitems();
 						}
 					}
-					
-
+#endif
 					//video->iVMRwc->RepaintVideo(hWnd, hdcMem);
 				}
 			}else{
@@ -421,7 +425,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				debug_print("%s\n", msg);
 
 				RECT textBound;
-				textBound.left = CONTENT_WIDTH/2 - 200 + 10; textBound.top = CONTENT_TOP + CONTENT_HEIGHT/2 - 225/2 + 95;
+				textBound.left = CONTENT_WIDTH/2 - 200 + 20; textBound.top = CONTENT_TOP + CONTENT_HEIGHT/2 - 225/2 + 95;
 				textBound.right = CONTENT_WIDTH/2 + 190; textBound.bottom = CONTENT_TOP + CONTENT_HEIGHT/2 + 395/2;
 				DrawTextA(hdcMem, msg, strlen(msg), &textBound, DT_LEFT);
 
@@ -465,6 +469,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				StretchDIBits(temp, 0, 0, 250, 180, 0, 0, 250, 180, FreeImage_GetBits(fbmp_weather_cur), 
 					FreeImage_GetInfo(fbmp_weather_cur), DIB_RGB_COLORS, SRCCOPY);
+
 				AlphaBlend(hdcMem, CONTENT_WIDTH + 10, CONTENT_TOP + 8, 250, 180, temp, 0, 0, 250, 180, bf);
 				//BitBlt(hdcMem, 990, 180, 1280, 720, temp, 0, 0, SRCCOPY);
 				DeleteObject(temp_bmp);
@@ -668,7 +673,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		} */
 		break;
 	case WM_KEYDOWN:
-		if(wParam == 'q' || wParam == 'Q'){
+		if(wParam == VK_ESCAPE || wParam == 'q' || wParam == 'Q'){
 			SendMessage(hWnd, WM_DESTROY, 0, 0);
 		}
 		break;
