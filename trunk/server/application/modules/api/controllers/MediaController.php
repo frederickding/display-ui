@@ -59,18 +59,20 @@ class Api_MediaController extends Zend_Controller_Action
 				// get it from the database
 				$query = $MediaModel->retrieveFromDb($medium);
 				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
+				->setHeader('Content-Length', $query['filesize'], TRUE)
 				->setHeader('Content-Disposition', 'attachment; filename="'.$query['filename'].'"', TRUE)
 				->setBody($query['data']);
 			} elseif(($query = $MediaModel->retrieveFromFile($medium)) !== FALSE) {
 				// get it from the filesystem
 				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
+				->setHeader('Content-Length', $query['filesize'])
 				->setHeader('Content-Disposition', 'attachment; filename="'.basename($query['filename']).'"', TRUE)
 				->clearBody();
-				readfile(MEDIA_DIR.'/'.$query['filename']);
+				readfile($query['filename']);
 			} else {
-					$this->getResponse()->setHttpResponseCode(404)
-					->setHeader('Content-Type', 'text/plain', TRUE)
-					->setBody('Media item could not be found.');
+				$this->getResponse()->setHttpResponseCode(404)
+				->setHeader('Content-Type', 'text/plain', TRUE)
+				->setBody('Media item could not be found.');
 			}
 		} else {
 			$this->getResponse()->setHttpResponseCode(401)
