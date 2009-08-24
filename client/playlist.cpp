@@ -21,7 +21,6 @@
 //#define CURL_STATICLIB
 
 #include <windows.h>
-#include <urlmon.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -228,7 +227,8 @@ int playlist_load_raw(){
 		fseek(playlist_file, 0, SEEK_SET);
 		
 		if(g_playlist_raw_size == 0) return -1;
-
+		
+		if(g_playlist_raw) free(g_playlist_raw);
 		g_playlist_raw = (char *) malloc(g_playlist_raw_size);
 		fread(g_playlist_raw, 1, g_playlist_raw_size, playlist_file);
 		
@@ -275,7 +275,7 @@ void playlist_process_raw(HWND hwnd){
 			new_elem->data = new_img;
 			
 			//playlist_image_doload((void *) i);
-			CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_image_doload, (void *)i, 0, NULL);
+			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_image_doload, (void *)i, 0, NULL));
 			
 			
 			
@@ -299,7 +299,7 @@ void playlist_process_raw(HWND hwnd){
 			new_elem->data = new_vid;
 			
 			//playlist_video_doload((void *)i);
-			CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_video_doload, (void *)i, 0, NULL);
+			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_video_doload, (void *)i, 0, NULL));
 			
 			debug_print(" -- %d asdf\n", __LINE__);
 			
@@ -321,24 +321,24 @@ void playlist_process_raw(HWND hwnd){
 }
 
 void playlist_load(HWND hwnd){
-	int loaded_old = playlist_load_raw();
-	debug_print("playlist_load\n");
+	//int loaded_old = playlist_load_raw();
+	//debug_print("playlist_load\n");
 	int result = dui_download("http://du.geekie.org/server/api/playlists/fetch/?sys_name=1&sig=%s", "data\\playlist.dat");
 	debug_print("playlist_load .. %d\n", result);
 	if(result == CURLE_OK) {
-		free(g_playlist_raw);
-
+		debug_print("[playlist_load] download operation succeeded ... loading new playlist\n");
 		if(playlist_load_raw() == 0){
 			playlist_process_raw(hwnd);			
-
 		}	
 	}else if(result == CURLE_COULDNT_RESOLVE_HOST){
-		debug_print("[playlist_load] download operation timed out\n");
-		if(loaded_old) playlist_process_raw(hwnd);
+		debug_print("[playlist_load] download operation timed out ... loading old playlist\n");
+		if(playlist_load_raw() == 0){
+			playlist_process_raw(hwnd);				
+		}
 
-		FILE *fp = fopen("data\\playlist.dat", "wb");
-		fwrite(g_playlist_raw, 1, g_playlist_raw_size, fp);
-		fclose(fp);
+		//FILE *fp = fopen("data\\playlist.dat", "wb");
+		//fwrite(g_playlist_raw, 1, g_playlist_raw_size, fp);
+		//fclose(fp);
 	}
 
 	//playlist_dumpitems();
