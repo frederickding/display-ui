@@ -54,7 +54,6 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 				->query()
 				->fetch();
 		$content = explode(';', $result['content']);
-		// $mime_type = $content[1];
 		$return = array();
 		$return['filename'] = $content[0];
 		$return['mime'] = $content[1];
@@ -77,12 +76,11 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 				->query()
 				->fetch();
 		$content = explode(';', $result['content']);
-		// $mime_type = $content[1];
-		if(!file_exists(MEDIA_DIR.'/'.$content[0])) return FALSE;
 		$return = array();
 		$return['filename'] = MEDIA_DIR.'/'.$content[0];
 		$return['mime'] = $content[1];
-		$return['filesize'] = filesize(MEDIA_DIR.'/'.$content[0]);
+		$return['filesize'] = filesize($return['filename']);
+		if(!file_exists($return['filename']) || $return['filesize'] == 0) return FALSE;
 		return $return;
 	}
 }
