@@ -58,11 +58,11 @@ abstract class Default_Model_DatabaseAbstract
 				$this->db->getConnection();
 				unset($config);
 			} catch (Zend_Db_Adapter_Exception $e) {
-				$this->db = FALSE;
+				$this->db = NULL;
 				die('Could not connect to database');
 				// couldn't connect
 			} catch (Zend_Exception $e) {
-				$this->db = FALSE;
+				$this->db = NULL;
 				die('Could not connect to database');
 				// couldn't load Adapter class
 			}
@@ -74,7 +74,7 @@ abstract class Default_Model_DatabaseAbstract
 	 */
 	public function disconnectDatabase ()
 	{
-		if ($this->db !== FALSE) {
+		if (!is_null($this->db)) {
 			if ($this->db->isConnected() && $this->db->closeConnection()) return TRUE;
 		}
 		return FALSE;

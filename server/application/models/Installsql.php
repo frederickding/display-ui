@@ -110,7 +110,7 @@ class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 				null, array(
 				'allowModifications' => true
 		));
-		
+
 		// load all the values from the variables in this class
 		$config->production->server->db->hostname = $this->_host;
 		$config->production->server->db->username = $this->_username;
@@ -118,7 +118,7 @@ class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 		$config->production->server->db->name = $this->_dbname;
 		$config->production->server->db->driver = $this->_driver;
 		$config->production->server->db->live = 0;
-		
+
 		$writer = new Zend_Config_Writer_Ini(array(
 				'config' => $config ,
 				'filename' => CONFIG_DIR . '/database.ini'
@@ -137,6 +137,7 @@ class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 			if(empty($result)) return FALSE;
 			else return TRUE;
 		};
+		return FALSE;
 	}
 	/**
 	 * Inserts the first user into the database
