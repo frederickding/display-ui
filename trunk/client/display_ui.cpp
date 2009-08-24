@@ -1,5 +1,5 @@
 /**
- * rhhstv.cpp, the entry point for the application
+ * display_ui.cpp, the entry point for the application
  *
  * Copyright 2009 Kirill Peretoltchine, Frederick Ding
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 #define _WIN32_IE 0x0501
 
 //#define FULLSCREEN
-#define SKIPVIDEO
+//#define SKIPVIDEO
 
 #include <windows.h>
 #include <urlmon.h>
@@ -40,8 +40,6 @@
 // (see line 7673 of strsafe.h. WTF, microsoft)
 #undef sprintf
 #undef strcat
-#define sprintf sprintf
-#define strcat strcat
 
 #include "resource.h"
 #include "display_ui.h"
@@ -51,6 +49,7 @@
 #include "playlist.h"
 #include "video.h"
 #include "sha1.h"
+#include "config.h"
 
 
 //#pragma comment(lib, "urlmon.lib") 
@@ -74,10 +73,10 @@ void load_headlines();
 
 LPVOID pHeaderImage;
 
-char *headline_txt = "The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit.";
+char *headline_txt = NULL; //"The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit.";
 
 int g_ticks = 0;
-int g_headline_x = 1280;
+int g_headline_x = SCREEN_WIDTH;
 bool g_video_painting = false;
 
 char *sig; // request signature (api key + date)
@@ -109,6 +108,8 @@ void load_headlines(){
 		headline_txt = (char *) malloc(size + 2);
 		memset(headline_txt, 0, size + 2);
 		fread(headline_txt, 1, size, fp);
+
+		g_headline_x = SCREEN_WIDTH;
 		
 		fclose(fp);
 	}
@@ -195,8 +196,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	//playlist_load(hWnd);
 	
-	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_load, (void *)hWnd, 0, NULL);
-	CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
+	CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_load, (void *)hWnd, 0, NULL));
+	CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL));
 
 	// enter the main loop:
 
@@ -413,17 +414,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				if(g_current_elem->type == 1){
 					image_element_t *img = (image_element_t *)g_current_elem->data;
-					sprintf(msg, "File: %s\n%d bytes downloaded.", img->filename, (int)g_current_elem->progress_now);
+					if(g_current_elem->progress_total){
+						sprintf(msg, "Progress: %d%%\nFile: %s\n%d/%d bytes.", (int)(g_current_elem->progress_now/g_current_elem->progress_total * 100), 
+							img->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
+					}else{
+						sprintf(msg, "File: %s\n%d bytes downloaded.", img->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
+					}
+					
 				}else if(g_current_elem->type == 3){
 					video_element_t *vid = (video_element_t *)g_current_elem->data;
-					sprintf(msg, "File: %s\n%d bytes downloaded.", vid->filename, (int)g_current_elem->progress_now);
+					if(g_current_elem->progress_total){
+						sprintf(msg, "Progress: %d%%\nFile: %s\n%d/%d bytes.", (int)(g_current_elem->progress_now/g_current_elem->progress_total * 100), 
+							vid->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
+					}else{
+						sprintf(msg, "File: %s\n%d bytes downloaded.", vid->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
+					}
+					
 				}else{
 					sprintf(msg, "%d bytes downloaded.", (int)g_current_elem->progress_now);
 				}
 				SelectObject(hdcMem, font_dejavusans_cond_bold_24);
 				
-				debug_print("%s\n", msg);
-
 				RECT textBound;
 				textBound.left = CONTENT_WIDTH/2 - 200 + 20; textBound.top = CONTENT_TOP + CONTENT_HEIGHT/2 - 225/2 + 95;
 				textBound.right = CONTENT_WIDTH/2 + 190; textBound.bottom = CONTENT_TOP + CONTENT_HEIGHT/2 + 395/2;
@@ -651,7 +662,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//g_ticks++;
 			return 0;
 		} else if(wParam == 2) {
-			CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL);
+			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL));
 			//weather_update();
 			return 0;
 		} else if(wParam == 3) {
@@ -789,11 +800,19 @@ int download_curl(char *url, char *dest_file, bool show_progress, void *callback
 				curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, arg);
 			}	
 			
+	//		HANDLE header = CreateFile("header.log", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	//		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, writefunc);
+	//		curl_easy_setopt(curl, CURLOPT_WRITEHEADER, header);
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
-			
 			// write to the destination file
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
 			res = curl_easy_perform(curl);
+
+	//		double content_len = 0;
+	//		curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &content_len);
+
+	//		debug_print("[download_curl] %s Content-Length: %d\n", dest_file, (int)content_len);
+	//		CloseHandle(header);
 			//fclose(fp);
 			if(res != CURLE_OK) debug_print("[download_curl] error %d\n", res);
 			//debug_print("[download_curl] finished dl! %s\n", dest_file);
@@ -816,7 +835,18 @@ int download_curl(char *url, char *dest_file, bool show_progress, void *callback
 }
 
 int download_curl(char *url, char *dest_file){
-	return download_curl(url, dest_file, false, NULL, NULL);
+	char *temp_dest = (char *) malloc(strlen(dest_file) + 5);
+	sprintf(temp_dest, "%s.tmp", dest_file);
+	
+	int ret = download_curl(url, temp_dest, false, NULL, NULL);
+
+	if(ret == CURLE_OK){
+		MoveFileEx(temp_dest, dest_file, MOVEFILE_REPLACE_EXISTING);
+	}
+	
+	free(temp_dest);
+
+	return ret;
 }
 
 int dui_download(char *url, char *dest_file, bool show_progress, void *callback, void *arg){
