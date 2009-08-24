@@ -3,7 +3,6 @@
 // Used by resource.rc
 //
 #define IDI_ICON1                       101
-#define IDB_BITMAP1                     101
 
 // Next default values for new objects
 // 
