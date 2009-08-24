@@ -176,7 +176,7 @@ unsigned long weather_update(void *p, bool download_new){
 		}
 	}
 	RECT rt;
-	rt.top = 112; rt.left = 980; rt.right = 1280; rt.bottom = 664;
+	rt.top = CONTENT_TOP; rt.left = CONTENT_WIDTH; rt.right = SCREEN_WIDTH; rt.bottom = CONTENT_BOTTOM;
 	InvalidateRect((HWND) p, &rt, false);
 
 	return 0;
