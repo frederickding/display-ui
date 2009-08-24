@@ -107,7 +107,7 @@ void playlist_image_doload(void *p){
 	
 	debug_print("downloading image... %s\n", new_img->filename);
 
-	sprintf(download_src, "http://du.geekie.org/server/api/media/download/?sys_name=1&sig=%%s&id=%d", element->id);
+	sprintf(download_src, "/api/media/download/?id=%d", element->id);
 	
 	//debug_print("downloading ... [%s] -> [%s]\n", download_src, download_dest);
 	if(!file_exists(new_img->filename)){
@@ -182,7 +182,7 @@ void playlist_video_doload(void *p){
 
 	debug_print("downloading video... %s\n", new_vid->filename);
 	
-	sprintf(download_src, "http://du.geekie.org/server/api/media/download/?sys_name=1&sig=%%s&id=%d", element->id);
+	sprintf(download_src, "/api/media/download/?id=%d", element->id);
 	//debug_print("downloading ... [%s] -> [%s]\n", download_src, download_dest);
 	free(p);
 	if(!file_exists(new_vid->filename)){
@@ -323,7 +323,7 @@ void playlist_process_raw(HWND hwnd){
 void playlist_load(HWND hwnd){
 	//int loaded_old = playlist_load_raw();
 	//debug_print("playlist_load\n");
-	int result = dui_download("http://du.geekie.org/server/api/playlists/fetch/?sys_name=1&sig=%s", "data\\playlist.dat");
+	int result = dui_download("/api/playlists/fetch/", "data\\playlist.dat");
 	debug_print("playlist_load .. %d\n", result);
 	if(result == CURLE_OK) {
 		debug_print("[playlist_load] download operation succeeded ... loading new playlist\n");
