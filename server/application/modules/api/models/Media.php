@@ -29,12 +29,15 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 	/**
 	 * Determines whether a medium is stored in the database table
 	 * @param $_id
-	 * @return bool
+	 * @return int
 	 */
 	public function isStoredDb($_id)
 	{
-		return (bool) $this->db->fetchOne('SELECT data IS NOT NULL AS data'
+		$result = $this->db->fetchOne('SELECT data IS NOT NULL AS data'
 			.' FROM dui_media WHERE id = ? LIMIT 1', $_id);
+		if($result == 1) return 1;
+		elseif($result == 0) return 0;
+		else return -1;
 	}
 	/**
 	 * Gets the data stored in the SQL database
@@ -79,7 +82,7 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 		$return = array();
 		$return['filename'] = MEDIA_DIR.'/'.$content[0];
 		$return['mime'] = $content[1];
-		$return['filesize'] = filesize($return['filename']);
+		$return['filesize'] = filesize(MEDIA_DIR.'/'.$content[0]);
 		return $return;
 	}
 }
