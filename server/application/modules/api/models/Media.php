@@ -54,12 +54,12 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 				->query()
 				->fetch();
 		$content = explode(';', $result['content']);
-		$return = array();
-		$return['filename'] = $content[0];
-		$return['mime'] = $content[1];
-		$return['data'] = $result['data'];
-		$return['filesize'] = $result['data_size'];
-		return $return;
+		return array(
+			'filename' => $content[0],
+			'mime' => $content[1],
+			'data' => $result['data'],
+			'filesize' => $result['data_size']
+		);
 	}
 	/**
 	 * Gets the data about a file stored in the filesystem
@@ -75,11 +75,13 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 				->limit(1)
 				->query()
 				->fetch();
+		if(empty($result['content'])) return FALSE;
 		$content = explode(';', $result['content']);
-		$return = array();
-		$return['filename'] = MEDIA_DIR.'/'.$content[0];
-		$return['mime'] = $content[1];
-		$return['filesize'] = filesize($return['filename']);
+		$return = array(
+			'filename' => MEDIA_DIR.'/'.$content[0],
+			'mime' => $content[1],
+			'filesize' => filesize(MEDIA_DIR.'/'.$content[0])
+		);
 		if(!file_exists($return['filename']) || $return['filesize'] == 0) return FALSE;
 		return $return;
 	}
