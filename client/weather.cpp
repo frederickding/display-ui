@@ -64,7 +64,7 @@ unsigned long weather_update(void *p, bool download_new){
 	int result = -1;
 
 	if(download_new){
-		result = dui_download("http://du.geekie.org/server/api/weather/current/?sys_name=1&sig=%s&location=CAXX0401", "data\\weather\\weather_c.dat");
+		result = dui_download("/api/weather/current/?location=CAXX0401", "data\\weather\\weather_c.dat");
 	}
 	if(result == CURLE_OK || !download_new) {
 
@@ -120,7 +120,7 @@ unsigned long weather_update(void *p, bool download_new){
 	}
 
 	if(download_new){
-		result = dui_download("http://du.geekie.org/server/api/weather/forecast/?sys_name=1&sig=%s&location=CAXX0401&day=2", "data\\weather\\weather_fc.dat");
+		result = dui_download("/api/weather/forecast/?location=CAXX0401&day=2", "data\\weather\\weather_fc.dat");
 	}
 
 	if(result == CURLE_OK || !download_new) {

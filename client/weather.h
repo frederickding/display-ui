@@ -1,8 +1,6 @@
 #ifndef weather_header
 #define weather_header
 
-#include <wchar.h>
-
 typedef struct _weather_t{
 	int condition;
 	char temp[6];
@@ -26,25 +24,4 @@ FIBITMAP *weather_getimage_current();
 FIBITMAP *weather_getimage_fc(int num);
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -11,6 +11,25 @@
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmap1.bmp"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // English (Canada) resources
@@ -28,7 +47,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_CAN
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "icon.ico"
+IDI_ICON1               ICON    DISCARDABLE     "icon.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -36,18 +55,18 @@ IDI_ICON1               ICON                    "icon.ico"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "\r\n"
     "\0"
@@ -56,6 +75,7 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -78,13 +98,13 @@ BEGIN
     BEGIN
         BLOCK "100904b0"
         BEGIN
-            VALUE "FileDescription", "The client executable which shows the Display UI"
-            VALUE "FileVersion", "0, 3, 3, 3"
-            VALUE "InternalName", "display_ui"
-            VALUE "LegalCopyright", "Copyright (C) 2009 Kirill Peretoltchine & Frederick Ding"
-            VALUE "OriginalFilename", "display_ui.exe"
-            VALUE "ProductName", "Display UI Client"
-            VALUE "ProductVersion", "internal-testing"
+            VALUE "FileDescription", "The client executable which shows the Display UI\0"
+            VALUE "FileVersion", "0, 3, 3, 3\0"
+            VALUE "InternalName", "display_ui\0"
+            VALUE "LegalCopyright", "Copyright (C) 2009 Kirill Peretoltchine & Frederick Ding\0"
+            VALUE "OriginalFilename", "display_ui.exe\0"
+            VALUE "ProductName", "Display UI Client\0"
+            VALUE "ProductVersion", "internal-testing\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -92,6 +112,8 @@ BEGIN
         VALUE "Translation", 0x1009, 1200
     END
 END
+
+#endif    // !_MAC
 
 #endif    // English (Canada) resources
 /////////////////////////////////////////////////////////////////////////////

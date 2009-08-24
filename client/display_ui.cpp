@@ -22,7 +22,7 @@
 #define _WIN32_IE 0x0501
 
 //#define FULLSCREEN
-//#define SKIPVIDEO
+#define SKIPVIDEO
 
 #include <windows.h>
 #include <urlmon.h>
@@ -48,7 +48,6 @@
 #include "weather.h"
 #include "playlist.h"
 #include "video.h"
-#include "sha1.h"
 #include "config.h"
 
 
@@ -79,7 +78,6 @@ int g_ticks = 0;
 int g_headline_x = SCREEN_WIDTH;
 bool g_video_painting = false;
 
-char *sig; // request signature (api key + date)
 
 extern playlist_t g_playlist;
 playlist_element_t *g_current_elem;
@@ -88,7 +86,7 @@ void *bmp_bytes;
 void update(void *p) {
 	weather_update(p, true);
 
-	if(dui_download("http://du.geekie.org/server/api/headlines/fetch/?sys_name=1&sig=%s", "data\\headlines.dat") == CURLE_OK) {
+	if(dui_download("/api/headlines/fetch/", "data\\headlines.dat") == CURLE_OK) {
 		load_headlines();
 	}
 }
@@ -141,8 +139,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	debug_init();
 	weather_init();
 	
-	sig = (char *) malloc(41);
-	generate_sig();
+	config_load();
+	debug_print("%s\n", lpCmdLine);
+
+	//sig = (char *) malloc(41);
+	config_generate_sig();
 
 		/* use this for full-screen:
 		-GetSystemMetrics(SM_CXFRAME), -GetSystemMetrics(SM_CYCAPTION) - 
@@ -189,7 +190,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		NULL);
 #endif
 	
-	weather_update(hWnd, false);
+	//weather_update(hWnd, false);
 	load_headlines();
 
 	ShowWindow(hWnd, nCmdShow);
@@ -703,9 +704,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		FreeImage_Unload(fbmp_loading);
 		FreeImage_DeInitialise();
 		
-
 		debug_close();
-		free(sig);
 		free(bmp_bytes);
 		weather_exit();
 		video_shutdown();
@@ -719,39 +718,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void generate_sig() {
-	char *api_key = "41e0a9448f91edba4b05c6c2fc0edb1d6418aa292b5b2942637bec43a29b9523";
-	char date[11];
-	time_t rawtime;
-	tm * ptm;
-	time (&rawtime);
-	ptm = gmtime (&rawtime);
 
-	strftime(date, 11, "%Y-%m-%d", ptm);
-
-	memset(sig, 0, 41);
-
-	// SHA1 hash the produced string
-	SHA1Context sha;
-	uint8_t Message_Digest[20];
-	SHA1Reset(&sha);
-	SHA1Input(&sha, (const unsigned char *) api_key, strlen(api_key));
-	SHA1Input(&sha, (const unsigned char *) date, strlen(date));
-	if(!SHA1Result(&sha, Message_Digest)) {
-		for(int i = 0; i < 20; i++) {
-			char temp[2];
-			sprintf(temp, "%02x", Message_Digest[i]);
-			strcat(sig, temp);
-		}
-	} else {
-		// TODO: handle errors
+void make_url(char *dest, char *url){
+	if(strchr(url, '?') == NULL){
+		sprintf(dest, "%s%s?sys_name=%s&sig=%s", config_get_url(), url, config_get_sysname(), config_get_sig());
+	}else{
+		sprintf(dest, "%s%s&sys_name=%s&sig=%s", config_get_url(), url, config_get_sysname(), config_get_sig());
 	}
-	debug_print("%s\n", sig);
-}
-
-// format needs to contain a %s where the sig goes
-void make_url(char *dest, char *format){
-	sprintf(dest, format, sig);
 }
 
 
@@ -851,12 +824,13 @@ int download_curl(char *url, char *dest_file){
 
 int dui_download(char *url, char *dest_file, bool show_progress, void *callback, void *arg){
 
-	char *full_url = (char *) malloc(strlen(url) + 39);
+	char *full_url = (char *) malloc(strlen(config_get_url()) + strlen(url) + strlen("&sys_name=&sig=")
+									+ strlen(config_get_sysname()) + strlen(config_get_sig()));
 	char *temp_dest = (char *) malloc(strlen(dest_file) + 5);
 	make_url(full_url, url);
 	sprintf(temp_dest, "%s.tmp", dest_file);
 	
-	debug_print("%s .. %s\n", temp_dest, dest_file);
+	//debug_print("%s .. %s\n", temp_dest, dest_file);
 
 	int ret = download_curl(full_url, temp_dest, show_progress, callback, arg);
 		//URLDownloadToFile(NULL, full_url, temp_dest, 0, NULL);//download_curl(full_url, dest_file);
