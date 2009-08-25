@@ -169,5 +169,9 @@ SOURCE=".\dui-icon.ico"
 SOURCE=.\resource.rc
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\version.dsm
+# End Source File
 # End Target
 # End Project

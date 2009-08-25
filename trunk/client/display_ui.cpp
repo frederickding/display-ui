@@ -22,7 +22,7 @@
 #define _WIN32_IE 0x0501
 
 //#define FULLSCREEN
-#define SKIPVIDEO
+//#define SKIPVIDEO
 
 #include <windows.h>
 #include <urlmon.h>
@@ -82,7 +82,9 @@ char *headline_txt = NULL; //"The quick brown fox jumps over the lazy dog | Lore
 
 int g_ticks = 0;
 int g_headline_x = SCREEN_WIDTH;
+
 bool g_video_painting = false;
+bool g_goto_next = false;
 
 
 static FIBITMAP *fbmp_bg			= NULL;
@@ -358,6 +360,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		if(wParam == VK_ESCAPE || wParam == 'q' || wParam == 'Q'){
 			SendMessage(hWnd, WM_DESTROY, 0, 0);
+		}else if(wParam == VK_SPACE){
+			g_goto_next = true;
 		}
 		break;
 	case WM_ERASEBKGND:
@@ -419,12 +423,17 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 					image_element_t *image = (image_element_t *) g_current_elem->data;
 					//debug_print("%d", image->loaded);
 					//debug_print("asdf\n");
-					if(timeleft == 0xffff) timeleft = g_current_elem->secs * FRAMES_PER_SEC / 4;
+					if(timeleft == 0xffff) timeleft = g_current_elem->secs * FRAMES_PER_SEC;
 					image->bf.SourceConstantAlpha = imgalpha;
 					
 					AlphaBlend(hdcMem, CONTENT_WIDTH/2 - image->width/2, CONTENT_TOP + CONTENT_HEIGHT/2 - image->height/2, 
 						image->width, image->height, image->hdc, 0, 0, image->width, image->height, image->bf);
 					
+					if(g_goto_next){
+						timeleft = 15;
+						g_goto_next = false;
+					}
+
 					if(timeleft == 0){
 						if(g_current_elem->next) g_current_elem = g_current_elem->next;
 						debug_print("%08lX\n", g_current_elem);
@@ -490,7 +499,8 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 						
 						//ValidateRect(hWnd, &ps.rcPaint);
 
-						if(position >= duration){
+						if(position >= duration || g_goto_next){
+							g_goto_next = false;
 							debug_print("video end reached.\n");
 							video_unload(video);
 							g_video_painting = false;
