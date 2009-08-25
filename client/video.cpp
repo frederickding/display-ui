@@ -130,7 +130,7 @@ HRESULT video_load(HWND hwnd, video_element_t *video){
 				SetRect(&rc_dst, CONTENT_WIDTH/2 - width/2, CONTENT_TOP + CONTENT_HEIGHT/2 - height/2, 
 					CONTENT_WIDTH/2 + width/2, CONTENT_TOP + CONTENT_HEIGHT/2 + height/2); 
 			}else{
-				SetRect(&rc_dst, 0, CONTENT_TOP, CONTENT_WIDTH - 1, CONTENT_BOTTOM + 1);	
+				SetRect(&rc_dst, 0, CONTENT_TOP, CONTENT_WIDTH, CONTENT_BOTTOM + 1);	
 			}
 
 			// Set the video position.
