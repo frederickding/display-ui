@@ -8,9 +8,9 @@ The Display UI project is developed and will be released under the [http://www.a
 = Libraries =
 
 Display UI makes use of open source libraries. These include:
-  * [http://framework.zend.com/ Zend Framework], [http://framework.zend.com/license licensed under the New BSD License]
+  * [http://framework.zend.com/ Zend Framework], an object-oriented web application framework for PHP, [http://framework.zend.com/license licensed under the New BSD License]
   * [http://freeimage.sourceforge.net/ The FreeImage Project], an open source image library, [http://freeimage.sourceforge.net/license.html licensed under the FreeImage Public License]
-  * [http://curl.haxx.se/libcurl/ libcurl], the multi-protocol file transfer library, licensed under a MIT/X-style license (see the curl license below)
+  * [http://curl.haxx.se/libcurl/ libcurl], the multi-protocol file transfer library, licensed under a MIT/X-style license (see the cURL license below)
 
 = Apache License 2.0 =
 <table border="0" cellpadding="2">
