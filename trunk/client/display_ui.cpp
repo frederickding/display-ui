@@ -52,19 +52,20 @@
 
 
 //#pragma comment(lib, "urlmon.lib") 
-#pragma comment(lib, "freeimage.lib") 
+#pragma comment(lib, "freeimage.lib")
 #pragma comment(lib, "msimg32.lib")
 #pragma comment(lib, "strmiids.lib")
 #pragma comment(lib, "libcurl.lib")
-#pragma comment(lib, "ws2_32")
-#pragma comment(lib, "winmm")
+#pragma comment(lib, "version.lib")
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winmm.lib")
 
-#define FRAMES_PER_SEC 25 // should be a factor of 1000!
+#define FRAMES_PER_SEC 50 // should be a factor of 1000!
 #define FRAME_INTERVAL 1000 / FRAMES_PER_SEC
 
 #define MakeFont(name, bold, italic, underline, size) CreateFont(-size, \
 			0, 0, 0, (bold ? FW_BOLD : FALSE), (italic ? FW_BOLD : FALSE), (underline ? FW_BOLD : FALSE), FALSE, ANSI_CHARSET, \
-			OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, name)
+			OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_ROMAN, name)
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -825,9 +826,11 @@ int download_curl(char *url, char *dest_file, bool show_progress, void *callback
 			
 			debug_print("[download_curl] URL: %s\n", url);
 			debug_print("[download_curl] dest file: %s\n", dest_file);
+			
+
 
 			curl_easy_setopt(curl, CURLOPT_URL, url);
-			curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; Display UI Client)");
+			curl_easy_setopt(curl, CURLOPT_USERAGENT, config_get_useragent());
 			curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
 			curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 

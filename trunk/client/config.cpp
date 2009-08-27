@@ -11,6 +11,9 @@
 char g_api_key[65];
 char g_sys_name[65];
 char g_sig[41];
+char g_version[24];
+char g_winver[12];
+char g_useragent[64];
 
 // length of server url cannot exceed 255 characters!
 char g_server_url[256];
@@ -31,6 +34,37 @@ int config_load(){
 	
 	GetPrivateProfileString("system", "server_location", "undefined", g_server_url, 256, path);
 	debug_print("[config_load] server_url = %s\n", g_server_url);
+	
+	DWORD version_info_size = GetFileVersionInfoSize("display_ui.exe", NULL);
+	char *version_info = (char *)malloc(version_info_size);
+	GetFileVersionInfo("display_ui.exe", NULL, version_info_size, version_info);
+	
+	VS_FIXEDFILEINFO *vs_ffi = (VS_FIXEDFILEINFO *) malloc(sizeof(VS_FIXEDFILEINFO));
+
+	unsigned int vs_ffi_size;
+	VerQueryValue(version_info, "\\", (void **)&vs_ffi, &vs_ffi_size);
+
+	sprintf(g_version, "%d.%d.%d.%d", HIWORD(vs_ffi->dwFileVersionMS), LOWORD(vs_ffi->dwFileVersionMS), 
+		HIWORD(vs_ffi->dwFileVersionLS), LOWORD(vs_ffi->dwFileVersionLS));
+	
+	debug_print("[config_load] file version: %s\n", g_version);
+
+	free(version_info);
+	
+	
+	// see link for how to read windows versions:
+	// http://msdn.microsoft.com/en-us/library/ms724834%28VS.85%29.aspx
+
+	OSVERSIONINFO osver;
+	osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osver);
+
+	sprintf(g_winver, "%d.%d", osver.dwMajorVersion, osver.dwMinorVersion);
+	debug_print("[config_load] windows version: %s\n", g_winver);
+	
+	sprintf(g_useragent, "Mozilla/5.0 (compatible; Windows NT %s) DisplayUIClient/%s", g_winver, g_version);
+	
+	debug_print("[config_load] user agent: %s\n", g_useragent);
 
 	return 0;
 }
@@ -76,4 +110,16 @@ char *config_get_url(){
 
 char *config_get_sysname(){
 	return g_sys_name;
+}
+
+char *config_get_version(){
+	return g_version;
+}
+
+char *config_get_winver(){
+	return g_winver;
+}
+
+char *config_get_useragent(){
+	return g_useragent;
 }
