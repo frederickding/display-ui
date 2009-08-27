@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <time.h>
 
-
-
 #include "display_ui.h"
 #include "sha1.h"
 #include "debug.h"
@@ -18,7 +16,7 @@ char g_useragent[64];
 // length of server url cannot exceed 255 characters!
 char g_server_url[256];
 
-
+// Load data from .ini file.
 int config_load(){
 	char path[MAX_PATH + 16];
 	
@@ -65,13 +63,12 @@ int config_load(){
 	sprintf(g_useragent, "Mozilla/5.0 (compatible; Windows NT %s) DisplayUIClient/%s", g_winver, g_version);
 	
 	debug_print("[config_load] user agent: %s\n", g_useragent);
-
+	
 	return 0;
 }
 
-
+// Signature is a SHA1 hash of the date in Y-m-d format appended to the api key
 void config_generate_sig() {
-
 	char date[11];
 	time_t rawtime;
 	tm * ptm;
