@@ -40,7 +40,7 @@ weather_t current;
 weather_fc_t **forecast = (weather_fc_t **) 0;
 bool initialized = false;
 
-
+// Initialize weather
 void weather_init() {
 	forecast = (weather_fc_t **) malloc(sizeof(weather_fc_t *) * 2);
 	forecast[0] = (weather_fc_t *) malloc(sizeof(weather_fc_t));
@@ -53,12 +53,18 @@ void weather_init() {
 	// weather_update(NULL);
 }
 
+// Unitialize weather
+// TODO: free weather icons
 void weather_exit() {
 	if(forecast[0]) free(forecast[0]);
 	if(forecast[1]) free(forecast[1]);
 	if(forecast) free(forecast);
 }
 
+// Update weather info.
+// params:
+//		p:		 	  HWND of the window in which weather is being drawn.
+//		download_new: If false, loads existing weather info from file.
 unsigned long weather_update(void *p, bool download_new){
 	
 	int result = -1;
@@ -66,11 +72,12 @@ unsigned long weather_update(void *p, bool download_new){
 	if(download_new){
 		result = dui_download("/api/weather/current/?location=CAXX0401", "data\\weather\\weather_c.dat");
 	}
-	if(result == CURLE_OK || !download_new) {
 
+	// Read from the file if download was OK, or if redownload wasn't requested
+	if(result == CURLE_OK || !download_new){
 		FILE *fp = fopen("data\\weather\\weather_c.dat", "r");
 
-		if(fp) {
+		if(fp){
 			int temp = 0;
 			fscanf(fp, "%d", &current.condition);
 			fscanf(fp, "%d", &temp);
@@ -86,10 +93,8 @@ unsigned long weather_update(void *p, bool download_new){
 			memset(current.description, 0, length + 2);
 			fgets(current.description, length + 1, fp);
 
-			debug_print("desc: %08lX (%d)\n", current.description, length);
+			debug_print("[weather_update] current description at %08lX (%d)\n", current.description, length);
 			
-			
-
 			fclose(fp);
 
 			char imgurl[48];
@@ -97,17 +102,22 @@ unsigned long weather_update(void *p, bool download_new){
 			tm *ptm;
 			time (&rawtime);
 			ptm = localtime(&rawtime);
+
+			// Create URL based on condition and time of day
 			sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%d%c.png", current.condition, (ptm->tm_hour < 6 || ptm->tm_hour > 19) ? 'n' : 'd');
 			
+			// Download a weather icon
 			download_curl(imgurl, "img\\current.png");
-			//URLDownloadToFile(NULL, imgurl, "img\\current.png", 0, NULL);
-
+			
+			// If an image is already loaded, unload that one.
 			if(fbmp_weather_current){
 				FreeImage_Unload(fbmp_weather_current);
 				fbmp_weather_current = NULL;
 			}	
 			fbmp_weather_current = FreeImage_Load(FIF_PNG, "img\\current.png", NULL);
-
+			
+			// Resize it to the appropriate size. This is done here to avoid lag during redrawing. FreeImage's
+			// rescaling is way better than StretchDIBits, anyways.
 			FIBITMAP *temp_img = fbmp_weather_current;
 			fbmp_weather_current = FreeImage_Rescale(fbmp_weather_current, 250, 180, FILTER_BICUBIC);
 			FreeImage_Unload(temp_img);
@@ -122,7 +132,8 @@ unsigned long weather_update(void *p, bool download_new){
 	if(download_new){
 		result = dui_download("/api/weather/forecast/?location=CAXX0401&day=2", "data\\weather\\weather_fc.dat");
 	}
-
+	
+	// If forecast info was downloaded correctly, or if no download was requested, read from the data file.
 	if(result == CURLE_OK || !download_new) {
 		FILE *fp = fopen("data\\weather\\weather_fc.dat", "r");
 
@@ -133,7 +144,6 @@ unsigned long weather_update(void *p, bool download_new){
 				fscanf(fp, "\n%d", &forecast[i]->condition);
 				fscanf(fp, "%d", &temp_hi);
 				fscanf(fp, "%d", &temp_lo);
-
 
 				sprintf(forecast[i]->temp_hi, "%d°", temp_hi);
 				sprintf(forecast[i]->temp_lo, "%d", temp_lo);
@@ -146,23 +156,25 @@ unsigned long weather_update(void *p, bool download_new){
 				memset(forecast[i]->description, 0, length + 1);
 				fgets(forecast[i]->description, length + 1, fp);
 
-				debug_print("high: %s, low: %s, desc: %s\n", forecast[i]->temp_hi, forecast[i]->temp_lo, forecast[i]->description);
+				debug_print("[weather_update -- forecast] Day %d: %s/%s [%s]\n", i, forecast[i]->temp_hi, forecast[i]->temp_lo, forecast[i]->description);
 
 				char imgurl[48];
 				char filename[19];
+
+				// Create URL based on condition and filename based on FC day number
 				sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%dd.png", forecast[i]->condition);
 				sprintf(filename, "img\\forecast_%d.png", i);
-				//debug_print("%s -> %s\n", imgurl, filename);
 				
 				download_curl(imgurl, filename);
-				//URLDownloadToFile(NULL, imgurl, filename, 0, NULL);
-
+				
+				// If the image already exists, unload it
 				if(fbmp_weather_fc[i]){
 					FreeImage_Unload(fbmp_weather_fc[i]);
 					fbmp_weather_fc[i] = NULL;
 				}	
 				fbmp_weather_fc[i] = FreeImage_Load(FIF_PNG, filename, NULL);
-
+				
+				// Resize here to avoid lag later.
 				FIBITMAP *temp_img = fbmp_weather_fc[i];
 				fbmp_weather_fc[i] = FreeImage_Rescale(fbmp_weather_fc[i], 188, 135, FILTER_BICUBIC);
 				FreeImage_Unload(temp_img);
@@ -175,6 +187,8 @@ unsigned long weather_update(void *p, bool download_new){
 			return 1;
 		}
 	}
+
+	// Tell Windows to send a WM_PAINT message for the weather panel rectangle, as it needs to be redrawn.
 	RECT rt;
 	rt.top = CONTENT_TOP; rt.left = CONTENT_WIDTH; rt.right = SCREEN_WIDTH; rt.bottom = CONTENT_BOTTOM;
 	InvalidateRect((HWND) p, &rt, false);

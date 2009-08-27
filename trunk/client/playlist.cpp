@@ -34,15 +34,15 @@
 #undef sprintf
 #undef swprintf
 #undef strcat
-//#define sprintf sprintf
-//#define swprintf swprintf
-//#define strcat strcat
 
 #include "display_ui.h"
 #include "freeimage.h"
 #include "playlist.h"
 #include "video.h"
 #include "debug.h"
+
+#define MEDIA_TYPE_IMAGE 1
+#define MEDIA_TYPE_VIDEO 3
 
 #pragma pack(1)
 
@@ -88,35 +88,41 @@ bool file_exists(const char * filename){
     return false;
 }
 
-
+// Callback for cURL's progress updates during download
 int playlist_media_dl_progress_cb(void *arg, double dltotal, double dlnow, double ultotal, double ulnow){
 	playlist_element_t *element = (playlist_element_t *) arg;
 	
+	// Update the progress in the playlist_element_t structure
 	element->progress_total = (int) dltotal;
 	element->progress_now   = (int) dlnow;
 	return 0;
 }
 
+// Does the actual loading. This is called from a thread in order to do simultaneous downloads.
+// params:
+//		p:	A pointer to a playlist_thread_elem_t structure describing the element to load.
+//			Function assumes that the element is an image. This is freed at end of this function.
 void playlist_image_doload(void *p){
 	playlist_thread_elem_t *th_image = (playlist_thread_elem_t *) p;
 	playlist_element_t *element = th_image->elem;
 	image_element_t *new_img = (image_element_t *) element->data;
 
-	char download_src[69 + 15];
-	memset(download_src, 0, 69 + 15);
+	char download_src[24 + 15];
 	
-	debug_print("downloading image... %s\n", new_img->filename);
+	debug_print("[playlist_image_doload] downloading image... %s\n", new_img->filename);
 
 	sprintf(download_src, "/api/media/download/?id=%d", element->id);
 	
-	//debug_print("downloading ... [%s] -> [%s]\n", download_src, download_dest);
+	// Download the image if it doesn't exist yet.
+	// TODO: Do some sort of check to see if image on the server differs from the local copy.
 	if(!file_exists(new_img->filename)){
 		if(dui_download(download_src, new_img->filename, true, (void *)playlist_media_dl_progress_cb, (void *)element) != CURLE_OK){
-			debug_print("image download failed! %d %s\n", element->id, download_src);
+			debug_print("[playlist_image_doload] Image download failed! ID: %d, URL: %s\n", element->id, download_src);
 			return;
 		}
 	}
 	
+	// Load image from disk.
 	new_img->type = FreeImage_GetFileType(new_img->filename, 0);
 	if(new_img->type == FIF_UNKNOWN){
 		new_img->type = FreeImage_GetFIFFromFilename(new_img->filename);
@@ -126,30 +132,41 @@ void playlist_image_doload(void *p){
 	long width = FreeImage_GetWidth(new_img->fbmp_image);
 	long height = FreeImage_GetHeight(new_img->fbmp_image);
 	
+	// If width or height exceeds the dimensions of the content area, resize the image
 	if(width > CONTENT_WIDTH){
-		debug_print("image too large! resizing\n");
+		debug_print("[playlist_image_doload] Image too large! Resizing...\n");
+
+		// Calculate new dimensions.
 		height = CONTENT_WIDTH * height / width;
 		width = CONTENT_WIDTH;
+		
+		// Resize the image.
 		FIBITMAP *temp = new_img->fbmp_image;
 		new_img->fbmp_image = FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
 		FreeImage_Unload(temp);
-		debug_print("new dimensions: %d x %d ... \n", width, height);
-	}else if(height > CONTENT_HEIGHT){
+		debug_print("[playlist_image_doload] New dimensions: %dx%d.\n", width, height);
+	}
+	if(height > CONTENT_HEIGHT){
+		debug_print("[playlist_image_doload] Image too large! Resizing...\n");
+
+		// Calculate new dimensions.
 		width = CONTENT_HEIGHT * width / height;
 		height = CONTENT_HEIGHT;
+		
+		// Resize the image.
 		FIBITMAP *temp = new_img->fbmp_image;
 		new_img->fbmp_image = FreeImage_Rescale(new_img->fbmp_image, width, height, FILTER_BICUBIC);
 		FreeImage_Unload(temp);
+		debug_print("[playlist_image_doload] New dimensions: %dx%d.\n", width, height);
 	}
 	
+	// Pre-multiply PNG images to make alpha transparency work as it should.
 	if(new_img->type == FIF_PNG) FreeImage_PreMultiplyWithAlpha(new_img->fbmp_image);
-	debug_print("new_img->fbmp_image = %08lX\n", new_img->fbmp_image);
+
+	debug_print("[playlist_image_doload] new_img->fbmp_image = %08lX\n", new_img->fbmp_image);
 
 	HDC hdcWin = GetDC(th_image->hwnd);
 	new_img->hdc = CreateCompatibleDC(hdcWin);
-	
-	
-	
 	new_img->hbm = CreateCompatibleBitmap(hdcWin, width, height);
 	SelectObject(new_img->hdc, new_img->hbm);
 	
@@ -167,36 +184,42 @@ void playlist_image_doload(void *p){
 	new_img->bf.AlphaFormat = (new_img->type == FIF_PNG ? AC_SRC_ALPHA : AC_SRC_OVER);
 	
 	free(p);
-	debug_print("image loaded.\n");
+	debug_print("[playlist_image_doload] Image loaded.\n");
+
+	// Tell the program that the image is ready for drawing.
 	element->ready = true;
 }
 
 
+// Does the actual loading. This is called from a thread in order to do simultaneous downloads.
+// params:
+//		p:	A pointer to a playlist_thread_elem_t structure describing the element to load.
+//			Function assumes that the element is a video. This is freed at end of this function.
 void playlist_video_doload(void *p){
 	playlist_thread_elem_t *th_vid = (playlist_thread_elem_t *) p;
 	playlist_element_t *element = th_vid->elem;
 	video_element_t *new_vid = (video_element_t *) element->data;
 	
-	char download_src[69 + 15];
-	memset(download_src, 0, 69 + 15);
+	char download_src[24 + 15];
 
-	debug_print("downloading video... %s\n", new_vid->filename);
+	debug_print("[playlist_video_doload] downloading video... %s\n", new_vid->filename);
 	
+	// Download the video from the server.
 	sprintf(download_src, "/api/media/download/?id=%d", element->id);
-	//debug_print("downloading ... [%s] -> [%s]\n", download_src, download_dest);
-	free(p);
 	if(!file_exists(new_vid->filename)){
 		if(dui_download(download_src, new_vid->filename, true, (void *)playlist_media_dl_progress_cb, (void *)element) != CURLE_OK){
-			debug_print("image download failed! %s\n", download_src);
+			debug_print("[playlist_video_doload] image download failed! %s\n", download_src);
 			return;
 		}
 	}
-
-	element->ready = true;
-
 	
+	free(p);
+
+	// Tell the program that the video is ready for rendering.
+	element->ready = true;
 }
 
+// Dumps all playlist elements to the debug file.
 void playlist_dumpitems(){
 	playlist_element_t *current = g_playlist.first;
 
@@ -215,7 +238,7 @@ void playlist_dumpitems(){
 	}while(current != g_playlist.first);
 }
 
-
+// Load the raw playlist file from disk into memory
 int playlist_load_raw(){
 	FILE *playlist_file;
 
@@ -240,91 +263,93 @@ int playlist_load_raw(){
 	return -1;
 }
 
+// Process the raw playlist data. Create playlist structs and load
+// media where necessary.
+// params:
+//		hwnd:	Handle to window in which playlist items will be rendered.
 void playlist_process_raw(HWND hwnd){
 	
 	playlist_f_t *playlist = (playlist_f_t *) g_playlist_raw;
 	g_playlist.num_elements = playlist->num_elements;
-	debug_print("number of elements: %d **\n", g_playlist.num_elements);
+	debug_print("[playlist_process_raw] number of elements: %d **\n", g_playlist.num_elements);
 	
 	playlist_element_f_t *current = (playlist_element_f_t *) playlist->data;		
-	
 	playlist_element_t *prev_elem = NULL;
+
+	// Loop through all elements
 	for(int i = 0; i < playlist->num_elements; i++){
-		debug_print("element type: %d\nsecs: %d\nlen: %x\n", current->type, current->secs, current->len);
+		debug_print("[playlist_process_raw] element type: %d\n", current->type);
+		debug_print("[playlist_process_raw]         secs: %d\n", current->secs);
+		debug_print("[playlist_process_raw]       length: %x\n", current->len);
+		
+		// Create a new entry in the linked list
 		playlist_element_t *new_elem = (playlist_element_t *) malloc(sizeof(playlist_element_t));
 		memset(new_elem, 0, sizeof(playlist_element_t));
-
+		
+		// Transfer options from raw entry to linked list entry
 		new_elem->type = current->type;
 		new_elem->secs = current->secs;
 		new_elem->trans = current->trans;
 		new_elem->id = current->id;
 		
-		if(new_elem->type == 1){
-			// image
+		if(new_elem->type == MEDIA_TYPE_IMAGE){
 			image_element_f_t *current_img = (image_element_f_t *) current->data;
 			image_element_t *new_img = (image_element_t *) malloc(sizeof(image_element_t));
-			
+	
 			memset(new_img, 0, sizeof(image_element_t));
+			
+			// Filenames are [id].[ext]
 			sprintf(new_img->filename, "media\\%d.%s", current->id, current_img->ext);
 			
-			debug_print("filename: %s\n", new_img->filename);
+			debug_print("[playlist_process_raw] filename: %s\n", new_img->filename);
 			
 			playlist_thread_elem_t *i = (playlist_thread_elem_t *) malloc(sizeof(playlist_thread_elem_t));
 			i->hwnd = hwnd; i->elem = new_elem;
-			
 			new_elem->data = new_img;
 			
-			//playlist_image_doload((void *) i);
+			// Download to disk and load media in a separate thread.
 			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_image_doload, (void *)i, 0, NULL));
-			
-			
-			
-		}else if(new_elem->type == 3){
+		}else if(new_elem->type == MEDIA_TYPE_VIDEO){
 			video_element_f_t *current_vid = (video_element_f_t *) current->data;
 			video_element_t *new_vid = (video_element_t *) malloc(sizeof(video_element_t));
 			memset(new_vid, 0, sizeof(video_element_t));
 			
-			
+			// Need widechar version of filename for DShow
 			sprintf(new_vid->filename, "media\\%d.%s", current->id, current_vid->ext);
 			mbstowcs(new_vid->filename_w, new_vid->filename, strlen(new_vid->filename));
-			//swprintf(new_vid->filename_w, L"media\\%d.%s", current->id, current_vid->ext);
 			
-			debug_print("filename: %s\nwfilename: %ws\n", new_vid->filename, new_vid->filename_w);
-			
-			
+			debug_print("[playlist_process_raw] filename: %s\n", new_vid->filename);
+			debug_print("[playlist_process_raw] wfilename: %ws\n", new_vid->filename_w);
 			
 			playlist_thread_elem_t *i = (playlist_thread_elem_t *) malloc(sizeof(playlist_thread_elem_t));
 			i->hwnd = hwnd; i->elem = new_elem;
-			
 			new_elem->data = new_vid;
 			
-			//playlist_video_doload((void *)i);
+			// Download to disk and load media in a separate thread.
 			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))playlist_video_doload, (void *)i, 0, NULL));
-			
-			debug_print(" -- %d asdf\n", __LINE__);
-			
-			//video_load(hwnd, new_vid);
-			
 		}
 		
+		// Insert element into linked list
 		if(i == 0) g_playlist.first = new_elem;
 		if(prev_elem) prev_elem->next = new_elem;
 		prev_elem = new_elem;
 		new_elem->next = g_playlist.first;
+
+		// Increment pointer to point to next entry in raw playlist data
 		current = (playlist_element_f_t *) ((unsigned long)current + (unsigned long)current->len);
 		
 		
-		debug_print("%08lX -- %08lX .. %d\n", g_playlist_raw, new_elem, new_elem->type);
+		//debug_print("%08lX -- %08lX .. %d\n", g_playlist_raw, new_elem, new_elem->type);
 	}
 	
 	free(g_playlist_raw);
 }
 
+// Attempts to download a playlist, loads old one from disk if can't connect
 void playlist_load(HWND hwnd){
-	//int loaded_old = playlist_load_raw();
-	//debug_print("playlist_load\n");
 	int result = dui_download("/api/playlists/fetch/", "data\\playlist.dat");
-	debug_print("playlist_load .. %d\n", result);
+
+	debug_print("[playlist_load] DL result: %d\n", result);
 	if(result == CURLE_OK) {
 		debug_print("[playlist_load] download operation succeeded ... loading new playlist\n");
 		if(playlist_load_raw() == 0){
@@ -335,10 +360,6 @@ void playlist_load(HWND hwnd){
 		if(playlist_load_raw() == 0){
 			playlist_process_raw(hwnd);				
 		}
-
-		//FILE *fp = fopen("data\\playlist.dat", "wb");
-		//fwrite(g_playlist_raw, 1, g_playlist_raw_size, fp);
-		//fclose(fp);
 	}
 
 	//playlist_dumpitems();
@@ -348,10 +369,10 @@ void playlist_unload(){
 	playlist_element_t *current = g_playlist.first;
 
 	for(int i = 0; i < g_playlist.num_elements; i++){
-		debug_print("unload: %d -- %08lX\n", current->type, current);
+		debug_print("[playlist_unload] type: %d -- address: 0x%08lX\n", current->type, current);
 		if(current->type == 1){
 			image_element_t *current_img = (image_element_t *) current->data;
-			debug_print("unload: %s\n", current_img->filename);
+			debug_print("[playlist_unload -- image] unloading %s...\n", current_img->filename);
 			if(current_img->fbmp_image) FreeImage_Unload(current_img->fbmp_image);
 			if(current_img->filename) free(current_img->filename);
 			DeleteObject(current_img->hbm);
@@ -359,22 +380,10 @@ void playlist_unload(){
 			free(current_img);
 		}else if(current->type == 2){
 			video_element_t *current_vid = (video_element_t *) current->data;
-			debug_print("unload: %s\n", current_vid->filename);
-			//if(current_vid->iMedDet) current_vid->iMedDet->Release();
-			//if(current_vid->iSplGrab) current_vid->iSplGrab->Release();
-			//if(current_vid->framebuf) free(current_vid->framebuf);
-			
-/*			if(current_vid->iVMRwc) current_vid->iVMRwc->Release();
-			if(current_vid->iGraphBldr) current_vid->iGraphBldr->Release();
-			if(current_vid->iMedCtrl) current_vid->iMedCtrl->Release();
-			if(current_vid->iMedEvt) current_vid->iMedEvt->Release();
-			if(current_vid->iMedSeek) current_vid->iMedSeek->Release(); */
-			//video_unload(current_vid);
-			//DeleteObject(current_vid->hbm);
-			//DeleteDC(current_vid->hdc);
-
+			debug_print("[playlist_unload -- video] unloading %s...\n", current_vid->filename);
 			free(current_vid);
 		}
+
 		playlist_element_t *tmp = current;
 		current = current->next;
 		free(tmp);
