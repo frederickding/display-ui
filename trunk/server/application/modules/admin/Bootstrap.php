@@ -9,11 +9,4 @@ class Admin_Bootstrap extends Zend_Application_Module_Bootstrap
 					array('module' => 'admin', 'controller' => 'login', 'action' => 'logout'));
 		$router->addRoute('login', $route[0]);
 	}
-	protected function _initLayouts()
-	{
-		$this->setOptions(array(
-			'layoutPath' => realpath('./views/layouts'),
-			'layout' => 'controlpanel'
-		));
-	}
 }
