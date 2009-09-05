@@ -38,13 +38,13 @@ class Admin_IndexController extends Zend_Controller_Action
 		// TODO implement actions
 		$this->_helper->viewRenderer->setNoRender();
 		if(!$this->auth_session->authenticated) {
-			$this->_redirect($this->view->serverUrl().$this->view->url(array('module' => 'admin', 'controller' => 'login')));
+			$this->_redirect($this->view->serverUrl().$this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index')));
 		}
 	}
 	public function dashboardAction()
 	{
 		if(!$this->auth_session->authenticated) {
-			$this->_redirect($this->view->serverUrl().$this->view->url(array('module' => 'admin', 'controller' => 'login')));
+			$this->_redirect($this->view->serverUrl().$this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index')));
 		}
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 	}
