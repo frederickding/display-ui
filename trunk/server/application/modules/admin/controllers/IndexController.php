@@ -41,4 +41,9 @@ class Admin_IndexController extends Zend_Controller_Action
 			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/login/');
 		}
 	}
+	public function dashboardAction()
+	{
+		$this->_helper->layout()->setLayout('AdminPanelNavigation');
+
+	}
 }
