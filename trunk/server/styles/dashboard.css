@@ -65,7 +65,7 @@ input[type=submit]:hover, input[type=submit]:active {
 	border-bottom: 1px solid #aaaaaa;
 	position: absolute;
 	top: 2em;
-	left: 17.54em; /* *left: 17.1em; */
+	left: 17.54em;
 }
 #bd {
 	position: absolute;
@@ -75,7 +75,6 @@ input[type=submit]:hover, input[type=submit]:active {
 }
 #bd #yui-main .yui-b {
 	margin: 0 auto auto 17.54em;
-	/* *margin-left: 17.1em; */
 	background-color: #ffffff;
 	padding: 1em 1.465em;
 	border-radius: 10px;

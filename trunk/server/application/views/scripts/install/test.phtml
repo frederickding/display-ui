@@ -251,35 +251,29 @@ code {
 		<small>Display UI Server/<?php echo APPLICATION_VER; ?></small>
 	</div>
 </div>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl('images/installer/jquery.qtip-1.0.0-rc3.min.js'); ?>"></script>
-<script type="text/javascript">
-//<![CDATA[
+<?php echo $this->inlineScript()->appendScript('
 $(document).ready(function(){
-    $('tr[title]').qtip({
+    $(\'tr[title]\').qtip({
         style: {
-            name: 'dark',
+            name: \'dark\',
             tip: true
         }
     });
-	$('p.notice').hide();
-	setTimeout("$('p.notice').show('fold', {}, '500');", 2500);
-	$('a.next[title]').qtip({
+	$(\'p.notice\').hide();
+	setTimeout("$(\'p.notice\').show(\'fold\', {}, \'500\');", 2500);
+	$(\'a.next[title]\').qtip({
 		style: {
-			name: 'light',
+			name: \'light\',
 			tip: true
 		}
 	});
-	$('a.back[title]').qtip({
+	$(\'a.back[title]\').qtip({
 		style: {
-			name: 'light',
+			name: \'light\',
 			tip: true
 		}
 	});
-	$('a.next').effect('pulsate', {	times: 3 }, 2000);
-});
-//]]>
-</script>
+	$(\'a.next\').effect(\'pulsate\', {	times: 3 }, 2000);
+});'); ?>
 </body>
 </html>
