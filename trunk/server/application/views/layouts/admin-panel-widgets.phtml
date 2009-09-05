@@ -48,8 +48,8 @@ echo $this->doctype('XHTML1_STRICT');
 <body>
 <div id="doc2">
 	<div id="hd">
-		<span id="system-name"><?php echo $this->metadata->system_name; ?></span>
-		<span id="top-howdy">Howdy, <a href="#" title="User profile"><?php echo $this->metadata->user_name; ?></a>
+		<span id="system-name"><?php echo $this->systemName; ?></span>
+		<span id="top-howdy">Howdy, <a href="#" title="User profile"><?php echo $this->username; ?></a>
 		&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://du.geekie.org/server/" title="Logout" class="logout">Logout</a></span>
 	</div>
 	<div id="bd" class="yui-t2">
@@ -60,7 +60,8 @@ echo $this->doctype('XHTML1_STRICT');
 				<div class="clear"></div>
 			</div>
 		</div>
-<?php echo $this->partial('admin-panel-navigation.phtml'); ?>
+<?php echo $this->partial('admin-panel-navigation.phtml',
+	array('active' => $this->navActive, 'systemName' => $this->systemName)); ?>
 	</div>
 </div>
 <?php echo $this->inlineScript(); ?>
