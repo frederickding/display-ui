@@ -32,7 +32,8 @@ class Admin_IndexController extends Zend_Controller_Action
 		$this->base_uri = $this->base_uri[0];
 		// initiate a session for the installer
 		$this->auth_session = new Zend_Session_Namespace('auth');
-		$this->view->systemName = 'Developmental Installation';
+		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
+		$this->view->systemName = $config->server->install->name;
 	}
 	public function indexAction()
 	{
@@ -45,8 +46,5 @@ class Admin_IndexController extends Zend_Controller_Action
 	public function dashboardAction()
 	{
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
-		$this->view->navActive = 'dashboard';
-		$this->view->title = 'Dashboard';
-		$this->view->headTitle('Dashboard');
 	}
 }
