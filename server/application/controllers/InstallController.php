@@ -28,10 +28,6 @@ class InstallController extends Zend_Controller_Action
 {
 	public function init()
 	{
-		// first of all, we need a way to find the current URL
-		// and the URL of the images
-		$this->base_uri = explode("/install", $_SERVER['REQUEST_URI']);
-		$this->base_uri = $this->base_uri[0];
 		// initiate a session for the installer
 		$this->session = new Zend_Session_Namespace('installer');
 	}
@@ -42,7 +38,6 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
-		$this->view->base_uri = $this->base_uri;
 	    $this->session->page = 1;
 	}
 	/**
@@ -52,12 +47,12 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function testAction ()
 	{
-		$this->view->base_uri = $this->base_uri;
 		$this->view->tests = array();
 
 		// if session page isn't 1, don't proceed
 		if(!($this->session->page >= 1))
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 
 		// if PHP version is greater than 5.2.0, TRUE (pass)
 		$this->view->tests[0] = phpversion() >= '5.2.0';
@@ -112,11 +107,10 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function configAction ()
 	{
-		$this->view->base_uri = $this->base_uri;
-
 		// if session page isn't 2, don't proceed
 		if($this->session->page < 2)
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 
 		$this->_helper->viewRenderer->setNoRender();
 		if (file_exists(CONFIG_DIR . '/configuration.ini')) {
@@ -159,10 +153,10 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function databaseAction()
 	{
-		$this->view->base_uri = $this->base_uri;
 		// if session page isn't 3, don't proceed
 		if($this->session->page < 3)
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 		$this->_helper->viewRenderer->setNoRender();
 		if (file_exists(CONFIG_DIR . '/database.ini')) {
 			// the configuration is already set up
@@ -198,7 +192,8 @@ class InstallController extends Zend_Controller_Action
 					$db->writeConfig();
 					// send user to next step
 					$this->session->page = 4;
-					$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/user/');
+					$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'user')));
 				} else {
 					// connection apparently works but couldn't execute SQL
 					$this->view->status = 1;
@@ -212,10 +207,10 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function userAction()
 	{
-		$this->view->base_uri = $this->base_uri;
 		// if session page isn't 4, don't proceed
 		if($this->session->page < 4)
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 		$this->_helper->viewRenderer->setNoRender();
 		$db = new Default_Model_Installsql(true);
 		if(!$db->hasFirstUser()) {
@@ -235,7 +230,8 @@ class InstallController extends Zend_Controller_Action
 				} elseif($db->insertFirstUser($this->view->username, $this->view->password, $this->view->email)) {
 					// send user to finished screen
 					$this->session->page = 5;
-					$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/done/');
+					$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'done')));
 				} else {
 					$this->uhoh = TRUE;
 					$this->render('databasesuccess');
@@ -245,7 +241,8 @@ class InstallController extends Zend_Controller_Action
 			// user already installed
 			// send user to finished screen
 			$this->session->page = 5;
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/done/');
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'done')));
 		}
 	}
 	/**
@@ -253,10 +250,9 @@ class InstallController extends Zend_Controller_Action
 	 */
 	public function doneAction()
 	{
-		$this->view->base_uri = $this->base_uri;
-
 		// if session page isn't 5, don't proceed
 		if($this->session->page < 5)
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->view->base_uri.'/install/');
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 	}
 }
