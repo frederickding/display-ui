@@ -43,10 +43,12 @@ class Admin_LoginController extends Zend_Controller_Action
 		$Auth = new Admin_Model_Authentication();
 		if($Auth->checkPassword($_user, $_password)) {
 			$this->session->authenticated = TRUE;
-			$this->_redirect($this->view->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')));
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')));
 		} else {
 			$this->session->authenticated = FALSE;
-			$this->_redirect($this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index')).'?username='.$_user);
+			$this->_redirect($this->view->serverUrl()
+							.$this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index')).'?username='.$_user);
 		}
 	}
 	public function logoutAction()
