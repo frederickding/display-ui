@@ -28,14 +28,11 @@ class Admin_LoginController extends Zend_Controller_Action
 {
 	public function init()
 	{
-		$this->base_uri = explode('/admin/login', $_SERVER['REQUEST_URI']);
-		$this->base_uri = $this->base_uri[0];
 		// initiate a session for the installer
 		$this->session = new Zend_Session_Namespace('auth');
 	}
 	public function indexAction()
 	{
-		$this->view->base_uri = $this->base_uri;
 		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 	}
 	public function submitAction()
@@ -46,19 +43,14 @@ class Admin_LoginController extends Zend_Controller_Action
 		$Auth = new Admin_Model_Authentication();
 		if($Auth->checkPassword($_user, $_password)) {
 			$this->session->authenticated = TRUE;
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/');
+			$this->_redirect($this->view->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')));
 		} else {
 			$this->session->authenticated = FALSE;
-			$this->_redirect('http://'.$_SERVER['SERVER_NAME'].$this->base_uri.'/admin/login/?username='.$_user);
+			$this->_redirect($this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index'), 'login').'?username='.$_user);
 		}
 	}
 	public function logoutAction()
 	{
-		if(strpos($_SERVER['REQUEST_URI'], 'logout') !== FALSE) {
-			$this->base_uri = explode('/admin/logout', $_SERVER['REQUEST_URI']);
-			$this->base_uri = $this->base_uri[0];
-		}
 		$this->session->authenticated = FALSE;
-		$this->view->base_uri = $this->base_uri;
-	}
+}
 }
