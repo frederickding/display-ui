@@ -6,9 +6,9 @@ $this->headLink()
 	->prependStylesheet('http://yui.yahooapis.com/combo?2.7.0/build/reset-fonts-grids/'
 						.'reset-fonts-grids.css&amp;2.7.0/build/base/base-min.css')
 	// now all of our styling
-	->appendStylesheet('styles/dashboard.css')
+	->appendStylesheet($this->baseUrl('styles/dashboard.css'))
 	// and, for compatibility, some custom IE styles
-	->appendStylesheet('styles/ie.css', NULL, TRUE);
+	->appendStylesheet($this->baseUrl('styles/ie.css'), NULL, TRUE);
 $this->inlineScript()
 	// our functionality-enabling code, will be externalized
 	->appendScript('$j(document).ready(function () {
@@ -31,9 +31,9 @@ $this->headScript()
 	->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js')
 	// give jQuery the $j alias
 	->appendScript('var $j = jQuery.noConflict();')
-	->appendFile('scripts/jquery.blockui.min.js')
+	->appendFile($this->baseUrl('scripts/jquery.blockui.min.js'))
 	// our custom code for control panel functionality
-	->appendFile('scripts/dui.core-functionality.js');
+	->appendFile($this->baseUrl('scripts/dui.core-functionality.js'));
 echo $this->doctype('XHTML1_STRICT');
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
