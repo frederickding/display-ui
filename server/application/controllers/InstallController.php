@@ -30,11 +30,13 @@ class InstallController extends Zend_Controller_Action
 	{
 		// initiate a session for the installer
 		$this->session = new Zend_Session_Namespace('installer');
+		$this->view->inlineScript()
+			->appendFile('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js')
+			->appendFile('http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js')
+			->appendFile($this->baseUrl('scripts/jquery.qtip-1.0.0-rc3.min.js'));
 	}
 	/**
 	 * Default method
-	 *
-	 * Don't actually do anything
 	 */
 	public function indexAction ()
 	{
