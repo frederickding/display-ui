@@ -1,3 +1,17 @@
+<?php
+$pages1 = array(
+	array(
+		'label' => 'Dashboard',
+		'title' => 'Dashboard',
+		'module' => 'admin',
+		'controller' => 'index',
+		'action' => 'dashboard',
+		'id' => 'sidebar-nav-dashboard'
+	)
+);
+echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, array('ulClass' => 'sidebar-nav'));
+?>
+
 <?php $l = $this->layout(); ?>
 		<div class="yui-b" id="sidebar">
 			<div id="sidebar-icon"> <a href="#" title="<?php echo $l->metadata->system_name; ?>">Display UI Server</a> </div>
