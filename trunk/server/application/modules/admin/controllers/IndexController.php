@@ -44,6 +44,6 @@ class Admin_IndexController extends Zend_Controller_Action
 	public function dashboardAction()
 	{
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
-
+		$this->view->navigation->is_dashboard = TRUE;
 	}
 }

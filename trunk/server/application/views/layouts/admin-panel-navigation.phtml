@@ -1,5 +1,5 @@
 <?php
-$pages1 = array(
+/* $pages1 = array(
 	array(
 		'label' => 'Dashboard',
 		'title' => 'Dashboard',
@@ -9,27 +9,25 @@ $pages1 = array(
 		'id' => 'sidebar-nav-dashboard'
 	)
 );
-echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, array('ulClass' => 'sidebar-nav'));
+echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, array('ulClass' => 'sidebar-nav')); */
 ?>
-
-<?php $l = $this->layout(); ?>
-		<div class="yui-b" id="sidebar">
-			<div id="sidebar-icon"> <a href="#" title="<?php echo $l->metadata->system_name; ?>">Display UI Server</a> </div>
-			<ul class="sidebar-nav">
-				<li id="sidebar-nav-dashboard"<?php if($l->navigation->is_dashboard) echo ' class="active"'; ?>><a href="#" title="Dashboard">Dashboard</a></li>
-			</ul>
-			<ul class="sidebar-nav">
-				<li id="sidebar-nav-headlines"<?php if($l->navigation->is_headlines) echo ' class="active"'; ?>><a href="#" title="Headlines">Headlines</a></li>
-				<li id="sidebar-nav-multimedia"<?php if($l->navigation->is_multimedia) echo ' class="active"'; ?>><a href="#" title="Media">Multimedia</a></li>
-				<li id="sidebar-nav-weather"<?php if($l->navigation->is_weather) echo ' class="active"'; ?>><a href="#" title="Weather">Weather</a></li>
-				<li id="sidebar-nav-clients"<?php if($l->navigation->is_clients) echo ' class="active"'; ?>><a href="#" title="Clients">Clients</a></li>
-			</ul>
-			<ul class="sidebar-nav">
-				<li id="sidebar-nav-users"<?php if($l->navigation->is_users) echo ' class="active"'; ?>><a href="#" title="Users">Users</a></li>
-				<li id="sidebar-nav-options"<?php if($l->navigation->is_options) echo ' class="active"'; ?>><a href="#" title="Options">Options</a></li>
-				<li id="sidebar-nav-backup"<?php if($l->navigation->is_backup) echo ' class="active"'; ?>><a href="#" title="Backup or restore">Backup</a></li>
-			</ul>
-			<ul class="sidebar-nav">
-				<li id="sidebar-nav-logout"><a href="http://du.geekie.org/server/" title="Logout">Logout</a></li>
-			</ul>
-		</div>
+<div class="yui-b" id="sidebar">
+	<div id="sidebar-icon"> <a href="#" title="<?php echo $this->metadata->system_name; ?>">Display UI Server</a> </div>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-dashboard"<?php if($this->navigation->is_dashboard) echo ' class="active"'; ?>><a href="#" title="Dashboard">Dashboard</a></li>
+	</ul>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-headlines"<?php if($this->navigation->is_headlines) echo ' class="active"'; ?>><a href="#" title="Headlines">Headlines</a></li>
+		<li id="sidebar-nav-multimedia"<?php if($this->navigation->is_multimedia) echo ' class="active"'; ?>><a href="#" title="Media">Multimedia</a></li>
+		<li id="sidebar-nav-weather"<?php if($this->navigation->is_weather) echo ' class="active"'; ?>><a href="#" title="Weather">Weather</a></li>
+		<li id="sidebar-nav-clients"<?php if($this->navigation->is_clients) echo ' class="active"'; ?>><a href="#" title="Clients">Clients</a></li>
+	</ul>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-users"<?php if($this->navigation->is_users) echo ' class="active"'; ?>><a href="#" title="Users">Users</a></li>
+		<li id="sidebar-nav-options"<?php if($this->navigation->is_options) echo ' class="active"'; ?>><a href="#" title="Options">Options</a></li>
+		<li id="sidebar-nav-backup"<?php if($this->navigation->is_backup) echo ' class="active"'; ?>><a href="#" title="Backup or restore">Backup</a></li>
+	</ul>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-logout"><a href="http://du.geekie.org/server/" title="Logout">Logout</a></li>
+	</ul>
+</div>
