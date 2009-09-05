@@ -1,0 +1,6 @@
+@charset "utf-8";
+/* Only IE uses this */
+
+
+table.status-report tr + tr { background-color: #efefef; }
+table.status-report tr + tr + tr { background-color: #ffffff; }
