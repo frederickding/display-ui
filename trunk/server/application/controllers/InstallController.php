@@ -33,7 +33,7 @@ class InstallController extends Zend_Controller_Action
 		$this->view->inlineScript()
 			->appendFile('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js')
 			->appendFile('http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js')
-			->appendFile($this->baseUrl('scripts/jquery.qtip-1.0.0-rc3.min.js'));
+			->appendFile($this->view->baseUrl('scripts/jquery.qtip-1.0.0-rc3.min.js'));
 	}
 	/**
 	 * Default method
