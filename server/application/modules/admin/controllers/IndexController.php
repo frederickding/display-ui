@@ -46,5 +46,7 @@ class Admin_IndexController extends Zend_Controller_Action
 	{
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 		$this->view->navActive = 'dashboard';
+		$this->view->title = 'Dashboard';
+		$this->view->headTitle('Dashboard');
 	}
 }
