@@ -50,7 +50,7 @@ echo $this->doctype('XHTML1_STRICT');
 	<div id="hd">
 		<span id="system-name"><?php echo $this->systemName; ?></span>
 		<span id="top-howdy">Howdy, <a href="#" title="User profile"><?php echo $this->username; ?></a>
-		&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://du.geekie.org/server/" title="Logout" class="logout">Logout</a></span>
+		&nbsp;&nbsp;|&nbsp;&nbsp;<a href="<?php echo $this->baseUrl(''); ?>" title="Logout" class="logout">Logout</a></span>
 	</div>
 	<div id="bd" class="yui-t2">
 		<div id="yui-main">

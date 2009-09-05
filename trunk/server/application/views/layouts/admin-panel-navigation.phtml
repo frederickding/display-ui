@@ -28,6 +28,6 @@ echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, a
 		<li id="sidebar-nav-backup"<?php if($this->active == 'backup') echo ' class="active"'; ?>><a href="#" title="Backup or restore">Backup</a></li>
 	</ul>
 	<ul class="sidebar-nav">
-		<li id="sidebar-nav-logout"><a href="http://du.geekie.org/server/" title="Logout">Logout</a></li>
+		<li id="sidebar-nav-logout"><a href="<?php echo $this->baseUrl(''); ?>" title="Logout">Logout</a></li>
 	</ul>
 </div>
