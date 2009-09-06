@@ -26,27 +26,34 @@
  */
 class Admin_IndexController extends Zend_Controller_Action
 {
-	public function init()
+	public function init ()
 	{
 		// initiate a session for the installer
 		$this->auth_session = new Zend_Session_Namespace('auth');
 		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
 		$this->view->systemName = $config->server->install->name;
+		$this->view->username = $this->auth_session->username;
 	}
-	public function indexAction()
+	public function indexAction ()
 	{
 		// TODO implement actions
 		$this->_helper->viewRenderer->setNoRender();
-		if(!$this->auth_session->authenticated) {
-			$this->_redirect($this->view->serverUrl()
-							.$this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index')));
+		if (! $this->auth_session->authenticated) {
+			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'login' ,
+				'action' => 'index'
+			)));
 		}
 	}
-	public function dashboardAction()
+	public function dashboardAction ()
 	{
-		if(!$this->auth_session->authenticated) {
-			$this->_redirect($this->view->serverUrl()
-							.$this->view->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'index')));
+		if (! $this->auth_session->authenticated) {
+			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'login' ,
+				'action' => 'index'
+			)));
 		}
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 	}
