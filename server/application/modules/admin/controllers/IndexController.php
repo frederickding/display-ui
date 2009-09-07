@@ -70,31 +70,35 @@ class Admin_IndexController extends Zend_Controller_Action
 		));
 		$message->setAttribs(array(
 			'id' => 'quickline-message' ,
-			'cols' => 20 ,
+			'cols' => 20,
 			'rows' => 5
-		))->addDecorators(array(
-			array(
-				'Label' ,
-				array(
-					'tag' => 'p'
-				)
-			) ,
+		))->setDecorators(array(
+			'ViewHelper' ,
+			'Label' ,
 			array(
 				'HtmlTag' ,
 				array(
 					'tag' => 'p'
 				)
 			)
-		))->removeDecorator('DtDdWrapper');
+		));
 		$show = new Zend_Form_Element_Select('quickline-clients', array(
 			'label' => 'Show on'
 		));
 		$show->setAttribs(array(
 			'id' => 'quickline-clients' ,
 			'size' => 1
-		))->addDecorator('HtmlTag', array(
-			'tag' => 'p'
-		))->removeDecorator('DtDdWrapper');
+		))->setDecorators(array(
+			'ViewHelper' ,
+			'Errors' ,
+			'Label' ,
+			array(
+				'HtmlTag' ,
+				array(
+					'tag' => 'p'
+				)
+			)
+		));
 		foreach($this->listClients as $c) {
 			$show->addMultiOption($c, $c);
 		}
