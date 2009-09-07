@@ -75,19 +75,19 @@ class Admin_IndexController extends Zend_Controller_Action
 			'id' => 'quickline-message' ,
 			'cols' => 20 ,
 			'rows' => 5
-		))->setLabel('Headline Message')->setRequired();
+		))->setLabel('Headline Message')->setRequired()->addDecorator('Label');
 		$show = new Zend_Form_Element_Select('quickline-clients');
 		$show->setAttribs(array(
 			'id' => 'quickline-clients' ,
 			'size' => 1
-		))->setLabel('Show on')->addMultiOption('devtesting', 'devtesting');
+		))->setLabel('Show on')->addMultiOption('devtesting', 'devtesting')->addDecorator('Label');
 		$submit = new Zend_Form_Element_Submit('quickline-submit');
 		$submit->setAttrib('id', 'quickline-submit')->setLabel('Save & Active');
 		$form->addElements(array(
 			'quickline-message' => $message ,
 			'quickline-clients' => $show ,
 			'quickline-submit' => $submit
-		))->addDecorator('Label')->removeDecorator('DtDdWrapper');
+		))->removeDecorator('DtDdWrapper');
 		return $form;
 	}
 }
