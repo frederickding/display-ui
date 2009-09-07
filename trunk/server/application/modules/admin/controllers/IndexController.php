@@ -82,12 +82,12 @@ class Admin_IndexController extends Zend_Controller_Action
 			'size' => 1
 		))->setLabel('Show on')->addMultiOption('devtesting', 'devtesting');
 		$submit = new Zend_Form_Element_Submit('quickline-submit');
-		$submit->setAttrib('id', 'quickline-submit')->setValue('Save & Active');
+		$submit->setAttrib('id', 'quickline-submit')->setLabel('Save & Active');
 		$form->addElements(array(
 			'quickline-message' => $message ,
 			'quickline-clients' => $show ,
 			'quickline-submit' => $submit
-		));
+		))->addDecorator('Label')->removeDecorator('DtDdWrapper');
 		return $form;
 	}
 }
