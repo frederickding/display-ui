@@ -36,7 +36,7 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 			$query = $this->db->select()->from('information_schema.TABLES', array(
 				'TABLE_NAME' ,
 				'TABLE_ROWS'
-			))->where('TABLE_NAME LIKE dui_%');
+			))->where('TABLE_NAME LIKE \'dui_%\'');
 			$result = $this->db->fetchPairs($query);
 			$result2 = $this->db->fetchOne($this->db->select()->from('dui_media', 'COUNT(id)')->where('type = \'image\''));
 			$result3 = $this->db->fetchOne($this->db->select()->from('dui_media', 'COUNT(id)')->where('type = \'video\''));
