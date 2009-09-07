@@ -4,13 +4,25 @@ $this->title = 'Dashboard';
 $this->headTitle('Dashboard');
 if(APPLICATION_ENV == 'development')
 	$this->inlineScript()->appendScript('$j(document).ready(function() {
-	$j(\'#quickline-form\').ajaxForm({
-		target: \'#quickline-response\'
+	$j("#quickline-form").ajaxForm({
+		target: "#quickline-response",
+		resetForm: true,
+		beforeSubmit : function() {
+			$j("#quickline-form").block({ message: "Sending&hellip;" });
+		},
+		success : function() { $j("#quickline-form").reset().unblock(); }
 	});
 });');
 else $this->inlineScript()->appendScript('$j(document).ready(function() {
-	$j(\'#quickline-form\').ajaxForm(function() {
-		alert(\'Headline successfully stored!\');
+	$j("#quickline-form").ajaxForm({
+		resetForm: true,
+		beforeSubmit : function() {
+			$j("#quickline-form").block({ message: "Sending&hellip;" });
+		},
+		success : function() {
+			$j("#quickline-response").html("Successfully saved!");
+			$j("#quickline-form").reset().unblock();
+		}
 	});
 });');
 ?>
@@ -84,10 +96,8 @@ foreach($this->activeClients as $client) { ?>
 							<div class="widgets-widget-content">
 <?php
 if(!empty($this->quicklineNotice)) echo '<p>'.$this->quicklineNotice.'</p>';
-echo $this->quicklineForm;
-if(APPLICATION_ENV == 'development') { ?>
+echo $this->quicklineForm; ?>
 								<div id="quickline-response"></div>
-<?php } ?>
 							</div>
 						</div>
 					</div>
