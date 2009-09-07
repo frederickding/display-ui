@@ -91,7 +91,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		$values = $form->getValues();
 		$DashboardModel->insertQuickline($values['quicklinemessage'], $values['quicklineclients']);
 		return $this->getResponse()->setHttpResponseCode(200)
-			->setBody('Message: '.$values['quicklinemessage']."\n".$values['quicklineclients']);
+			->setBody('Success! Message "'.htmlspecialchars($values['quicklinemessage']).'" inserted');
 	}
 	public function quicklineForm ()
 	{
