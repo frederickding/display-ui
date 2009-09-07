@@ -73,7 +73,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			'cols' => 20 ,
 			'rows' => 5
 		))->addDecorators(array(
-			'Label' ,
+			array('Label',array('tag'=>'p')) ,
 			array(
 				'HtmlTag' ,
 				array(
@@ -88,7 +88,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			'id' => 'quickline-clients' ,
 			'size' => 1
 		))->addMultiOption('devtesting', 'devtesting')->addDecorators(array(
-			'Label' ,
+			array('Label', array('tag'=>'p')) ,
 			array(
 				'HtmlTag' ,
 				array(
@@ -112,6 +112,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			'quickline-clients' => $show ,
 			'quickline-submit' => $submit
 		))->removeDecorator('DtDdWrapper');
+		$form->removeDecorator('HtmlTag');
 		return $form;
 	}
 }
