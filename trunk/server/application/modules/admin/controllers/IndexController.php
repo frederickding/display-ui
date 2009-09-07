@@ -65,7 +65,7 @@ class Admin_IndexController extends Zend_Controller_Action
 	public function quicklineForm ()
 	{
 		$form = new Zend_Form();
-		$form->setAction($this->url(array(
+		$form->setAction($this->view->url(array(
 			'module' => 'admin' ,
 			'controller' => 'index' ,
 			'action' => 'dashboard'
