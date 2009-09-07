@@ -99,11 +99,8 @@ class Admin_IndexController extends Zend_Controller_Action
 		$submit = new Zend_Form_Element_Submit('quickline-submit', array(
 			'label' => 'Save & Activate'
 		));
-		$submit->setAttrib('id', 'quickline-submit')->addDecorator(array(
-			'HtmlTag' ,
-			array(
-				'tag' => 'p'
-			)
+		$submit->setAttrib('id', 'quickline-submit')->addDecorator('HtmlTag', array(
+			'tag' => 'p'
 		))->removeDecorator('DtDdWrapper');
 		$form = new Zend_Form();
 		$form->setAction($this->view->url(array(
