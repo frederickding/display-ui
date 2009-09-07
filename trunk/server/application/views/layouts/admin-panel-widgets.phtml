@@ -61,6 +61,7 @@ echo $this->headMeta()->setIndent("\t") . "\n"; ?>
 	$j(\'div.widgets-widget h2\').click(function (event) {
 		event.preventDefault();
 		DisplayUI.toggleWidget($j(this));
+	});
 	$j(\'#quickline-form\').submit(function() {
 		$j(this).ajaxSubmit(function() { alert(\'Headline successfully stored!\'); } );
 		return false;
