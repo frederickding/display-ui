@@ -70,19 +70,19 @@ class Admin_IndexController extends Zend_Controller_Action
 			'controller' => 'index' ,
 			'action' => 'dashboard'
 		)))->setMethod('post')->setAttrib('id', 'quickline-form');
-		$message = new Zend_Form_Element_Textarea();
-		$message->setName('quickline-message')->setAttribs(array(
+		$message = new Zend_Form_Element_Textarea('quickline-message');
+		$message->setAttribs(array(
 			'id' => 'quickline-message' ,
 			'cols' => 20 ,
 			'rows' => 5
 		))->setLabel('Headline Message')->setRequired();
-		$show = new Zend_Form_Element_Select();
+		$show = new Zend_Form_Element_Select('quickline-clients');
 		$show->setAttribs(array(
 			'id' => 'quickline-clients' ,
 			'size' => 1
-		))->setName('quickline-clients')->setLabel('Show on')->addMultiOption('devtesting', 'devtesting');
-		$submit = new Zend_Form_Element_Submit();
-		$submit->setName('quickline-submit')->setAttrib('id', 'quickline-submit')->setValue('Save & Active');
+		))->setLabel('Show on')->addMultiOption('devtesting', 'devtesting');
+		$submit = new Zend_Form_Element_Submit('quickline-submit');
+		$submit->setAttrib('id', 'quickline-submit')->setValue('Save & Active');
 		$form->addElements(array(
 			'quickline-message' => $message ,
 			'quickline-clients' => $show ,
