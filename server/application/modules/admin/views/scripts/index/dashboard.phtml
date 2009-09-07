@@ -2,6 +2,17 @@
 $this->navActive = 'dashboard';
 $this->title = 'Dashboard';
 $this->headTitle('Dashboard');
+if(APPLICATION_ENV == 'development')
+	$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j(\'#quickline-form\').ajaxForm({
+		target: \'#quickline-response\'
+	});
+});');
+else $this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j(\'#quickline-form\').ajaxForm(function() {
+		alert(\'Headline successfully stored!\');
+	});
+});');
 ?>
 
 				<div class="yui-gc">
@@ -73,7 +84,10 @@ foreach($this->activeClients as $client) { ?>
 							<div class="widgets-widget-content">
 <?php
 if(!empty($this->quicklineNotice)) echo '<p>'.$this->quicklineNotice.'</p>';
-echo $this->quicklineForm; ?>
+echo $this->quicklineForm;
+if(APPLICATION_ENV == 'development') { ?>
+								<div id="quickline-response"></div>
+<?php } ?>
 							</div>
 						</div>
 					</div>
