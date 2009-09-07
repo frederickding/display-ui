@@ -59,5 +59,6 @@ class Admin_IndexController extends Zend_Controller_Action
 		$DashboardModel = new Admin_Model_Dashboard();
 		$this->view->statusReport = $DashboardModel->fetchStatusReport();
 		$this->view->activeClients = $DashboardModel->fetchActiveClients();
+		$this->view->listClients = $DashboardModel->fetchClients($this->auth_session->username);
 	}
 }
