@@ -8,20 +8,26 @@ if(APPLICATION_ENV == 'development')
 		target: "#quickline-response",
 		resetForm: true,
 		beforeSubmit : function() {
-			$j("#quickline-form").block({ message: "Sending&hellip;" });
+			$j("#quickline-form").block({
+				message: "Sending&hellip;",
+				css : { margin: 0.1em, border: none }
+			});
 		},
-		success : function() { $j("#quickline-form").reset().unblock(); }
+		success : function() { $j("#quickline-form").unblock().reset(); }
 	});
 });');
 else $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#quickline-form").ajaxForm({
 		resetForm: true,
 		beforeSubmit : function() {
-			$j("#quickline-form").block({ message: "Sending&hellip;" });
+			$j("#quickline-form").block({
+				message: "Sending&hellip;",
+				css : { margin: 0.1em, border: none }
+			});
 		},
 		success : function() {
 			$j("#quickline-response").html("Successfully saved!");
-			$j("#quickline-form").reset().unblock();
+			$j("#quickline-form").unblock().reset();
 		}
 	});
 });');
