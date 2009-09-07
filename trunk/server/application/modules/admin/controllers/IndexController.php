@@ -60,5 +60,33 @@ class Admin_IndexController extends Zend_Controller_Action
 		$this->view->statusReport = $DashboardModel->fetchStatusReport();
 		$this->view->activeClients = $DashboardModel->fetchActiveClients();
 		$this->view->listClients = $DashboardModel->fetchClients($this->auth_session->username);
+		$this->view->quicklineForm = $this->quicklineForm();
+	}
+	public function quicklineForm ()
+	{
+		$form = new Zend_Form();
+		$form->setAction($this->url(array(
+			'module' => 'admin' ,
+			'controller' => 'index' ,
+			'action' => 'dashboard'
+		)))->setMethod('post')->setAttrib('id', 'quickline-form');
+		$message = $form->createElement('textarea', 'quickline-message')->setAttribs(array(
+			'id' => 'quickline-message' ,
+			'cols' => 20 ,
+			'rows' => 5
+		))->setLabel('Headline Message')->setRequired();
+		$show = new Zend_Form_Element_Select();
+		$show->setAttribs(array(
+			'id' => 'quickline-clients' ,
+			'size' => 1
+		))->setName('quickline-clients')->setLabel('Show on')->addMultiOption('devtesting', 'devtesting');
+		$submit = new Zend_Form_Element_Submit();
+		$submit->setName('quickline-submit')->setAttrib('id', 'quickline-submit')->setValue('Save & Active');
+		$form->addElements(array(
+			'quickline-message' => $message ,
+			'quickline-clients' => $show ,
+			'quickline-submit' => $submit
+		));
+		return $form;
 	}
 }

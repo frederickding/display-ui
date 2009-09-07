@@ -71,7 +71,10 @@ foreach($this->activeClients as $client) { ?>
 						<div class="widgets-widget">
 							<h2>QuickLine</h2>
 							<div class="widgets-widget-content">
-								<form id="quickline-form" method="post" action="<?php echo $this->logoutLink = $this->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')); ?>">
+<?php
+echo $this->form;
+?>
+								<form id="quickline-form" method="post" action="<?php echo $this->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')); ?>">
 									<p>
 										<label for="quickline-message">Headline Message</label>
 										<textarea name="quickline-message" id="quickline-message" cols="20" rows="5"></textarea>
