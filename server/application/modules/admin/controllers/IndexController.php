@@ -56,5 +56,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			)));
 		}
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
+		$DashboardModel = new Admin_Model_Dashboard();
+		$this->view->statusReport = $DashboardModel->fetchStatusReport();
 	}
 }
