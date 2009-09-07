@@ -105,8 +105,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			'quickline-message' => $message ,
 			'quickline-clients' => $show ,
 			'quickline-submit' => $submit
-		))->removeDecorator('HtmlTag');
-		$form->removeDecorator('DtDdWrapper');
+		))->removeDecorator('DtDdWrapper');
 		return $form;
 	}
 }
