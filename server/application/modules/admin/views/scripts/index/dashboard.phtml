@@ -71,7 +71,9 @@ foreach($this->activeClients as $client) { ?>
 						<div class="widgets-widget">
 							<h2>QuickLine</h2>
 							<div class="widgets-widget-content">
-<?php echo $this->quicklineForm; ?>
+<?php
+if(!empty($this->quicklineNotice)) echo '<p>'.$this->quicklineNotice.'</p>';
+echo $this->quicklineForm; ?>
 							</div>
 						</div>
 					</div>

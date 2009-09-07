@@ -111,12 +111,12 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 	{
 		if (! is_null($this->db)) {
 			$this->db->insert('dui_headlines', array(
-				'title' => $this->db->quote(trim($_title)) ,
+				'title' => trim($_title),
 				'active' => 1 ,
 				// make it expire in 1 month by default
 				'expires' => new Zend_Db_Expr('DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)') ,
 				'type' => 'news' ,
-				'client' => $this->db->quote($_clientId)
+				'client' => $_clientId
 			));
 			if($this->db->lastInsertId()) return TRUE;
 		}
