@@ -97,7 +97,7 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 				// treat is as the username
 				$query->where('u.username = ?', $_admin);
 			}
-			return $this->db->fetchAssoc($query);
+			return $query->query()->fetchAll(Zend_Db::FETCH_ASSOC);
 		}
 		return array();
 	}
