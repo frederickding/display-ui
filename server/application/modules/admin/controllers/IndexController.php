@@ -79,6 +79,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			)));
 		}
 		$DashboardModel = new Admin_Model_Dashboard();
+		$this->listClients = $DashboardModel->fetchClients($this->auth_session->username);
 		$this->_helper->viewRenderer->setNoRender();
 
 		$form = $this->quicklineForm();
