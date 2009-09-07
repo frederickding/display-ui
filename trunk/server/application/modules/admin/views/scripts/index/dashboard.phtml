@@ -2,6 +2,11 @@
 $this->navActive = 'dashboard';
 $this->title = 'Dashboard';
 $this->headTitle('Dashboard');
+$this->headStyle()->appendStyle('div.blockMsg {
+	background: none !important;
+	border: none !important;
+	text-align: center !important;
+}');
 if(APPLICATION_ENV == 'development')
 	$this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#quickline-form").ajaxForm({
@@ -9,8 +14,7 @@ if(APPLICATION_ENV == 'development')
 		resetForm: true,
 		beforeSubmit : function() {
 			$j("#quickline-form").block({
-				message: "Sending&hellip;",
-				css : { margin: 4, border: \'none\' }
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
 			});
 		},
 		success : function() { $j("#quickline-form").unblock().reset(); }
@@ -21,8 +25,7 @@ else $this->inlineScript()->appendScript('$j(document).ready(function() {
 		resetForm: true,
 		beforeSubmit : function() {
 			$j("#quickline-form").block({
-				message: "Sending&hellip;",
-				css : { margin: 4, border: \'none\' }
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
 			});
 		},
 		success : function() {
