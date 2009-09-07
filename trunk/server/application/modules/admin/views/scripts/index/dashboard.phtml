@@ -11,29 +11,29 @@ $this->headTitle('Dashboard');
 							<div class="widgets-widget-content">
 								<table cellspacing="0" class="status-report">
 									<tr id="status-report-clients">
-										<td class="number"><a href="#clients">4</a></td>
+										<td class="number"><a href="#clients"><?php echo $this->statusReport['clients']; ?></a></td>
 										<td><a href="#clients">TV clients</a></td>
 									</tr>
 									<tr id="status-report-headlines">
-										<td class="number"><a href="#headlines">37</a></td>
+										<td class="number"><a href="#headlines"><?php echo $this->statusReport['headlines']; ?></a></td>
 										<td><a href="#headlines">headlines</a></td>
 									</tr>
 									<tr id="status-report-users">
-										<td class="number"><a href="#users">14</a></td>
+										<td class="number"><a href="#users"><?php echo $this->statusReport['users']; ?></a></td>
 										<td><a href="#users">users</a></td>
 									</tr>
 								</table>
 								<table cellspacing="0" class="status-report">
 									<tr id="status-report-videos">
-										<td class="number"><a href="#videos">21</a></td>
+										<td class="number"><a href="#videos"><?php echo $this->statusReport['videos']; ?></a></td>
 										<td><a href="#videos">videos</a></td>
 									</tr>
 									<tr id="status-report-pictures">
-										<td class="number"><a href="#pics">98</a></td>
+										<td class="number"><a href="#pics"><?php echo $this->statusReport['pictures']; ?></a></td>
 										<td><a href="#pics">pictures</a></td>
 									</tr>
 									<tr id="status-report-texts">
-										<td class="number"><a href="#texts">50</a></td>
+										<td class="number"><a href="#texts">0</a></td>
 										<td><a href="#texts">text slides</a></td>
 									</tr>
 								</table>
@@ -66,7 +66,7 @@ $this->headTitle('Dashboard');
 						<div class="widgets-widget">
 							<h2>QuickLine</h2>
 							<div class="widgets-widget-content">
-								<form id="quickline-form" method="post" action="">
+								<form id="quickline-form" method="post" action="<?php echo $this->logoutLink = $this->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')); ?>">
 									<p>
 										<label for="quickline-message">Headline Message</label>
 										<textarea name="quickline-message" id="quickline-message" cols="20" rows="5"></textarea>
