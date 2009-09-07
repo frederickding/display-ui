@@ -43,14 +43,14 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	 * Checks whether the provided user's password is valid
 	 * @param string $_user
 	 * @param string $_password
-	 * @return boolean|int On true, returns User ID
+	 * @return boolean
 	 */
 	public function checkPassword($_user, $_password)
 	{
-		$query = $this->db->quoteInto('SELECT id,password FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$result = $this->db->fetchRow($query);
-		if($this->PasswordHash->CheckPassword($_password, $result->password)) {
-			return (int) $result->id;
+		$query = $this->db->quoteInto('SELECT password FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$result = $this->db->fetchOne($query);
+		if($this->PasswordHash->CheckPassword($_password, $result)) {
+			return TRUE;
 		} else return FALSE;
 	}
 	/**
