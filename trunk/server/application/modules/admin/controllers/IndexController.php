@@ -64,39 +64,38 @@ class Admin_IndexController extends Zend_Controller_Action
 	}
 	public function quicklineForm ()
 	{
-		$message = new Zend_Form_Element_Textarea('quickline-message');
+		$message = new Zend_Form_Element_Textarea('quickline-message', array(
+			'label' => 'Headline Message' ,
+			'required' => TRUE
+		));
 		$message->setAttribs(array(
 			'id' => 'quickline-message' ,
 			'cols' => 20 ,
 			'rows' => 5
-		))->setLabel('Headline Message')->setRequired()->addDecorators(array(
+		))->addDecorators(array(
 			'Label' ,
-			array(
-				'HtmlTag' ,
-				array(
-					'tag' => 'p'
-				)
-			)
+			new Zend_Form_Decorator_HtmlTag(array(
+				'tag' => 'p'
+			))
+		))->removeDecorator('DtDdWrapper');
+		$show = new Zend_Form_Element_Select('quickline-clients', array(
+			'label' => 'Show on'
 		));
-		$message->removeDecorator('DtDdWrapper');
-		$show = new Zend_Form_Element_Select('quickline-clients');
 		$show->setAttribs(array(
 			'id' => 'quickline-clients' ,
 			'size' => 1
-		))->setLabel('Show on')->addMultiOption('devtesting', 'devtesting')->addDecorators(array(
+		))->addMultiOption('devtesting', 'devtesting')->addDecorators(array(
 			'Label' ,
-			array(
-				'HtmlTag' ,
-				array(
-					'tag' => 'p'
-				)
-			)
+			new Zend_Form_Decorator_HtmlTag(array(
+				'tag' => 'p'
+			))
+		))->removeDecorator('DtDdWrapper');
+		$submit = new Zend_Form_Element_Submit('quickline-submit', array(
+			'label' => 'Save & Activate'
 		));
-		$show->removeDecorator('DtDdWrapper');
-		$submit = new Zend_Form_Element_Submit('quickline-submit');
-		$submit->setAttrib('id', 'quickline-submit')->setLabel('Save & Active')->addDecorator('HtmlTag', array(
+		$submit->setAttrib('id', 'quickline-submit')->addDecorator(new Zend_Form_Decorator_HtmlTag(array(
 			'tag' => 'p'
-		));
+		)))->removeDecorator('DtDdWrapper');
 		$form = new Zend_Form();
 		$form->setAction($this->view->url(array(
 			'module' => 'admin' ,
@@ -106,7 +105,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			'quickline-message' => $message ,
 			'quickline-clients' => $show ,
 			'quickline-submit' => $submit
-		))->removeDecorator('DtDdWrapper');
+		))->removeDecorator('HtmlTag');
 		return $form;
 	}
 }
