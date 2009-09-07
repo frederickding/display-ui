@@ -71,24 +71,7 @@ foreach($this->activeClients as $client) { ?>
 						<div class="widgets-widget">
 							<h2>QuickLine</h2>
 							<div class="widgets-widget-content">
-<?php
-echo $this->quicklineForm;
-?>
-								<form id="quickline-form" method="post" action="<?php echo $this->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')); ?>">
-									<p>
-										<label for="quickline-message">Headline Message</label>
-										<textarea name="quickline-message" id="quickline-message" cols="20" rows="5"></textarea>
-									</p>
-									<p>
-										<label for="quickline-clients">Show on</label>
-										<select name="quickline-clients" size="1" id="quickline-clients">
-<?php foreach($this->listClients as $c) echo "\t\t\t\t\t\t\t\t\t\t<option>$c</option>\n"; ?>
-										</select>
-									</p>
-									<p>
-										<input type="submit" id="quickline-submit" name="quickline-submit" value="Save &amp; Activate" />
-									</p>
-								</form>
+<?php echo $this->quicklineForm; ?>
 							</div>
 						</div>
 					</div>

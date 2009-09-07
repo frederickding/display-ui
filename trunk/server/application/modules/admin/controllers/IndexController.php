@@ -59,7 +59,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		$DashboardModel = new Admin_Model_Dashboard();
 		$this->view->statusReport = $DashboardModel->fetchStatusReport();
 		$this->view->activeClients = $DashboardModel->fetchActiveClients();
-		$this->view->listClients = $DashboardModel->fetchClients($this->auth_session->username);
+		$this->listClients = $DashboardModel->fetchClients($this->auth_session->username);
 		$this->view->quicklineForm = $this->quicklineForm();
 	}
 	public function quicklineForm ()
@@ -73,7 +73,12 @@ class Admin_IndexController extends Zend_Controller_Action
 			'cols' => 20 ,
 			'rows' => 5
 		))->addDecorators(array(
-			array('Label',array('tag'=>'p')) ,
+			array(
+				'Label' ,
+				array(
+					'tag' => 'p'
+				)
+			) ,
 			array(
 				'HtmlTag' ,
 				array(
@@ -87,15 +92,12 @@ class Admin_IndexController extends Zend_Controller_Action
 		$show->setAttribs(array(
 			'id' => 'quickline-clients' ,
 			'size' => 1
-		))->addMultiOption('devtesting', 'devtesting')->addDecorators(array(
-			array('Label', array('tag'=>'p')) ,
-			array(
-				'HtmlTag' ,
-				array(
-					'tag' => 'p'
-				)
-			)
+		))->addDecorator('HtmlTag', array(
+			'tag' => 'p'
 		))->removeDecorator('DtDdWrapper');
+		foreach($this->listClients as $c) {
+			$show->addMultiOption($c, $c);
+		}
 		$submit = new Zend_Form_Element_Submit('quickline-submit', array(
 			'label' => 'Save & Activate'
 		));
