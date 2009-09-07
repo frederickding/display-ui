@@ -29,13 +29,13 @@ $this->headTitle('Dashboard');
 										<td><a href="#videos">videos</a></td>
 									</tr>
 									<tr id="status-report-pictures">
-										<td class="number"><a href="#pics"><?php echo $this->statusReport['pictures']; ?></a></td>
+										<td class="number"><a href="#pics"><?php echo $this->statusReport['images']; ?></a></td>
 										<td><a href="#pics">pictures</a></td>
 									</tr>
-									<tr id="status-report-texts">
+<?php /*									<tr id="status-report-texts">
 										<td class="number"><a href="#texts">0</a></td>
 										<td><a href="#texts">text slides</a></td>
-									</tr>
+									</tr> */ ?>
 								</table>
 								<div class="clear"></div>
 							</div>
@@ -43,9 +43,14 @@ $this->headTitle('Dashboard');
 						<div class="widgets-widget">
 							<h2>Active Clients</h2>
 							<div class="widgets-widget-content">
-								<span class="active-clients-name">Main Foyer display</span>
+<?php if(count($this->activeClients) > 0) {
+foreach($this->activeClients as $client) { ?>
+								<span class="active-clients-name"><?php echo $client['sys_name']; ?></span>
 								<span class="active-clients-actions"><a href="#turn-off">turn off</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#edit-client">edit</a></span><br />
-								<span class="active-clients-last">Last active 5 minutes ago</span>
+								<span class="active-clients-last">Last active <?php echo $client['time_diff']; ?> minutes ago</span>
+<?php } } else { ?>
+								<p>No clients have been active within the last 12 hours.</p>
+<?php } ?>
 							</div>
 						</div>
 					</div>

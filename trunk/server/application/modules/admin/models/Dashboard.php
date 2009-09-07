@@ -50,4 +50,28 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 		}
 		return array();
 	}
+	/**
+	 * Retrieves a list of clients active within the 12 hours
+	 * @param int $_limit
+	 * @return array
+	 */
+	public function fetchActiveClients ($_limit = 5)
+	{
+		if (! is_null($this->db)) {
+			/* select only clients that submitted API queries within the past 12 hours,
+			 * and order them by last_active time
+			 */
+			$query = $this->db->select()->from('dui_clients', array(
+				'id' ,
+				'sys_name' ,
+				'last_active' ,
+				'time_diff' => new Zend_Db_Expr('CAST( (UTC_TIMESTAMP() - ' . $this->db->quoteIdentifier('last_active') . ') / 60 AS SIGNED)')
+			))->where('UTC_TIMESTAMP() - ' . $this->db->quoteIdentifier('last_active') . ' < 60*60*12')
+			->order('last_active DESC')->limit($_limit)->query();
+			// fetch the query
+			$resultset = $query->fetchAll(Zend_Db::FETCH_ASSOC);
+			return $resultset;
+		}
+		return array();
+	}
 }
