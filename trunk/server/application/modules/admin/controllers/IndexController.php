@@ -70,7 +70,8 @@ class Admin_IndexController extends Zend_Controller_Action
 			'controller' => 'index' ,
 			'action' => 'dashboard'
 		)))->setMethod('post')->setAttrib('id', 'quickline-form');
-		$message = $form->createElement('textarea', 'quickline-message')->setAttribs(array(
+		$message = new Zend_Form_Element_Textarea();
+		$message->setName('quickline-message')->setAttribs(array(
 			'id' => 'quickline-message' ,
 			'cols' => 20 ,
 			'rows' => 5
