@@ -21,6 +21,7 @@ echo $this->headScript()
 	->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js')
 	->appendScript('var $j = jQuery.noConflict();')
 	->appendFile($this->baseUrl('scripts/jquery.blockui.min.js'))
+	->appendFile($this->baseUrl('scripts/jquery.form.min.js'))
 	->appendFile($this->baseUrl('scripts/dui.core-functionality.js')) . "\n";
 echo $this->headMeta()->setIndent("\t") . "\n"; ?>
 </head>
