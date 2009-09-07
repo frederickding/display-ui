@@ -146,67 +146,67 @@ code {
 				<?php if($this->tests[0]) {
 				echo '<td class="good">'; }
 				else echo '<td class="bad" title="You\'ll need to upgrade PHP">';
-				echo phpversion(); ?></td>
+				echo phpversion() . '</td>'; ?>
 			</tr>
 			<tr title="Hash functions are used for cryptography, in securing this application">
 				<td>Hash functions</td>
 				<?php if($this->tests[1])
-				echo '<td class="good">supported';
-				else echo '<td class="bad">not supported'; ?></td>
+				echo '<td class="good">supported</td>';
+				else echo '<td class="bad">not supported</td>'; ?>
 			</tr>
 			<tr title="cURL is used to fetch data for weather and headlines">
 				<td>cURL</td>
 				<?php if($this->tests[2])
-				echo '<td class="good">supported';
-				else echo '<td class="bad">not supported'; ?></td>
+				echo '<td class="good">supported</td>';
+				else echo '<td class="bad">not supported</td>'; ?>
 			</tr>
 			<tr title="Sockets can be used instead of cURL">
 				<td>Sockets</td>
 				<?php if($this->tests[3])
-				echo '<td class="good">supported';
-				else echo '<td class="bad">not supported'; ?></td>
+				echo '<td class="good">supported</td>';
+				else echo '<td class="bad">not supported</td>'; ?>
 			</tr>
 			<tr title="MySQLi is one way of connecting to the database">
 				<td>MySQLi functions</td>
 				<?php if($this->tests[4])
-				echo '<td class="good">supported';
-				else echo '<td class="bad">not supported'; ?></td>
+				echo '<td class="good">supported</td>';
+				else echo '<td class="bad">not supported</td>'; ?>
 			</tr>
 			<tr title="PDO is the preferred driver for connecting to a database">
 				<td>PHP Data Objects &amp; MySQL driver</td>
 				<?php if($this->tests[5])
-				echo '<td class="good">installed';
-				else echo '<td class="bad">not installed'; ?></td>
+				echo '<td class="good">installed</td>';
+				else echo '<td class="bad">not installed</td>'; ?>
 			</tr>
 			<tr title="APC helps to speed up the application when under load">
 				<td>Alternative PHP Cache</td>
 				<?php if($this->tests[6])
-				echo '<td class="good">installed';
-				else echo '<td class="bad">not installed'; ?></td>
+				echo '<td class="good">installed</td>';
+				else echo '<td class="bad">not installed</td>'; ?>
 			</tr>
 			<tr title="We have to store the settings somewhere!">
 				<td>Configuration files</td>
 				<?php if($this->tests[7])
-				echo '<td class="good">writable';
-				else echo '<td class="bad">not writable'; ?></td>
+				echo '<td class="good">writable</td>';
+				else echo '<td class="bad">not writable</td>'; ?>
 			</tr>
 			<tr title="Display UI stores some of the media in the filesystem">
 				<td>Media storage</td>
 				<?php if($this->tests[10])
-				echo '<td class="good">writable';
-				else echo '<td class="bad">not writable'; ?></td>
+				echo '<td class="good">writable</td>';
+				else echo '<td class="bad">not writable</td>'; ?>
 			</tr>
 			<tr>
 				<td>PHP safe mode</td>
 				<?php if($this->tests[8])
-				echo '<td class="good">disabled';
-				else echo '<td class="bad">enabled'; ?></td>
+				echo '<td class="good">disabled</td>';
+				else echo '<td class="bad">enabled</td>'; ?>
 			</tr>
 			<tr>
 				<td>Output buffering</td>
 				<?php if($this->tests[9])
-				echo '<td class="good">disabled';
-				else echo '<td class="bad">enabled'; ?></td>
+				echo '<td class="good">disabled</td>';
+				else echo '<td class="bad">enabled</td>'; ?>
 			</tr>
 		</table>
 <?php if(!$this->tests[10]) { ?>
