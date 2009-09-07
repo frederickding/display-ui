@@ -149,7 +149,7 @@ class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 	public function insertFirstUser($_username, $_password, $_email)
 	{
 		// initialize the PHPass class
-		$PasswordHash = new Default_Model_PasswordHash(8, TRUE);
+		$PasswordHash = new Default_Model_PasswordHash(8, FALSE);
 		$this->db->insert('dui_users', array(
 			'username' => $_username,
 			'password' => $PasswordHash->HashPassword($_password),

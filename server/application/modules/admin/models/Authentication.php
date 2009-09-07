@@ -36,7 +36,7 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	 */
 	public function __construct()
 	{
-		$this->PasswordHash = new Default_Model_PasswordHash(8, TRUE);
+		$this->PasswordHash = new Default_Model_PasswordHash(8, FALSE);
 		parent::__construct();
 	}
 	/**
@@ -48,9 +48,9 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	public function checkPassword($_user, $_password)
 	{
 		$query = $this->db->quoteInto('SELECT id,password FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$result = $this->db->fetchAssoc($query);
-		if($this->PasswordHash->CheckPassword($_password, $result[1]['password'])) {
-			return (int) $result[1]['id'];
+		$result = $this->db->fetchRow($query);
+		if($this->PasswordHash->CheckPassword($_password, $result->password)) {
+			return (int) $result->id;
 		} else return FALSE;
 	}
 	/**
@@ -62,7 +62,7 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	{
 		$query = $this->db->quoteInto('SELECT id FROM dui_users WHERE username = ? LIMIT 1', $_user);
 		$result = $this->db->fetchOne($query);
-		if(!is_empty($result)) return (int) $result;
+		if(!empty($result)) return (int) $result;
 		else return FALSE;
 	}
 	/**
@@ -98,7 +98,7 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 			$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
 		}
 		$result = $this->db->fetchOne($query);
-		if(!is_empty($result)) return $result;
+		if(!empty($result)) return $result;
 		else return '';
 	}
 }
