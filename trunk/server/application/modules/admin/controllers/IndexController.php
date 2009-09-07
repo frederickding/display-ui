@@ -83,14 +83,15 @@ class Admin_IndexController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 
 		$form = $this->quicklineForm();
-		$values = $form->getValues();
 		if (! $form->isValid($_POST)) {
 			return $this->getResponse()->setHttpResponseCode(400);
 		}
 		// success!
 		// process the data by inserting it into the DB
+		$values = $form->getValues();
 		$DashboardModel->insertQuickline($values['quicklinemessage'], $values['quicklineclients']);
-		return $this->getResponse()->setHttpResponseCode(200);
+		return $this->getResponse()->setHttpResponseCode(200)
+			->setBody('Message: '.$values['quicklinemessage']."\n".$values['quicklineclients']);
 	}
 	public function quicklineForm ()
 	{
