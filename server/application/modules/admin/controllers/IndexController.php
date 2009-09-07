@@ -56,11 +56,39 @@ class Admin_IndexController extends Zend_Controller_Action
 			)));
 		}
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
-		$DashboardModel = new Admin_Model_Dashboard();
+		if (! isset($DashboardModel)) {
+			$DashboardModel = new Admin_Model_Dashboard();
+		}
 		$this->view->statusReport = $DashboardModel->fetchStatusReport();
 		$this->view->activeClients = $DashboardModel->fetchActiveClients();
 		$this->listClients = $DashboardModel->fetchClients($this->auth_session->username);
 		$this->view->quicklineForm = $this->quicklineForm();
+	}
+	public function quicklineAction ()
+	{
+		if (! $this->auth_session->authenticated) {
+			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'login' ,
+				'action' => 'index'
+			)));
+		}
+		if (! $this->getRequest()->isPost()) {
+			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'index' ,
+				'action' => 'dashboard'
+			)));
+		}
+		$DashboardModel = new Admin_Model_Dashboard();
+		$form = $this->quicklineForm();
+		if (! $form->isValid($_POST)) {
+			return $this->_forward('dashboard');
+		}
+		// success!
+		$values = $form->getValues();
+		$DashboardModel->insertQuickline($values['quicklinemessage'], $values['quicklineclients']);
+		return $this->_forward('dashboard');
 	}
 	public function quicklineForm ()
 	{
@@ -100,7 +128,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			)
 		));
 		foreach($this->listClients as $c) {
-			$show->addMultiOption($c, $c);
+			$show->addMultiOption($c['id'], $c['sys_name']);
 		}
 		$submit = new Zend_Form_Element_Submit('quickline-submit', array(
 			'label' => 'Save & Activate'
@@ -112,7 +140,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		$form->setAction($this->view->url(array(
 			'module' => 'admin' ,
 			'controller' => 'index' ,
-			'action' => 'dashboard'
+			'action' => 'quickline'
 		)))->setMethod('post')->setAttrib('id', 'quickline-form')->addElements(array(
 			'quickline-message' => $message ,
 			'quickline-clients' => $show ,
