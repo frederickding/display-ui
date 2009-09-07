@@ -10,7 +10,7 @@ if(APPLICATION_ENV == 'development')
 		beforeSubmit : function() {
 			$j("#quickline-form").block({
 				message: "Sending&hellip;",
-				css : { margin: 0.1em, border: none }
+				css : { margin: 4, border: \'none\' }
 			});
 		},
 		success : function() { $j("#quickline-form").unblock().reset(); }
@@ -22,7 +22,7 @@ else $this->inlineScript()->appendScript('$j(document).ready(function() {
 		beforeSubmit : function() {
 			$j("#quickline-form").block({
 				message: "Sending&hellip;",
-				css : { margin: 0.1em, border: none }
+				css : { margin: 4, border: \'none\' }
 			});
 		},
 		success : function() {
