@@ -94,7 +94,7 @@ class Admin_IndexController extends Zend_Controller_Action
 	}
 	public function quicklineForm ()
 	{
-		$message = new Zend_Form_Element_Textarea('quickline-message', array(
+		$message = new Zend_Form_Element_Textarea('quicklinemessage', array(
 			'label' => 'Headline Message' ,
 			'required' => TRUE
 		));
@@ -112,7 +112,7 @@ class Admin_IndexController extends Zend_Controller_Action
 				)
 			)
 		));
-		$show = new Zend_Form_Element_Select('quickline-clients', array(
+		$show = new Zend_Form_Element_Select('quicklineclients', array(
 			'label' => 'Show on'
 		));
 		$show->setAttribs(array(
@@ -132,7 +132,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		foreach($this->listClients as $c) {
 			$show->addMultiOption($c['id'], $c['sys_name']);
 		}
-		$submit = new Zend_Form_Element_Submit('quickline-submit', array(
+		$submit = new Zend_Form_Element_Submit('quicklinesubmit', array(
 			'label' => 'Save & Activate'
 		));
 		$submit->setAttrib('id', 'quickline-submit')->addDecorator('HtmlTag', array(
@@ -144,9 +144,9 @@ class Admin_IndexController extends Zend_Controller_Action
 			'controller' => 'index' ,
 			'action' => 'quickline'
 		)))->setMethod('post')->setAttrib('id', 'quickline-form')->addElements(array(
-			'quickline-message' => $message ,
-			'quickline-clients' => $show ,
-			'quickline-submit' => $submit
+			'quicklinemessage' => $message ,
+			'quicklineclients' => $show ,
+			'quicklinesubmit' => $submit
 		))->removeDecorator('DtDdWrapper');
 		$form->removeDecorator('HtmlTag');
 		return $form;
