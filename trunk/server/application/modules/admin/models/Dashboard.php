@@ -86,7 +86,7 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 			/*
 			 * A complex SQL query to find ONLY clients to which the current user has access
 			 */
-			$query = $this->db->select()->from(array('c' => 'dui_clients'), 'sys_name')
+			$query = $this->db->select()->from(array('c' => 'dui_clients'), array('id', 'sys_name'))
 			->join(array('u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')' , array())
 			->order('c.id ASC')
 			->limit($_limit);
@@ -97,8 +97,29 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 				// treat is as the username
 				$query->where('u.username = ?', $_admin);
 			}
-			return $this->db->fetchCol($query);
+			return $this->db->fetchAssoc($query);
 		}
 		return array();
+	}
+	/**
+	 * Inserts a headline into the database from the Quickline form
+	 * @param string $_title
+	 * @param int $_clientId
+	 * @return bool
+	 */
+	public function insertQuickline ($_title, $_clientId)
+	{
+		if (! is_null($this->db)) {
+			$this->db->insert('dui_headlines', array(
+				'title' => $this->db->quote(trim($_title)) ,
+				'active' => 1 ,
+				// make it expire in 1 month by default
+				'expires' => new Zend_Db_Expr('DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)') ,
+				'type' => 'news' ,
+				'client' => $this->db->quote($_clientId)
+			));
+			if($this->db->lastInsertId()) return TRUE;
+		}
+		return FALSE;
 	}
 }
