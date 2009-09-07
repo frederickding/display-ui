@@ -74,9 +74,12 @@ class Admin_IndexController extends Zend_Controller_Action
 			'rows' => 5
 		))->addDecorators(array(
 			'Label' ,
-			new Zend_Form_Decorator_HtmlTag(array(
-				'tag' => 'p'
-			))
+			array(
+				'HtmlTag' ,
+				array(
+					'tag' => 'p'
+				)
+			)
 		))->removeDecorator('DtDdWrapper');
 		$show = new Zend_Form_Element_Select('quickline-clients', array(
 			'label' => 'Show on'
@@ -86,16 +89,22 @@ class Admin_IndexController extends Zend_Controller_Action
 			'size' => 1
 		))->addMultiOption('devtesting', 'devtesting')->addDecorators(array(
 			'Label' ,
-			new Zend_Form_Decorator_HtmlTag(array(
-				'tag' => 'p'
-			))
+			array(
+				'HtmlTag' ,
+				array(
+					'tag' => 'p'
+				)
+			)
 		))->removeDecorator('DtDdWrapper');
 		$submit = new Zend_Form_Element_Submit('quickline-submit', array(
 			'label' => 'Save & Activate'
 		));
-		$submit->setAttrib('id', 'quickline-submit')->addDecorator(new Zend_Form_Decorator_HtmlTag(array(
-			'tag' => 'p'
-		)))->removeDecorator('DtDdWrapper');
+		$submit->setAttrib('id', 'quickline-submit')->addDecorator(array(
+			'HtmlTag' ,
+			array(
+				'tag' => 'p'
+			)
+		))->removeDecorator('DtDdWrapper');
 		$form = new Zend_Form();
 		$form->setAction($this->view->url(array(
 			'module' => 'admin' ,
