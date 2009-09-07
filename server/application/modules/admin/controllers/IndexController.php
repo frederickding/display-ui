@@ -79,29 +79,17 @@ class Admin_IndexController extends Zend_Controller_Action
 			)));
 		}
 		$DashboardModel = new Admin_Model_Dashboard();
-		// set everything up in the dashboard
-		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 		$this->_helper->viewRenderer->setNoRender();
-		$this->listClients = $DashboardModel->fetchClients($this->auth_session->username);
-		$this->view->statusReport = $DashboardModel->fetchStatusReport();
-		$this->view->activeClients = $DashboardModel->fetchActiveClients();
 
 		$form = $this->quicklineForm();
 		$values = $form->getValues();
 		if (! $form->isValid($_POST)) {
-			$form->getElement('quicklinemessage')->setValue($values['quicklinemessage']);
-			$form->getElement('quicklineclients')->setValue($values['quicklineclients']);
-			$this->view->quicklineForm = $form;
-			$this->view->quicklineNotice = 'Oops! Something went wrong.';
-			return $this->render('dashboard');
+			return $this->getResponse()->setHttpResponseCode(400);
 		}
 		// success!
 		// process the data by inserting it into the DB
 		$DashboardModel->insertQuickline($values['quicklinemessage'], $values['quicklineclients']);
-
-		$this->view->quicklineForm = $form;
-		$this->view->quicklineNotice = 'Headline successfully stored.';
-		return $this->render('dashboard');
+		return $this->getResponse()->setHttpResponseCode(200);
 	}
 	public function quicklineForm ()
 	{
