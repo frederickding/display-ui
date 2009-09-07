@@ -1,4 +1,6 @@
 <?php
+define('PERFORMANCE_TIMER', microtime(TRUE));
+
 defined('APPLICATION_VER')
 	|| define('APPLICATION_VER', 'trunk');
 

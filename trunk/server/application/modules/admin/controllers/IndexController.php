@@ -30,6 +30,14 @@ class Admin_IndexController extends Zend_Controller_Action
 	{
 		// initiate a session for the installer
 		$this->auth_session = new Zend_Session_Namespace('auth');
+		// ALWAYS check if authenticated
+		if (! $this->auth_session->authenticated) {
+			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'login' ,
+				'action' => 'index'
+			)));
+		}
 		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
@@ -38,23 +46,9 @@ class Admin_IndexController extends Zend_Controller_Action
 	{
 		// TODO implement actions
 		$this->_helper->viewRenderer->setNoRender();
-		if (! $this->auth_session->authenticated) {
-			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
-				'module' => 'admin' ,
-				'controller' => 'login' ,
-				'action' => 'index'
-			)));
-		}
 	}
 	public function dashboardAction ()
 	{
-		if (! $this->auth_session->authenticated) {
-			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
-				'module' => 'admin' ,
-				'controller' => 'login' ,
-				'action' => 'index'
-			)));
-		}
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 		$DashboardModel = new Admin_Model_Dashboard();
 		$this->view->statusReport = $DashboardModel->fetchStatusReport();
@@ -64,13 +58,6 @@ class Admin_IndexController extends Zend_Controller_Action
 	}
 	public function quicklineAction ()
 	{
-		if (! $this->auth_session->authenticated) {
-			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
-				'module' => 'admin' ,
-				'controller' => 'login' ,
-				'action' => 'index'
-			)));
-		}
 		if (! $this->getRequest()->isPost()) {
 			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
 				'module' => 'admin' ,
