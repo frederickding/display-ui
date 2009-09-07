@@ -74,4 +74,31 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 		}
 		return array();
 	}
+	/**
+	 * Retrieves a list of clients to which the current admin has access
+	 * @param string|int $_admin
+	 * @param int $_limit
+	 * @return array
+	 */
+	public function fetchClients ($_admin, $_limit = 5)
+	{
+		if (! is_null($this->db)) {
+			/*
+			 * A complex SQL query to find ONLY clients to which the current user has access
+			 */
+			$query = $this->db->select()->from(array('c' => 'dui_clients'), 'sys_name')
+			->join(array('u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')' , array())
+			->order('c.id ASC')
+			->limit($_limit);
+			if(is_int($_admin)) {
+				// treat it as the integer user ID
+				$query->where('u.id = ?', $_admin);
+			} else {
+				// treat is as the username
+				$query->where('u.username = ?', $_admin);
+			}
+			return $this->db->fetchCol($query);
+		}
+		return array();
+	}
 }

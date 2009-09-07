@@ -79,8 +79,7 @@ foreach($this->activeClients as $client) { ?>
 									<p>
 										<label for="quickline-clients">Show on</label>
 										<select name="quickline-clients" size="1" id="quickline-clients">
-											<option>sys_name1</option>
-											<option>sys_name2</option>
+<?php foreach($this->listClients as $c) echo "\t\t\t\t\t\t\t\t\t\t<option>$c</option>\n"; ?>
 										</select>
 									</p>
 									<p>
