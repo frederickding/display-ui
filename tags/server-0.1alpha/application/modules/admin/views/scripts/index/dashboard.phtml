@@ -1,0 +1,114 @@
+<?php
+$this->navActive = 'dashboard';
+$this->title = 'Dashboard';
+$this->headTitle('Dashboard');
+$this->headStyle()->appendStyle('div.blockMsg {
+	background: none !important;
+	border: none !important;
+	text-align: center !important;
+	color: #ffffff !important;
+}');
+if(APPLICATION_ENV == 'development')
+	$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#quickline-form").ajaxForm({
+		target: "#quickline-response",
+		resetForm: true,
+		beforeSubmit : function() {
+			$j("#quickline-form").block({
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
+			});
+		},
+		success : function() { $j("#quickline-form").unblock().reset(); }
+	});
+});');
+else $this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#quickline-form").ajaxForm({
+		resetForm: true,
+		beforeSubmit : function() {
+			$j("#quickline-form").block({
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
+			});
+		},
+		success : function() {
+			$j("#quickline-response").html("Successfully saved!");
+			$j("#quickline-form").unblock().reset();
+		}
+	});
+});');
+?>
+
+				<div class="yui-gc">
+					<div class="yui-u first">
+						<div class="widgets-widget">
+							<h2>Status Report</h2>
+							<div class="widgets-widget-content">
+								<table cellspacing="0" class="status-report">
+									<tr id="status-report-clients">
+										<td class="number"><a href="#clients"><?php echo $this->statusReport['clients']; ?></a></td>
+										<td><a href="#clients">TV clients</a></td>
+									</tr>
+									<tr id="status-report-headlines">
+										<td class="number"><a href="#headlines"><?php echo $this->statusReport['headlines']; ?></a></td>
+										<td><a href="#headlines">headlines</a></td>
+									</tr>
+									<tr id="status-report-users">
+										<td class="number"><a href="#users"><?php echo $this->statusReport['users']; ?></a></td>
+										<td><a href="#users">users</a></td>
+									</tr>
+								</table>
+								<table cellspacing="0" class="status-report">
+									<tr id="status-report-videos">
+										<td class="number"><a href="#videos"><?php echo $this->statusReport['videos']; ?></a></td>
+										<td><a href="#videos">videos</a></td>
+									</tr>
+									<tr id="status-report-pictures">
+										<td class="number"><a href="#pics"><?php echo $this->statusReport['images']; ?></a></td>
+										<td><a href="#pics">pictures</a></td>
+									</tr>
+<?php /*									<tr id="status-report-texts">
+										<td class="number"><a href="#texts">0</a></td>
+										<td><a href="#texts">text slides</a></td>
+									</tr> */ ?>
+								</table>
+								<div class="clear"></div>
+							</div>
+						</div>
+						<div class="widgets-widget">
+							<h2>Active Clients</h2>
+							<div class="widgets-widget-content">
+<?php if(count($this->activeClients) > 0) {
+foreach($this->activeClients as $client) { ?>
+								<span class="active-clients-name"><?php echo $client['sys_name']; ?></span>
+								<span class="active-clients-actions"><a href="#turn-off">turn off</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#edit-client">edit</a></span><br />
+								<span class="active-clients-last">Last active <?php echo $client['time_diff']; ?> minutes ago</span>
+<?php } } else { ?>
+								<p>No clients have been active within the last 12 hours.</p>
+<?php } ?>
+							</div>
+						</div>
+					</div>
+					<div class="yui-u">
+						<div class="widgets-widget">
+							<h2>Quick Actions</h2>
+							<div class="widgets-widget-content">
+								<ul class="quick-actions">
+									<li>Add a client</li>
+									<li>Upload multimedia</li>
+									<li>Refresh caches</li>
+									<li>Make a backup</li>
+									<li>Link a client installation</li>
+									<li>Tweak system options</li>
+								</ul>
+							</div>
+						</div>
+						<div class="widgets-widget">
+							<h2>QuickLine</h2>
+							<div class="widgets-widget-content">
+<?php
+if(!empty($this->quicklineNotice)) echo '<p>'.$this->quicklineNotice.'</p>';
+echo $this->quicklineForm; ?>
+								<div id="quickline-response"></div>
+							</div>
+						</div>
+					</div>
+				</div>
