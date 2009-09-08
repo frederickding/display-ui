@@ -44,8 +44,14 @@ class Admin_IndexController extends Zend_Controller_Action
 	}
 	public function indexAction ()
 	{
-		// TODO implement actions
 		$this->_helper->viewRenderer->setNoRender();
+		if ($this->auth_session->authenticated) {
+			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'index' ,
+				'action' => 'dashboard'
+			)));
+		}
 	}
 	public function dashboardAction ()
 	{
