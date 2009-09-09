@@ -8,11 +8,14 @@ $this->headStyle()->appendStyle('#clients-list {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 }
+#clients-list td, #clients-list th, #clients-list {
+	border-color: #aaaaaa;
+}
 #clients-list tr.body {
 	font-size: 123.1%;
 	color: #383a3b;
 }
-#clients-list tr.heading {
+#clients-list th {
 	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
 	padding: 0.25em 0.5em;
 	margin: 0;
@@ -23,12 +26,12 @@ $this->headStyle()->appendStyle('#clients-list {
 	text-shadow: #ffffff 1px 1px 3px;
 	cursor: pointer;
 }
-#clients-list tr:nth-child(odd) { background-color: #efefef; }
-#clients-list tr:hover { background-color: #beeeff; }
-td.id { width: 10%; }
-td.sys_name { width: 50%; }
-td.last_active { width: 30%; }
-td.admin { width: 20%; }
+#clients-list tr.body:nth-child(odd) { background-color: #fafafa; }
+#clients-list tr.body:hover { background-color: #ddeeff; }
+td.id, th.id { width: 10%; }
+td.sys_name, th.sys_name { width: 50%; }
+td.last_active, th.last_active { width: 30%; }
+td.admin, th.admin { width: 20%; }
 #clients-list td {
 	padding: none;
 	margin: none;
@@ -38,10 +41,10 @@ td.admin { width: 20%; }
 
 <table cellspacing="0" id="clients-list">
 	<tr class="heading">
-		<td class="id">ID</td>
-		<td class="sys_name">Client System Name</td>
-		<td class="last_active">Last Active</td>
-		<td class="admin">Administrator</td>
+		<th class="id">ID</th>
+		<th class="sys_name">Client System Name</th>
+		<th class="last_active">Last Active</th>
+		<th class="admin">Administrator</th>
 	</tr>
 	<tr class="body">
 		<td class="id">1</td>

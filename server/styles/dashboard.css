@@ -238,7 +238,7 @@ table.status-report td.number {
 #status-report-clients { color: #1b557a; }
 #status-report-users { color: #505050; }
 #status-report-videos { color: #551b7a; }
-#status-report-pictures { color: #77bb55; }
+#status-report-pictures { color: #507B38; }
 #status-report-texts { color: #bb2200; }
 table.status-report a { border-bottom: none; color: inherit; }
 table.status-report tr:nth-child(even) { background-color: #efefef; }
@@ -260,3 +260,9 @@ ul.quick-actions li { list-style-type: square; }
 	font-style: italic;
 }
 #quickline-message { width: 100%; }
+div.blockMsg {
+	background: none !important;
+	border: none !important;
+	text-align: center !important;
+	color: #ffffff !important;
+}

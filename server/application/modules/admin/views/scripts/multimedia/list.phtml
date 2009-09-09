@@ -1,0 +1,79 @@
+<?php
+$this->navActive = 'multimedia';
+$this->title = 'Manage Multimedia';
+$this->headTitle('Multimedia');
+$this->headStyle()->appendStyle('#media-list {
+	width: 100%;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#media-list, #media-list td, #media-list th {
+	border-color: #aaaaaa;
+}
+#media-list tr.body {
+	font-size: 123.1%;
+	color: #383a3b;
+}
+#media-list th {
+	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
+	padding: 0.25em 0.5em;
+	margin: 0;
+	height: 1.5em; line-height: 1.25em;
+	font-size: 123.1%;
+	font-weight: bold;
+	color: #333333;
+	text-shadow: #ffffff 1px 1px 3px;
+	cursor: pointer;
+}
+#media-list tr.body:nth-child(odd) { background-color: #fafafa; }
+#media-list tr.body:hover { background-color: #ddeeff; }
+td.id, th.id { width: 5%; }
+td.title, th.title { width: 35%; }
+td.active, th.active { width: 5%; }
+td.expires, th.expires { width: 17.5%; }
+td.type, th.type { width: 10%; }
+td.actions, th.actions { width: 17.5%; }
+td.weight, th.weight { width: 10%; }
+td.actions { font-size: 77%; }
+#clients-list td {
+	padding: none;
+	margin: none;
+}
+td.actions a { border-bottom: none; margin-right: 0.25em; }
+td.actions a:hover { font-weight: bold; }
+td.actions a.view { color: #507B38; }
+td.actions a.edit { color: #551b7a; }
+td.actions a.delete { color: #bb2200; }
+');
+?>
+
+<table cellspacing="0" id="media-list">
+	<tr>
+		<th class="id">ID</th>
+		<th class="title">Title</th>
+		<th class="active">Active</th>
+		<th class="expires">Expires</th>
+		<th class="type">Type</th>
+		<th class="weight">Weight</th>
+		<th class="actions">Actions</th>
+	</tr>
+	<tr class="body">
+		<td class="id">100</td>
+		<td class="title">devtesting</td>
+		<td class="active">Yes</td>
+		<td class="expires"></td>
+		<td class="type">video</td>
+		<td class="weight">3</td>
+		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
+	</tr>
+	<tr class="body">
+		<td class="id">1</td>
+		<td class="title">devtesting</td>
+		<td class="active">Yes</td>
+		<td class="expires">2009-10-08</td>
+		<td class="type">image</td>
+		<td class="weight">1</td>
+		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
+	</tr>
+</table>
