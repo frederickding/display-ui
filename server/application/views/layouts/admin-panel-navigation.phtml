@@ -29,7 +29,7 @@ echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, a
 			<a href="#" title="Weather">Weather</a>
 		</li>
 		<li id="sidebar-nav-clients"<?php if($this->active == 'clients') echo ' class="active"'; ?>>
-			<a href="#" title="Clients">Clients</a>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'index')); ?>" title="Clients">Clients</a>
 		</li>
 	</ul>
 	<ul class="sidebar-nav">

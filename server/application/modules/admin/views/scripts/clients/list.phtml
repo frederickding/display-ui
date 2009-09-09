@@ -1,0 +1,58 @@
+<?php
+$this->navActive = 'clients';
+$this->title = 'Clients';
+$this->headTitle('Clients');
+$this->headStyle()->appendStyle('#clients-list {
+	width: 100%;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#clients-list tr.body {
+	font-size: 123.1%;
+	color: #383a3b;
+}
+#clients-list tr.heading {
+	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
+	padding: 0.25em 0.5em;
+	margin: 0;
+	height: 1.5em; line-height: 1.25em;
+	font-size: 123.1%;
+	font-weight: bold;
+	color: #333333;
+	text-shadow: #ffffff 1px 1px 3px;
+	cursor: pointer;
+}
+#clients-list tr:nth-child(odd) { background-color: #efefef; }
+#clients-list tr:hover { background-color: #beeeff; }
+td.id { width: 10%; }
+td.sys_name { width: 50%; }
+td.last_active { width: 30%; }
+td.admin { width: 20%; }
+#clients-list td {
+	padding: none;
+	margin: none;
+}
+');
+?>
+
+<table cellspacing="0" id="clients-list">
+	<tr class="heading">
+		<td class="id">ID</td>
+		<td class="sys_name">Client System Name</td>
+		<td class="last_active">Last Active</td>
+		<td class="admin">Administrator</td>
+	</tr>
+	<tr class="body">
+		<td class="id">1</td>
+		<td class="sys_name">devtesting</td>
+		<td class="last_active">2009-09-07 23:08:15</td>
+		<td class="admin">administrator</td>
+	</tr>
+	<tr class="body">
+		<td class="id">1</td>
+		<td class="sys_name">devtesting</td>
+		<td class="last_active">2009-09-07 23:08:15</td>
+		<td class="admin">administrator</td>
+	</tr>
+</table>

@@ -41,6 +41,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
+		return TRUE;
 	}
 	public function indexAction ()
 	{
