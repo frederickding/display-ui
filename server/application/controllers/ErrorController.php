@@ -19,6 +19,10 @@ class ErrorController extends Zend_Controller_Action
 		}
 		$this->view->exception = $errors->exception;
 		$this->view->request = $errors->request;
+		if ($this->_helper->layout()->getLayout() == 'AdminPanelWidgets') {
+			$this->view->headStyle()->appendStyle('pre { white-space: pre-wrap; }');
+			$this->_helper->viewRenderer->setRender('admin-error');
+		}
 	}
 }
 
