@@ -78,7 +78,7 @@ class Admin_Model_Acl
 			'multimedia'
 		));
 		// give view-only privilege for clients resource
-		$this->acl->allow('publisher', 'clients', 'view');
+		$this->acl->allow('publisher', 'clients', array('view', 'list'));
 		// IT can view, add, edit, delete options, users and clients
 		// IT can also view, make and restore backups
 		$this->acl->allow('it', array(
@@ -88,7 +88,7 @@ class Admin_Model_Acl
 			'backuprestore'
 		));
 		// give view-only privilege for headlines and multimedia
-		$this->acl->allow('it', array('headlines', 'multimedia'), 'view');
+		$this->acl->allow('it', array('headlines', 'multimedia'), array('view', 'list'));
 		// admin can do everything
 		$this->acl->allow('admin');
 	}
