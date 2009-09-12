@@ -38,7 +38,13 @@ class Admin_IndexController extends Zend_Controller_Action
 				'action' => 'index'
 			)));
 		}
-		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
+		// configuration object
+		if(Zend_Registry::isRegistered('configuration_ini')) {
+			$config = Zend_Registry::get('configuration_ini');
+		} else {
+			$config = new Zend_Config_ini(CONFIG_DIR . '/configuration.ini', 'production');
+			Zend_Registry::set('configuration_ini', $config);
+		}
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
 		return TRUE;
