@@ -16,7 +16,7 @@ $this->headStyle()->appendStyle('#media-list {
 	color: #383a3b;
 }
 #media-list th {
-	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
+	background: #d1d1d1 url(' . $this->baseUrl('images/widget-bg.png') . ') repeat-x;
 	padding: 0.25em 0.5em;
 	margin: 0;
 	height: 1.5em; line-height: 1.25em;
@@ -29,19 +29,20 @@ $this->headStyle()->appendStyle('#media-list {
 #media-list tr.body:nth-child(odd) { background-color: #fafafa; }
 #media-list tr.body:hover { background-color: #ddeeff; }
 td.id, th.id { width: 5%; }
-td.title, th.title { width: 38.5%; }
-td.active, th.active { width: 4%; }
-td.expires, th.expires { width: 17.5%; }
+td.title, th.title { width: 38.5%; font-weight: bold; }
+td.active, th.active { width: 4%; color: #666666; }
+td.expires, th.expires { width: 17.5%; color: #666666; }
 td.type, th.type { width: 10%; }
 td.actions, th.actions { width: 20%; }
-td.weight, th.weight { width: 5%; }
+td.weight, th.weight { width: 5%; color: #666666; }
 td.actions { font-size: 77%; }
+tr:hover td.expires, tr:hover td.active, tr:hover td.weight { color: inherit; }
 #clients-list td {
 	padding: none;
 	margin: none;
 }
-td.actions a { border-bottom: none; margin-right: 0.25em; }
-td.actions a:hover { font-weight: bold; }
+td.actions a { border-bottom: none; margin: 0 0.25em; }
+td.actions a:hover { border-bottom: inherit; }
 td.actions a.view { color: #507b38; }
 td.actions a.edit { color: #551b7a; }
 td.actions a.delete { color: #bb2200; }
@@ -49,7 +50,11 @@ td.actions a.delete { color: #bb2200; }
 .image_type { color: #507b38; }
 ');
 ?>
-
+<p>Showing media objects <?php
+echo $this->mediaRange[0] . ' to ' . $this->mediaRange[1];
+?> of <?php
+echo $this->mediaTotal;
+?>.</p>
 <table cellspacing="0" id="media-list">
 	<tr>
 		<th class="id">ID</th>
@@ -60,7 +65,7 @@ td.actions a.delete { color: #bb2200; }
 		<th class="weight"><abbr title="Weight">Wt.</abbr></th>
 		<th class="actions">Actions</th>
 	</tr>
-	<tr class="body">
+<?php /*	<tr class="body">
 		<td class="id">100</td>
 		<td class="title video_type">devtesting</td>
 		<td class="active">Yes</td>
@@ -68,14 +73,45 @@ td.actions a.delete { color: #bb2200; }
 		<td class="type video_type">video</td>
 		<td class="weight">3</td>
 		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
-	</tr>
-	<tr class="body">
-		<td class="id">1</td>
-		<td class="title image_type">devtesting</td>
-		<td class="active">Yes</td>
-		<td class="expires">2009-10-08</td>
-		<td class="type image_type">image</td>
-		<td class="weight">1</td>
-		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
-	</tr>
+	</tr> */
+foreach ($this->mediaData as $medium) {
+	$medium['active'] = ($medium['active'] == 1) ? 'Yes' : 'No';
+	$medium['viewLink'] = $this->url(array(
+		'module' => 'admin' ,
+		'controller' => 'multimedia' ,
+		'action' => 'view'
+	)) . '?id='.$medium['id'];
+	$medium['editLink'] = $this->url(array(
+		'module' => 'admin' ,
+		'controller' => 'multimedia' ,
+		'action' => 'edit'
+	)) . '?id='.$medium['id'];
+	$medium['delLink'] = $this->url(array(
+		'module' => 'admin' ,
+		'controller' => 'multimedia' ,
+		'action' => 'delete'
+	)) . '?id='.$medium['id'];
+	echo '	<tr class="body">
+		<td class="id">' . $medium['id'] . '</td>
+		<td class="title ' . $medium['type'] . '_type">' . $medium['title'] . '</td>
+		<td class="active">' . $medium['active'] . '</td>
+		<td class="expires">' . $medium['expires'] . '</td>
+		<td class="type ' . $medium['type'] . '_type">' . $medium['type'] . '</td>
+		<td class="weight">' . $medium['weight'] . '</td>
+		<td class="actions"><a href="'.$medium['viewLink'].'" class="view">View</a>
+		<a href="'.$medium['editLink'].'" class="edit">Edit</a>
+		<a href="'.$medium['delLink'].'" class="delete">Delete</a></td>
+	</tr>';
+}
+?>
 </table>
+<?php
+$numPages = ceil($this->mediaTotal / 25);
+for ($p = $this->page; $p <= $numPages; $p ++) {
+	echo '<a href="' . $this->url(array(
+		'module' => 'admin' ,
+		'controller' => 'multimedia' ,
+		'action' => 'list'
+	)) . "?page={$p}\">{$p}</a>&nbsp;&nbsp;";
+}
+?>

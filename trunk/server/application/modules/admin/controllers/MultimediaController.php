@@ -56,5 +56,11 @@ class Admin_MultimediaController extends Zend_Controller_Action
 	public function listAction ()
 	{
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
+		$MediaModel = new Admin_Model_Multimedia();
+		$this->view->page = $this->_getParam('page', '1');
+		$mediaData = $MediaModel->fetchMultimedia($this->view->page);
+		$this->view->mediaTotal = $mediaData[0];
+		$this->view->mediaData = $mediaData[1];
+		$this->view->mediaRange = array($mediaData[2], $mediaData[3]);
 	}
 }
