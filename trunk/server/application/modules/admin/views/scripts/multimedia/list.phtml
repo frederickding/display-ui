@@ -29,12 +29,12 @@ $this->headStyle()->appendStyle('#media-list {
 #media-list tr.body:nth-child(odd) { background-color: #fafafa; }
 #media-list tr.body:hover { background-color: #ddeeff; }
 td.id, th.id { width: 5%; }
-td.title, th.title { width: 35%; }
-td.active, th.active { width: 5%; }
+td.title, th.title { width: 38.5%; }
+td.active, th.active { width: 4%; }
 td.expires, th.expires { width: 17.5%; }
 td.type, th.type { width: 10%; }
-td.actions, th.actions { width: 17.5%; }
-td.weight, th.weight { width: 10%; }
+td.actions, th.actions { width: 20%; }
+td.weight, th.weight { width: 5%; }
 td.actions { font-size: 77%; }
 #clients-list td {
 	padding: none;
@@ -42,9 +42,11 @@ td.actions { font-size: 77%; }
 }
 td.actions a { border-bottom: none; margin-right: 0.25em; }
 td.actions a:hover { font-weight: bold; }
-td.actions a.view { color: #507B38; }
+td.actions a.view { color: #507b38; }
 td.actions a.edit { color: #551b7a; }
 td.actions a.delete { color: #bb2200; }
+.video_type { color: #551b7a; }
+.image_type { color: #507b38; }
 ');
 ?>
 
@@ -55,24 +57,24 @@ td.actions a.delete { color: #bb2200; }
 		<th class="active">Active</th>
 		<th class="expires">Expires</th>
 		<th class="type">Type</th>
-		<th class="weight">Weight</th>
+		<th class="weight"><abbr title="Weight">Wt.</abbr></th>
 		<th class="actions">Actions</th>
 	</tr>
 	<tr class="body">
 		<td class="id">100</td>
-		<td class="title">devtesting</td>
+		<td class="title video_type">devtesting</td>
 		<td class="active">Yes</td>
 		<td class="expires"></td>
-		<td class="type">video</td>
+		<td class="type video_type">video</td>
 		<td class="weight">3</td>
 		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
 	</tr>
 	<tr class="body">
 		<td class="id">1</td>
-		<td class="title">devtesting</td>
+		<td class="title image_type">devtesting</td>
 		<td class="active">Yes</td>
 		<td class="expires">2009-10-08</td>
-		<td class="type">image</td>
+		<td class="type image_type">image</td>
 		<td class="weight">1</td>
 		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
 	</tr>

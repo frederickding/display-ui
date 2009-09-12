@@ -23,7 +23,7 @@ echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, a
 			<a href="#" title="Headlines">Headlines</a>
 		</li>
 		<li id="sidebar-nav-multimedia"<?php if($this->active == 'multimedia') echo ' class="active"'; ?>>
-			<a href="#" title="Media">Multimedia</a>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'index')); ?>" title="Media">Multimedia</a>
 		</li>
 		<li id="sidebar-nav-weather"<?php if($this->active == 'weather') echo ' class="active"'; ?>>
 			<a href="#" title="Weather">Weather</a>
