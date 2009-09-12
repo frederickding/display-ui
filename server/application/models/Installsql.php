@@ -107,17 +107,16 @@ class Default_Model_Installsql extends Default_Model_DatabaseAbstract
 	public function writeConfig()
 	{
 		$config = new Zend_Config_Ini(CONFIG_DIR . '/database.default.ini',
-				null, array(
+				NULL, array(
 				'allowModifications' => true
 		));
 
 		// load all the values from the variables in this class
-		$config->production->server->db->hostname = $this->_host;
-		$config->production->server->db->username = $this->_username;
-		$config->production->server->db->password = $this->_password;
-		$config->production->server->db->name = $this->_dbname;
-		$config->production->server->db->driver = $this->_driver;
-		$config->production->server->db->live = 0;
+		$config->production->database->params->host = $this->_host;
+		$config->production->database->params->username = $this->_username;
+		$config->production->database->params->password = $this->_password;
+		$config->production->database->params->dbname = $this->_dbname;
+		$config->production->database->adapter = $this->_driver;
 
 		$writer = new Zend_Config_Writer_Ini(array(
 				'config' => $config ,
