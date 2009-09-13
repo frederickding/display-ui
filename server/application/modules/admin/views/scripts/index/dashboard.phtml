@@ -134,7 +134,9 @@ foreach($this->activeClients as $client) { ?>
 							<div class="widgets-widget-content">
 								<ul class="quick-actions">
 									<li>Add a client</li>
-									<li>Upload multimedia</li>
+									<li><a href="<?php
+echo $this->url(array('module' => 'admin', 'controller' => 'multimedia' , 'action' => 'upload'));
+?>">Upload multimedia</a></li>
 									<li>Refresh caches</li>
 									<li>Make a backup</li>
 									<li>Link a client installation</li>

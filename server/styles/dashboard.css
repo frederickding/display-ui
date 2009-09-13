@@ -42,6 +42,7 @@ select:hover, input:hover, input:active, textarea:hover {
 .clear {
 	clear: both;
 }
+noscript, noscript p { color: #bb2200; }
 
 /* Layout */
 #doc2 {
