@@ -32,22 +32,11 @@ p {
 	font-size: 123.1%;
 	color: #383a3b;
 }
-textarea:hover { border: 1px #551b7a solid; }
-select {
-	border: none;
-	font-family: Georgia, serif;
-	font-style: italic;
-	font-size: 100%;
-	border: 1px #ffffff solid;
-}
-select:hover {
-	border: 1px #551b7a solid;
-}
-input[type=submit] {
+input[type=submit], input[type=reset] {
 	background-color: #efefef;
 	border: 1px #efefef solid;
 }
-input[type=submit]:hover, input[type=submit]:active {
+select:hover, input:hover, input:active, textarea:hover {
 	border: 1px #551b7a solid;
 }
 .clear {
@@ -219,47 +208,6 @@ ul.sidebar-nav li {
 }
 .sidebar-nav li:last-child { border-bottom: none; }
 
-/* Status Report */
-table.status-report {
-	width: 50%;
-	float: left;
-}
-table.status-report td {
-	border: none;
-	font-size: 123.1%;
-}
-table.status-report td.number {
-	font-family: Georgia;
-	font-size: 146%;
-	line-height: 50%;
-	text-align: right;
-	width: 30%;
-}
-#status-report-clients { color: #1b557a; }
-#status-report-users { color: #505050; }
-#status-report-videos { color: #551b7a; }
-#status-report-pictures { color: #507B38; }
-#status-report-texts { color: #bb2200; }
-table.status-report a { border-bottom: none; color: inherit; }
-table.status-report tr:nth-child(even) { background-color: #efefef; }
-.active-clients-name { font-size: 123.1%; }
-.active-clients-actions { float: right; }
-.active-clients-actions a { border-bottom: none; color: #1b557a; }
-.active-clients-actions a:hover { border-bottom: 1px #383a3b dotted; }
-.active-clients-actions:after {
-	padding-left: 1em;
-	content: "\00BB";
-}
-.active-clients-last { font-style: italic; }
-ul.quick-actions { margin: 0 -0.5em 0 1em; }
-ul.quick-actions li { list-style-type: square; }
-#quickline-form p {
-	font-size: 100%;
-	font-family: Georgia, serif;
-	text-align: right;
-	font-style: italic;
-}
-#quickline-message { width: 100%; }
 div.blockMsg {
 	background: none !important;
 	border: none !important;

@@ -48,13 +48,22 @@ td.actions a.edit { color: #551b7a; }
 td.actions a.delete { color: #bb2200; }
 .video_type { color: #551b7a; }
 .image_type { color: #507b38; }
+.highlight {
+	background: #D7FFC1;
+	font-weight: bold;
+	text-align: center;
+	padding: 0.5em;
+	border-radius: 5px; border: 1px #ffffff solid;
+	-moz-border-radius: 5px;
+}
 ');
 ?>
-<p>Showing media objects <?php
-echo $this->mediaRange[0] . ' to ' . $this->mediaRange[1];
-?> of <?php
-echo $this->mediaTotal;
-?>.</p>
+<p class="highlight"><a href="<?php echo $this->url(array(
+		'module' => 'admin' ,
+		'controller' => 'multimedia' ,
+		'action' => 'upload'
+	)); ?>">Click here to <em>upload</em> media.</a></p>
+<p>Showing media objects <?php echo $this->mediaRange[0] . ' to ' . $this->mediaRange[1]; ?> of <?php echo $this->mediaTotal; ?>.</p>
 <table cellspacing="0" id="media-list">
 	<tr>
 		<th class="id">ID</th>
@@ -65,15 +74,7 @@ echo $this->mediaTotal;
 		<th class="weight"><abbr title="Weight">Wt.</abbr></th>
 		<th class="actions">Actions</th>
 	</tr>
-<?php /*	<tr class="body">
-		<td class="id">100</td>
-		<td class="title video_type">devtesting</td>
-		<td class="active">Yes</td>
-		<td class="expires"></td>
-		<td class="type video_type">video</td>
-		<td class="weight">3</td>
-		<td class="actions"><a href="#" class="view">View</a> <a href="#" class="edit">Edit</a> <a href="#" class="delete">Delete</a></td>
-	</tr> */
+<?php
 foreach ($this->mediaData as $medium) {
 	$medium['active'] = ($medium['active'] == 1) ? 'Yes' : 'No';
 	$medium['viewLink'] = $this->url(array(

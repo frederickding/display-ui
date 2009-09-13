@@ -1,0 +1,35 @@
+<?php
+$this->navActive = 'multimedia';
+$this->title = 'Upload Multimedia';
+$this->headTitle('Upload Multimedia');
+$this->headStyle()->appendStyle('form { font-size: 123.1%; }
+dd { margin-bottom: 1em; }
+input { margin-right: 0.25em; }
+label.optional { font-weight: normal; }
+label.optional:after { content: " (optional)"; color: #666666; }
+#mediumtitle, #mediumfile { width: 20em; }
+');
+$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j(\'#mediumactivation-label, #mediumactivation-element\').hide();
+	$j(\'#mediumactivatenow-element input\').change(function() {
+		var val = $j(\'#mediumactivatenow-element input:checked\').val();
+		switch(val) {
+			case \'0\':
+				$j(\'#mediumactivation-label label\').removeClass(\'optional\');
+				$j(\'#mediumactivation-label, #mediumactivation-element\').show(\'slide\');
+				break;
+			case \'1\':
+				$j(\'#mediumactivation-label, #mediumactivation-element\').hide(\'slide\');
+				$j(\'#mediumactivation-label label\').addClass(\'optional\');
+		}
+	});
+});');
+?>
+<p><strong>It's easy to upload a media file to the Display UI system.</strong></p>
+<ul>
+	<li>Fill in a title for your own reference.</li>
+	<li>Set whether the file begins showing <em>now</em> or on a certain date.</li>
+	<li>Optionally, set a higher weight to increase the frequency.</li>
+	<li>Finally, upload a file in a supported format, like JPEG, PNG, MP4, MOV, AVI, MKV, WMV, etc.</li>
+</ul>
+<?php echo $this->form; ?>

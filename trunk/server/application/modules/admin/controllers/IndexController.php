@@ -95,6 +95,7 @@ class Admin_IndexController extends Zend_Controller_Action
 	}
 	public function quicklineForm ()
 	{
+		$this->view->doctype('XHTML1_STRICT');
 		$message = new Zend_Form_Element_Textarea('quicklinemessage', array(
 			'label' => 'Headline Message' ,
 			'required' => TRUE
