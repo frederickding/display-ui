@@ -54,4 +54,81 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 		}
 		return array();
 	}
+	/**
+	 * Inserts a new multimedia item into the media table
+	 * @param array $_data
+	 * @param string $mime
+	 * @return string
+	 */
+	public function insertMultimedia ($_data, $mime = 'application/octet-stream')
+	{
+		if (! is_null($this->db)) { // only do something if DB is connected
+			// Build our dataset
+			$type = in_array(pathinfo($_data['mediumfile'], PATHINFO_EXTENSION), array(
+				'jpeg' ,
+				'jpg' ,
+				'png'
+			)) ? 'image' : (in_array(pathinfo($_data['mediumfile'], PATHINFO_EXTENSION), array(
+				'mov' ,
+				'mp4' ,
+				'avi' ,
+				'wmv' ,
+				'mkv'
+			)) ? 'video' : '');
+			foreach ($_data['mediumclients'] as $c) {
+				$clients .= $c . ',';
+			}
+			// $clients is a comma-delimited list of client IDs
+			$clients = substr($clients, 0, (strlen($clients) - 1));
+			// now build a key => value array of all the tables needed in the insert
+			$insertData = array(
+				'title' => $_data['mediumtitle'] ,
+				'activates' => (($_data['mediumactivatenow']) ? new Zend_Db_Expr(
+					'UTC_TIMESTAMP()') : $_data['mediumactivation']) ,
+				'expires' => $_data['mediumexpiration'] ,
+				'active' => 1 ,
+				'type' => $type ,
+				'clients' => $clients ,
+				'weight' => (int) $_data['mediumweight'] ,
+				'content' => $_data['mediumfile'] . ';' . $mime
+			);
+			// insert and return the value of the auto-increment ID
+			$this->db->insert('dui_media', $insertData);
+			return $this->db->lastInsertId();
+		}
+		return '';
+	}
+	/**
+	 * Retrieves a list of clients to which the current admin has access
+	 *
+	 * Note: exact clone of function from Admin_Model_Dashboard
+	 * @param string|int $_admin
+	 * @param int $_limit
+	 * @return array
+	 */
+	public function fetchClients ($_admin, $_limit = 5)
+	{
+		if (! is_null($this->db)) {
+			/*
+			 * A complex SQL query to find ONLY clients to which the current user has access
+			 */
+			$query = $this->db->select()->from(array(
+				'c' => 'dui_clients'
+			), array(
+				'id' ,
+				'sys_name'
+			))->join(array(
+				'u' => 'dui_users'
+			), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')', array())->order('c.id ASC')->limit($_limit);
+			if (is_int($_admin)) {
+				// treat it as the integer user ID
+				$query->where('u.id = ?', $_admin);
+			} else {
+				// treat is as the username
+				$query->where('u.username = ?', $_admin);
+			}
+			return $query->query()->fetchAll(Zend_Db::FETCH_ASSOC);
+		}
+		return array();
+	}
 }
