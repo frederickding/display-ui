@@ -47,6 +47,7 @@ class Admin_ClientsController extends Zend_Controller_Action
 		}
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
+		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 		return TRUE;
 	}
 	public function indexAction ()
@@ -55,6 +56,5 @@ class Admin_ClientsController extends Zend_Controller_Action
 	}
 	public function listAction ()
 	{
-		$this->_helper->layout()->setLayout('AdminPanelWidgets');
 	}
 }
