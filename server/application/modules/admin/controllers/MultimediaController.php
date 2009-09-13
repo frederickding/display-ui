@@ -42,7 +42,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		if (Zend_Registry::isRegistered('configuration_ini')) {
 			$config = Zend_Registry::get('configuration_ini');
 		} else {
-			$config = new Zend_Config_ini(CONFIG_DIR . '/configuration.ini', 'production');
+			$config = new Zend_Config_ini(CONFIG_DIR . '/configuration.ini',
+				'production');
 			Zend_Registry::set('configuration_ini', $config);
 		}
 		$this->view->systemName = $config->server->install->name;
@@ -68,63 +69,131 @@ class Admin_MultimediaController extends Zend_Controller_Action
 	}
 	public function uploadAction ()
 	{
-		$MediaModel = new Admin_Model_Multimedia();
-		$this->view->form = $this->uploadForm();
+		$form = $this->uploadForm();
+		$this->view->form = $form;
+	}
+	public function uploadProcessAction ()
+	{
+		if (! $this->getRequest()->isPost()) {
+			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => 'multimedia' ,
+				'action' => 'upload'
+			)));
+		}
+		$form = $this->uploadForm();
+		if ($form->isValid($_POST)) {
+			// assign the values and receive the file
+			$values = $form->getValues();
+			$MediaModel = new Admin_Model_Multimedia();
+			$this->view->id = $MediaModel->insertMultimedia($values);
+			return $this->render('upload-process');
+		} else {
+			$this->view->form = $form;
+			return $this->render('upload');
+		}
 	}
 	public function uploadForm ()
 	{
+		$MediaModel = new Admin_Model_Multimedia();
+		$listClients = $MediaModel->fetchClients($this->auth_session->username);
 		$this->view->doctype('XHTML1_STRICT');
-		$title = new Zend_Form_Element_Text('mediumtitle', array(
-			'label' => 'Title' ,
-			'required' => TRUE
+		$title = new Zend_Form_Element_Text('mediumtitle',
+			array(
+				'label' => 'Title' ,
+				'required' => TRUE
+			));
+		$title->addValidator('StringLength', FALSE, array(
+			1 ,
+			63
 		));
-		$title->addValidator('StringLength', FALSE, array(1, 63));
-		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow', array(
-			'label' => 'Immediately activate?' ,
-			'required' => TRUE
-		));
+		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow',
+			array(
+				'label' => 'Immediately activate?' ,
+				'required' => TRUE
+			));
 		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No');
-		$activates = new Zend_Form_Element_Text('mediumactivation', array(
-			'label' => 'Start showing on (YYYY-MM-DD)' ,
-			'required' => FALSE
-		));
-		$expires = new Zend_Form_Element_Text('mediumexpiration', array(
-			'label' => 'Stop showing on (YYYY-MM-DD)' ,
-			'required' => TRUE
-		));
-		$hash = new Zend_Form_Element_Hash('uploadnonce', array(
-			'salt' => 'unique'
-		));
+		$activates = new Zend_Form_Element_Text('mediumactivation',
+			array(
+				'label' => 'Start showing on (YYYY-MM-DD)' ,
+				'required' => FALSE
+			));
+		$expires = new Zend_Form_Element_Text('mediumexpiration',
+			array(
+				'label' => 'Stop showing on (YYYY-MM-DD)' ,
+				'required' => TRUE
+			));
+		$activates->addFilter('Alnum');
+		$expires->addFilter('Alnum');
+		$hash = new Zend_Form_Element_Hash('uploadnonce',
+			array(
+				'salt' => 'unique'
+			));
 		$hash->removeDecorator('label');
-		$weight = new Zend_Form_Element_Select('mediumweight', array(
-			'label' => 'Weight'
+		$weight = new Zend_Form_Element_Select('mediumweight',
+			array(
+				'label' => 'Weight'
+			));
+		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(
+			1 ,
+			10
 		));
-		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(1, 10));
-		$weight->addMultiOptions(range(1, 10));
-		$file = new Zend_Form_Element_File('mediumfile', array(
-			'label' => 'Media file' ,
-			'required' => TRUE
+		$weight->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
+		$submit = new Zend_Form_Element_Submit('mediasubmit',
+			array(
+				'label' => 'Upload!'
+			));
+		$submit->setDecorators(array(
+			'ViewHelper'
 		));
-		$file->addValidator('count', FALSE, 1);
+		$reset = new Zend_Form_Element_Reset('mediareset',
+			array(
+				'label' => 'Reset'
+			));
+		$reset->setDecorators(array(
+			'ViewHelper'
+		));
+		$file = new Zend_Form_Element_File('mediumfile',
+			array(
+				'label' => 'Media file' ,
+				'required' => TRUE
+			));
+		$file->addValidator('count', FALSE, 1)->addValidator('Extension', FALSE, array(
+			'jpg' ,
+			'jpeg' ,
+			'png' ,
+			'mov' ,
+			'mp4' ,
+			'avi' ,
+			'wmv' ,
+			'mkv'
+		))->setDestination(MEDIA_DIR);
+		$clients = new Zend_Form_Element_Multiselect('mediumclients',
+			array(
+				'label' => 'Show on these clients' ,
+				'required' => TRUE
+			));
+		foreach ($listClients as $c) {
+			$clients->addMultiOption($c['id'], $c['sys_name']);
+		}
 		// file can be any mime type or extension, we're not checking it
 		// form handling part will use the mime type and insert it into the db
 		$form = new Zend_Form();
 		$form->setAction($this->view->url(array(
 			'module' => 'admin' ,
 			'controller' => 'multimedia' ,
-			'action' => 'upload'
+			'action' => 'upload-process'
 		)))->setMethod('post')->setAttrib('id', 'mediaupload')->addElements(array(
 			'mediumtitle' => $title ,
 			'mediumactivatenow' => $immediateActive ,
 			'mediumactivation' => $activates ,
 			'mediumexpiration' => $expires ,
 			'mediumweight' => $weight ,
+			'mediumclients' => $clients ,
 			'mediumfile' => $file ,
-			'uploadnonce' => $hash
-		))->addElement('submit', 'mediasubmit', array(
-			'label' => 'Upload!'
-		))->addElement('reset', 'mediareset', array(
-			'label' => 'Reset'
+			'uploadnonce' => $hash ,
+			'mediasubmit' => $submit ,
+			'mediareset' => $reset
 		));
 		return $form;
 	}

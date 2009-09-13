@@ -7,7 +7,18 @@ dd { margin-bottom: 1em; }
 input { margin-right: 0.25em; }
 label.optional { font-weight: normal; }
 label.optional:after { content: " (optional)"; color: #666666; }
-#mediumtitle, #mediumfile { width: 20em; }
+#mediumtitle { width: 95%; }
+#mediaupload {
+	margin: 1em auto;
+	border: 1px #aaaaaa solid;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	width: 75%;
+}
+ul.errors {
+	color: #bb2200;
+}
 ');
 $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j(\'#mediumactivation-label, #mediumactivation-element\').hide();
@@ -28,8 +39,13 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 <p><strong>It's easy to upload a media file to the Display UI system.</strong></p>
 <ul>
 	<li>Fill in a title for your own reference.</li>
-	<li>Set whether the file begins showing <em>now</em> or on a certain date.</li>
+	<li>Set whether the file begins showing <em>now</em> or on a certain
+	date.</li>
 	<li>Optionally, set a higher weight to increase the frequency.</li>
-	<li>Finally, upload a file in a supported format, like JPEG, PNG, MP4, MOV, AVI, MKV, WMV, etc.</li>
+	<li>Select the clients on which you would like to show the file. You
+	can use <kbd>Ctrl</kbd> to select multiple clients.</li>
+	<li>Finally, upload a file in a supported format, like JPEG, PNG, MP4,
+	MOV, AVI, MKV, WMV, etc.</li>
 </ul>
-<?php echo $this->form; ?>
+<?php
+echo $this->form; ?>
