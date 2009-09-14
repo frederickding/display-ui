@@ -1,0 +1,157 @@
+<?php
+$this->navActive = 'dashboard';
+$this->title = 'Dashboard';
+$this->headTitle('Dashboard');
+if(APPLICATION_ENV == 'development')
+	$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#quickline-form").ajaxForm({
+		target: "#quickline-response",
+		resetForm: true,
+		beforeSubmit : function() {
+			$j("#quickline-form").block({
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
+			});
+		},
+		success : function() { $j("#quickline-form").unblock().reset(); }
+	});
+});');
+else $this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#quickline-form").ajaxForm({
+		resetForm: true,
+		beforeSubmit : function() {
+			$j("#quickline-form").block({
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
+			});
+		},
+		success : function() {
+			$j("#quickline-response").html("Successfully saved!");
+			$j("#quickline-form").unblock().reset();
+		}
+	});
+});');
+$this->headStyle()->appendStyle('table.status-report {
+	width: 50%;
+	float: left;
+}
+table.status-report td {
+	border: none;
+	font-size: 123.1%;
+}
+table.status-report td.number {
+	font-family: Georgia;
+	font-size: 146%;
+	line-height: 50%;
+	text-align: right;
+	width: 30%;
+}
+#status-report-clients { color: #1b557a; }
+#status-report-users { color: #505050; }
+#status-report-videos { color: #551b7a; }
+#status-report-pictures { color: #507B38; }
+#status-report-texts { color: #bb2200; }
+table.status-report a { border-bottom: none; color: inherit; }
+table.status-report tr:nth-child(even) { background-color: #efefef; }
+.active-clients-name { font-size: 123.1%; }
+.active-clients-actions { float: right; }
+.active-clients-actions a { border-bottom: none; color: #1b557a; }
+.active-clients-actions a:hover { border-bottom: 1px #383a3b dotted; }
+.active-clients-actions:after {
+	padding-left: 1em;
+	content: "\00BB";
+}
+.active-clients-last { font-style: italic; }
+ul.quick-actions { margin: 0 -0.5em 0 1em; }
+ul.quick-actions li { list-style-type: square; }
+#quickline-form select {
+	border: none;
+	font-family: Georgia, serif;
+	font-style: italic;
+	font-size: 100%;
+	border: 1px #ffffff solid;
+}
+#quickline-form p {
+	font-size: 100%;
+	font-family: Georgia, serif;
+	text-align: right;
+	font-style: italic;
+}
+#quickline-message { width: 100%; }');
+?>
+
+				<div class="yui-gc">
+					<div class="yui-u first">
+						<div class="widgets-widget">
+							<h2>Status Report</h2>
+							<div class="widgets-widget-content">
+								<table cellspacing="0" class="status-report">
+									<tr id="status-report-clients">
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>"><?php echo $this->statusReport['clients']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>">TV clients</a></td>
+									</tr>
+									<tr id="status-report-headlines">
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')); ?>"><?php echo $this->statusReport['headlines']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')); ?>">headlines</a></td>
+									</tr>
+									<tr id="status-report-users">
+										<td class="number"><a href="#users"><?php echo $this->statusReport['users']; ?></a></td>
+										<td><a href="#users">users</a></td>
+									</tr>
+								</table>
+								<table cellspacing="0" class="status-report">
+									<tr id="status-report-videos">
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['videos']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">videos</a></td>
+									</tr>
+									<tr id="status-report-pictures">
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['images']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">pictures</a></td>
+									</tr>
+<?php /*									<tr id="status-report-texts">
+										<td class="number"><a href="#texts">0</a></td>
+										<td><a href="#texts">text slides</a></td>
+									</tr> */ ?>
+								</table>
+								<div class="clear"></div>
+							</div>
+						</div>
+						<div class="widgets-widget">
+							<h2>Active Clients</h2>
+							<div class="widgets-widget-content">
+<?php if(count($this->activeClients) > 0) {
+foreach($this->activeClients as $client) { ?>
+								<span class="active-clients-name"><?php echo $client['sys_name']; ?></span>
+								<span class="active-clients-actions"><a href="#turn-off">turn off</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#edit-client">edit</a></span><br />
+								<span class="active-clients-last">Last active <?php echo $client['time_diff']; ?> minutes ago</span>
+<?php } } else { ?>
+								<p>No clients have been active within the last 12 hours.</p>
+<?php } ?>
+							</div>
+						</div>
+					</div>
+					<div class="yui-u">
+						<div class="widgets-widget">
+							<h2>Quick Actions</h2>
+							<div class="widgets-widget-content">
+								<ul class="quick-actions">
+									<li>Add a client</li>
+									<li><a href="<?php
+echo $this->url(array('module' => 'admin', 'controller' => 'multimedia' , 'action' => 'upload'));
+?>">Upload multimedia</a></li>
+									<li>Refresh caches</li>
+									<li>Make a backup</li>
+									<li>Link a client installation</li>
+									<li>Tweak system options</li>
+								</ul>
+							</div>
+						</div>
+						<div class="widgets-widget">
+							<h2>QuickLine</h2>
+							<div class="widgets-widget-content">
+<?php
+if(!empty($this->quicklineNotice)) echo '<p>'.$this->quicklineNotice.'</p>';
+echo $this->quicklineForm; ?>
+								<div id="quickline-response"></div>
+							</div>
+						</div>
+					</div>
+				</div>
