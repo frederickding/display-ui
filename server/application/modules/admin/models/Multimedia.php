@@ -69,11 +69,19 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'title' => $_data['mediumtitle'] ,
 				'activates' => (($_data['mediumactivatenow']) ? new Zend_Db_Expr(
 					'UTC_TIMESTAMP()') : $_data['mediumactivation']) ,
-				'expires' => $_data['mediumexpiration'] , 'active' => 1 ,
+				'active' => 1 ,
 				'type' => $type , 'clients' => $clients ,
 				'weight' => (int) $_data['mediumweight'] ,
 				// FIXME: MASSIVELY BROKEN OVERWRITING WITH DUPLICATE FILENAMES
 				'content' => $_data['mediumfile'] . ';' . $mime);
+			if (! empty($_data['mediumexpiration'])) {
+				$insertData['expires'] = $_data['mediumexpiration'];
+			}
+			if($type == 'image') {
+				if (! empty($_data['mediumduration']) && is_numeric($_data['mediumduration'])) {
+					$insertData['content'] .= ';' . $_data['mediumduration'];
+				}
+			}
 			// insert and return the value of the auto-increment ID
 			$this->db->insert('dui_media', $insertData);
 			return $this->db->lastInsertId();

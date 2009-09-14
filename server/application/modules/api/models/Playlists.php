@@ -124,18 +124,14 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			/* first element is now filename / path
 			 * second element is MIME type
 			 * third element if it exists is duration
-			 * fourth element if it exists is widthxheight
+			 * REMEMBER PHP ARRAY INDICES START AT 0
 			 */
 			// set a default duration of 20 seconds
 			if (! $medium['content'][2]) $medium['content'][2] = 20;
-			// set a default widthxheight of 0x0
-			if (! $medium['content'][4]) $medium['content'][4] = '0x0';
 			$playlist[] = array(
 				'type' => $medium['type'] ,
 				'filename' => $medium['content'][0] ,
 				'duration' => ($medium['type'] == 'video') ? 'file' : $medium['content'][2] ,
-				'width' => substr($medium['content'][4], 0, strpos($medium['content'][4], 'x')) ,
-				'height' => strstr($medium['content'][4], 'x') ,
 				'media-id' => (int) $medium['id']
 			);
 		}
@@ -168,8 +164,6 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			}
 			$playlist_objects[] = new Api_Model_PlaylistItem(
 				$item['media-id'], $item['type'], array(
-					'width' => $item['width'],
-					'height' => $item['height'],
 					'filename' => $item['filename']
 				), $item['duration']
 			);
