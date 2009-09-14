@@ -1,0 +1,62 @@
+<?php
+$this->navActive = 'headlines';
+$this->title = 'Manage Headlines';
+$this->headTitle('Headlines');
+$this->headStyle()->appendStyle('#headlines-list {
+	width: 100%;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#headlines-list td, #headlines-list th, #headlines-list {
+	border-color: #aaaaaa;
+}
+#headlines-list tr.body {
+	font-size: 123.1%;
+	color: #383a3b;
+}
+#headlines-list th {
+	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
+	padding: 0.25em 0.5em;
+	margin: 0;
+	height: 1.5em; line-height: 1.25em;
+	font-size: 123.1%;
+	font-weight: bold;
+	color: #333333;
+	text-shadow: #ffffff 1px 1px 3px;
+	cursor: pointer;
+}
+#headlines-list tr.body:nth-child(odd) { background-color: #fafafa; }
+#headlines-list tr.body:hover { background-color: #ddeeff; }
+td.id, th.id { width: 10%; }
+td.title, th.title { width: 50%; }
+td.active, th.active { width: 4%; color: #666666; }
+td.expires, th.expires { width: 16%; color: #666666; }
+td.client, th.client { width: 20%; }
+tr:hover td.expires, tr:hover td.active { color: inherit; }
+#headlines-list td {
+	padding: none;
+	margin: none;
+}
+');
+?>
+<table cellspacing="0" id="headlines-list">
+	<tr class="heading">
+		<th class="id">ID</th>
+		<th class="title">Title</th>
+		<th class="active">Active</th>
+		<th class="expires">Expires</th>
+		<th class="client">Client</th>
+	</tr>
+<?php foreach($this->headlinesList as $h) {
+$h['active'] = ($h['active']) ? 'Yes' : 'No';
+	?>
+	<tr class="body">
+		<td class="id"><?php echo $h['id']; ?></td>
+		<td class="title"><?php echo $h['title']; ?></td>
+		<td class="active"><?php echo $h['active']; ?></td>
+		<td class="expires"><?php echo $h['expires']; ?></td>
+		<td class="client"><?php echo $h['sys_name']; ?></td>
+	</tr>
+<?php } ?>
+</table>
