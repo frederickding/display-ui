@@ -148,9 +148,13 @@ class Admin_MultimediaController extends Zend_Controller_Action
 				'required' => FALSE));
 		$expires = new Zend_Form_Element_Text('mediumexpiration',
 			array('label' => 'Stop showing on (YYYY-MM-DD)' ,
-				'required' => TRUE));
+				'required' => FALSE));
 		$activates->addFilter('Alnum');
 		$expires->addFilter('Alnum');
+		$duration = new Zend_Form_Element_Text('mediumduration',
+			array('label' => 'Length to show image')
+		);
+		$duration->setValue('15');
 		$weight = new Zend_Form_Element_Select('mediumweight',
 			array('label' => 'Weight'));
 		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(
@@ -178,8 +182,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			'controller' => 'multimedia' , 'action' => 'upload-process')))->setMethod('post')->setAttrib('id', 'mediaupload')->addElements(array(
 			'mediumtitle' => $title , 'mediumactivatenow' => $immediateActive ,
 			'mediumactivation' => $activates , 'mediumexpiration' => $expires ,
-			'mediumweight' => $weight , 'mediumclients' => $clients ,
-			'mediumfile' => $file ,
+			'mediumclients' => $clients , 'mediumweight' => $weight ,
+			'mediumduration' => $duration, 'mediumfile' => $file ,
 			'mediasubmit' => $submit , 'mediareset' => $reset));
 		return $form;
 	}
