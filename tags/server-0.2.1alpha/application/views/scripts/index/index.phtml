@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Display UI Server | Welcome</title>
+	<style type="text/css">
+	<!--
+	body {
+		background-color: #F0F0F0;
+	}
+	img {
+		border: none;
+		display: block;
+	}
+	img#welcomeimg {
+		position: fixed;
+		left: 50%; top: 45%;
+		margin-left: -400px;
+		margin-top: -300px;
+	}
+	-->
+	</style>
+</head>
+<body>
+<div class="wrapper">
+	<div id="body">
+		<img id="welcomeimg" src="<?php echo $this->baseUrl('images/welcome.jpg'); ?>" width="800" height="600"
+		alt="Welcome to Display UI" usemap="#welcomemap" />
+		<map id="welcomemap" name="welcomemap">
+			<area shape="rect" coords="40,420,277,557" href="<?php echo $this->url(array('controller' => 'install', 'action' => 'index')); ?>" alt="Install Display UI Server" />
+			<area shape="rect" coords="278,420,522,557" href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'index')); ?>" alt="Manage Display UI" />
+			<area shape="rect" coords="523,420,760,557" href="<?php echo $this->url(array('module' => 'link', 'controller' => 'index', 'action' => 'index')); ?>" alt="Display the interface on a TV screen" />
+		</map>
+	</div>
+</div>
+</body>
+</html>
