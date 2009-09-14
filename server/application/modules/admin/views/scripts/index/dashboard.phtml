@@ -89,8 +89,8 @@ ul.quick-actions li { list-style-type: square; }
 										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>">TV clients</a></td>
 									</tr>
 									<tr id="status-report-headlines">
-										<td class="number"><a href="#headlines"><?php echo $this->statusReport['headlines']; ?></a></td>
-										<td><a href="#headlines">headlines</a></td>
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')); ?>"><?php echo $this->statusReport['headlines']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')); ?>">headlines</a></td>
 									</tr>
 									<tr id="status-report-users">
 										<td class="number"><a href="#users"><?php echo $this->statusReport['users']; ?></a></td>
