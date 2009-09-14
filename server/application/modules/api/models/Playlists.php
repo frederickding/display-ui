@@ -96,6 +96,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				INNER JOIN `dui_clients` AS c ON ( m.`clients`
 				REGEXP CONCAT( '(^|[0-9]*,)', c.`id` , '(,|$)' ) ) */
 				->where('c.sys_name = ?', $_sys_name)
+				->where('UTC_TIMESTAMP() > m.activates AND (UTC_TIMESTAMP() < m.expires OR m.expires IS NULL)')
 				->order('m.weight DESC')
 				->limit($_number);
 		$result = $query->query()->fetchAll();
