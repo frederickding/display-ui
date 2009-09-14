@@ -79,6 +79,10 @@ typedef struct _playlist_thread_elem_t{
 playlist_t g_playlist;
 char *g_playlist_raw;
 int g_playlist_raw_size;
+bool g_newexists = false;
+bool g_downloading_plst = false;
+
+extern playlist_element_t *g_current_elem;
 
 bool file_exists(const char * filename){
     if (FILE * file = fopen(filename, "r")){
@@ -355,14 +359,56 @@ void playlist_load(HWND hwnd){
 		if(playlist_load_raw() == 0){
 			playlist_process_raw(hwnd);			
 		}	
-	}else if(result == CURLE_COULDNT_RESOLVE_HOST){
-		debug_print("[playlist_load] download operation timed out ... loading old playlist\n");
+	}else{
+		//if(result == CURLE_COULDNT_RESOLVE_HOST){
+		debug_print("[playlist_load] download operation failed ... loading old playlist\n");
 		if(playlist_load_raw() == 0){
 			playlist_process_raw(hwnd);				
 		}
-	}
+		//}
 
-	//playlist_dumpitems();
+		playlist_retry_load(hwnd);
+	}
+}
+
+void playlist_retry_load(HWND hwnd){
+	
+	if(g_downloading_plst) return;
+
+	g_downloading_plst = true;
+	int result = dui_download_retry("/api/playlists/fetch/", "data\\playlist.dat");
+	
+	debug_print("[playlist_retry_load] DL result: %d\n", result);
+	if(result == CURLE_OK){
+		g_newexists = true;
+	}
+	g_downloading_plst = false;
+
+	/*
+	if(result == CURLE_OK) {
+		debug_print("[playlist_retry_load] download operation succeeded ... loading new playlist\n");
+		g_newexists = true;
+		//playlist_unload();
+		//if(playlist_load_raw() == 0){
+		//	playlist_process_raw(hwnd);			
+		//}	
+	}else{
+		
+		playlist_retry_load(hwnd);
+	}*/
+}
+
+void playlist_update(HWND hwnd){
+	debug_print("[playlist_update] ...\n");
+	if(g_newexists){
+		debug_print("[playlist_update] new playlist exists. reloading.\n");
+		playlist_unload();
+		if(playlist_load_raw() == 0){
+			playlist_process_raw(hwnd);				
+		}
+		g_current_elem = g_playlist.first;
+		g_newexists = false;
+	}
 }
 
 void playlist_unload(){
@@ -388,5 +434,8 @@ void playlist_unload(){
 		current = current->next;
 		free(tmp);
 	}
+
+	g_playlist.first = NULL;
+	g_playlist.num_elements = NULL;
 }
 

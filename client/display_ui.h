@@ -10,16 +10,23 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-#define CONTENT_WIDTH (SCREEN_WIDTH - 300)
-#define CONTENT_HEIGHT (SCREEN_HEIGHT - 112 - 56)
+#define DISPLAY_WIDTH 1280
+#define DISPLAY_HEIGHT 720
 
-#define CONTENT_TOP 112
+#define TOP_SPACER 0
+#define BOTTOM_SPACER 0
+
+#define CONTENT_WIDTH (DISPLAY_WIDTH - 300)
+#define CONTENT_HEIGHT (DISPLAY_HEIGHT - 112 - 56)
+
+#define CONTENT_TOP TOP_SPACER + 112
 #define CONTENT_BOTTOM (CONTENT_TOP + CONTENT_HEIGHT)
 
 void generate_sig();
 
 // use the first functions if sig needs to be appended
 int dui_download(char *url, char *dest_file);
+int dui_download_retry(char *url, char *dest_file);
 int dui_download(char *url, char *dest_file, bool show_progress, void *callback, void *arg);
 
 int download_curl(char *url, char *dest_file);

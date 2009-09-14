@@ -58,7 +58,7 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winmm.lib")
 
-#define FRAMES_PER_SEC 50 // should be a factor of 1000!
+#define FRAMES_PER_SEC 25 // should be a factor of 1000!
 #define FRAME_INTERVAL 1000 / FRAMES_PER_SEC
 
 #define MakeFont(name, bold, italic, underline, size) CreateFont(-size, \
@@ -74,7 +74,7 @@ void repaint_header(HDC hdcMem, PAINTSTRUCT ps);
 
 char *g_headline_txt = NULL; //"The quick brown fox jumps over the lazy dog | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis hendrerit hendrerit.";
 int g_ticks = 0;
-int g_headline_x = SCREEN_WIDTH;
+int g_headline_x = DISPLAY_WIDTH;
 bool g_video_painting = false;
 bool g_goto_next = false;
 
@@ -108,6 +108,10 @@ void update(void *p) {
 	}
 }
 
+void update_playlist(void *p) {
+	playlist_retry_load((HWND)p);
+}
+
 // Reads headline data from a file
 void load_headlines(){
 	FILE *fp = fopen("data\\headlines.dat", "r");
@@ -125,7 +129,7 @@ void load_headlines(){
 		memset(g_headline_txt, 0, size + 2);
 		fread(g_headline_txt, 1, size, fp);
 
-		g_headline_x = SCREEN_WIDTH;
+		g_headline_x = DISPLAY_WIDTH;
 		
 		fclose(fp);
 	}
@@ -317,12 +321,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if(wParam == 1){
 			// Redraw the header once per second
 			RECT rt;
-			rt.top = 0; rt.left = 0; rt.right = SCREEN_WIDTH; rt.bottom = CONTENT_TOP;
+			static int secs = 0;
+			rt.top = 0; rt.left = 0; rt.right = DISPLAY_WIDTH; rt.bottom = CONTENT_TOP;
 			InvalidateRect(hWnd, &rt, false);
+			
+			if(secs++ % (FRAMES_PER_SEC * 5) == 0){
+				rt.top = CONTENT_TOP; rt.left = CONTENT_WIDTH; rt.right = DISPLAY_WIDTH; rt.bottom = CONTENT_BOTTOM;
+				InvalidateRect(hWnd, &rt, false);
+			}
+
 			return 0;
 		}else if(wParam == 2){
 			// Update weather & headlines
 			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL));
+			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update_playlist, (void *)hWnd, 0, NULL));
 			//weather_update();
 			return 0;
 		}else if(wParam == 3){
@@ -334,8 +346,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if(!g_video_painting) 
 				InvalidateRect(hWnd, &rt, false);
 
-			rt2.top = CONTENT_BOTTOM; rt2.left = 0; rt2.right = SCREEN_WIDTH; rt2.bottom = SCREEN_HEIGHT;
+			rt2.top = CONTENT_BOTTOM; rt2.left = 0; rt2.right = DISPLAY_WIDTH; rt2.bottom = SCREEN_HEIGHT;
 			InvalidateRect(hWnd, &rt2, false);
+
 			g_headline_x -= 2;
 			g_ticks++;
 			return 0;}
@@ -345,6 +358,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SendMessage(hWnd, WM_DESTROY, 0, 0);
 		}else if(wParam == VK_SPACE){
 			g_goto_next = true;
+		}else if(wParam == VK_F5){
+			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update, (void *)hWnd, 0, NULL));
+			CloseHandle(CreateThread(NULL, 0x2000, (unsigned long (__stdcall *)(void *))update_playlist, (void *)hWnd, 0, NULL));
 		}
 		break;
 	//case WM_ERASEBKGND:
@@ -444,7 +460,10 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 				
 				if(timeleft == 0){
 					// Reached the end of the current item's timeframe. Go to the next one.
-					if(g_current_elem->next) g_current_elem = g_current_elem->next;
+					if(g_current_elem->next){
+						g_current_elem = g_current_elem->next;
+						if(g_current_elem == g_playlist.first) playlist_update(hWnd);
+					}
 					debug_print("[repaint_content - image] switched to playlist item @ 0x%08lX\n", g_current_elem);
 
 					// Draw the background image. Don't remember why this is necessary, but there's probably a reason.
@@ -497,7 +516,10 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 						video_unload(video);
 						g_video_painting = false;
 						iter = 0;
-						if(g_current_elem->next) g_current_elem = g_current_elem->next;
+						if(g_current_elem->next){
+							g_current_elem = g_current_elem->next;
+							if(g_current_elem == g_playlist.first) playlist_update(hWnd);
+						}
 						debug_print("[repaint_content - video] switched to playlist item @ 0x%08lX\n", g_current_elem);
 					}
 				}
@@ -560,7 +582,10 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 
 			if(t++ / FRAMES_PER_SEC >= 5){
 				// 5 seconds and the playlist item wasn't loaded; move on to next one
-				if(g_current_elem->next) g_current_elem = g_current_elem->next;
+				if(g_current_elem->next){
+					g_current_elem = g_current_elem->next;
+					if(g_current_elem == g_playlist.first) playlist_update(hWnd);
+				}
 				t = 0;
 			}
 		}
@@ -616,7 +641,7 @@ void repaint_weather(HDC hdcMem, PAINTSTRUCT ps){
 		// Display current temperature
 		RECT textBound;
 		textBound.left = CONTENT_WIDTH + 30; textBound.top = CONTENT_TOP + 8;
-		textBound.right = SCREEN_WIDTH - 20; textBound.bottom = CONTENT_TOP + 68;
+		textBound.right = DISPLAY_WIDTH - 20; textBound.bottom = CONTENT_TOP + 68;
 		SelectObject(hdcMem, g_font_dejavusans_cond_bold_42);
 		DrawTextA(hdcMem, current->temp, strlen(current->temp), &textBound, DT_RIGHT);
 		
@@ -734,7 +759,7 @@ void repaint_header(HDC hdcMem, PAINTSTRUCT ps){
 	ptm = localtime(&rawtime);
 	
 	// Draw background image
-	StretchDIBits(hdcMem, 0, 0, SCREEN_WIDTH, CONTENT_TOP, 0, 0, SCREEN_WIDTH, CONTENT_TOP, 
+	StretchDIBits(hdcMem, 0, TOP_SPACER, DISPLAY_WIDTH, CONTENT_TOP - TOP_SPACER, 0, 0, DISPLAY_WIDTH, CONTENT_TOP - TOP_SPACER, 
 		FreeImage_GetBits(g_fbmp_header), FreeImage_GetInfo(g_fbmp_header), DIB_RGB_COLORS, SRCCOPY);
 	
 	// Draw date in format [month day, year]
@@ -742,15 +767,15 @@ void repaint_header(HDC hdcMem, PAINTSTRUCT ps){
 	SetBkMode(hdcMem, TRANSPARENT); 
 	SetTextColor(hdcMem, RGB(255, 255, 255));
 	SelectObject(hdcMem, g_font_dejavusans_bold_20);
-	TextOut(hdcMem, CONTENT_WIDTH - 260, 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
+	TextOut(hdcMem, CONTENT_WIDTH - 260, TOP_SPACER + 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
 	SelectObject(hdcMem, g_font_dejavusans_cond_bold_32);
-	TextOut(hdcMem, CONTENT_WIDTH - 263, 50, datetimestr, strlen(datetimestr));
+	TextOut(hdcMem, CONTENT_WIDTH - 263, TOP_SPACER + 50, datetimestr, strlen(datetimestr));
 	
 	// Draw time in 24-hr format
 	memset(datetimestr, 0, 17);
 	strftime(datetimestr, 16, "%H:%M:%S", ptm);
 	SelectObject(hdcMem, g_font_dejavusans_cond_bold_58);
-	TextOut(hdcMem, CONTENT_WIDTH + 20, 27, datetimestr, strlen(datetimestr));
+	TextOut(hdcMem, CONTENT_WIDTH + 20, TOP_SPACER + 27, datetimestr, strlen(datetimestr));
 	
 	// Draw line to separate weather panel from content panel
 	HPEN pen = CreatePen(PS_DASH, 2, RGB(100, 100, 100));
@@ -764,7 +789,7 @@ void repaint_header(HDC hdcMem, PAINTSTRUCT ps){
 void repaint_headlines(HDC hdcMem, PAINTSTRUCT ps){
 	
 	// Draw the right part of the background image
-	StretchDIBits(hdcMem, 160, CONTENT_BOTTOM, SCREEN_WIDTH - 160, 56, 0, 0, SCREEN_WIDTH - 160, 56, 
+	StretchDIBits(hdcMem, 160, CONTENT_BOTTOM, DISPLAY_WIDTH - 160, 56, 0, 0, DISPLAY_WIDTH - 160, 56, 
 		FreeImage_GetBits(g_fbmp_headlines2), FreeImage_GetInfo(g_fbmp_headlines2), DIB_RGB_COLORS, SRCCOPY);
 	
 	// Draw text if it exists
@@ -775,7 +800,7 @@ void repaint_headlines(HDC hdcMem, PAINTSTRUCT ps){
 		// If the right edge of the text is past the left side of the screen, start again at the right side.
 		SIZE extents;
 		GetTextExtentPoint32(hdcMem, g_headline_txt, strlen(g_headline_txt), &extents);
-		if(g_headline_x + extents.cx < 160) g_headline_x = SCREEN_WIDTH;
+		if(g_headline_x + extents.cx < 160) g_headline_x = DISPLAY_WIDTH;
 	}
 	
 	// Draw the left part of the background image. This is done to create the effect of the headlines
@@ -930,7 +955,7 @@ int dui_download(char *url, char *dest_file, bool show_progress, void *callback,
 }
 
 // Creates valid DUI-API-compatible URL from an incomplete URL and downloads to disk.
-// Use this for downloading from the DUI server. Assumes no progress callback
+// Use this for downloading from the DUI server. Assumes no progress callback.
 // params:
 //		dest:	The destination buffer which will hold the full URL. This must be an allocated block 
 //				of memory of sufficient size. The directory must exist.
@@ -940,4 +965,22 @@ int dui_download(char *url, char *dest_file, bool show_progress, void *callback,
 //							/api/playlists/fetch/					   -- without additional params
 int dui_download(char *url, char *dest_file){
 	return dui_download(url, dest_file, false, NULL, NULL);
+}
+
+// Creates valid DUI-API-compatible URL from an incomplete URL and downloads to disk.
+// Retries indefinitely if the download operation failed. 
+// Use this for downloading from the DUI server. Assumes no progress callback.
+// params:
+//		dest:	The destination buffer which will hold the full URL. This must be an allocated block 
+//				of memory of sufficient size. The directory must exist.
+//		url:	The incomplete URL to be formatted. If it has additional parameters, it should not 
+//				end in &. If it does not have additional params, it should not end in ? as it will be appended. 
+//				Examples:	/api/weather/current/?location=CAXX0401    -- with additional params
+//							/api/playlists/fetch/					   -- without additional params
+int dui_download_retry(char *url, char *dest_file){
+	int result = dui_download(url, dest_file, false, NULL, NULL);
+	while(result != CURLE_OK){
+		result = dui_download(url, dest_file, false, NULL, NULL);
+	}
+	return result;
 }
