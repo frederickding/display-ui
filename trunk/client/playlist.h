@@ -57,6 +57,8 @@ typedef struct _video_element_t{
 //void playlist_dumpitems();
 
 void playlist_load(HWND hwnd);
+void playlist_retry_load(HWND hwnd);
+void playlist_update(HWND hwnd);
 void playlist_unload();
 
 #endif

@@ -16,10 +16,10 @@
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN89
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN89
+#endif //_WIN32
 
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -29,10 +29,10 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // English (Canada) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENC)
-#ifdef _WIN89
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_CAN
 #pragma code_page(1252)
-#endif //_WIN89
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -76,7 +76,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,3,4,89
+ FILEVERSION 0,3,5,2
  PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x20L
 #ifdef _DEBUG
@@ -90,10 +90,10 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "100904b0"
+        BLOCK "1001004b0"
         BEGIN
             VALUE "FileDescription", "Display UI Client Executable\0"
-            VALUE "FileVersion", "0, 3, 4, 89\0"
+            VALUE "FileVersion", "0, 3, 5, 2\0"
             VALUE "InternalName", "display_ui\0"
             VALUE "LegalCopyright", "Copyright (C) 2009 Kirill Peretoltchine & Frederick Ding\0"
             VALUE "OriginalFilename", "display_ui.exe\0"

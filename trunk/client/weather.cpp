@@ -70,7 +70,7 @@ unsigned long weather_update(void *p, bool download_new){
 	int result = -1;
 
 	if(download_new){
-		result = dui_download("/api/weather/current/?location=CAXX0401", "data\\weather\\weather_c.dat");
+		result = dui_download_retry("/api/weather/current/?location=CAXX0401", "data\\weather\\weather_c.dat");
 	}
 
 	// Read from the file if download was OK, or if redownload wasn't requested
@@ -130,7 +130,7 @@ unsigned long weather_update(void *p, bool download_new){
 	}
 
 	if(download_new){
-		result = dui_download("/api/weather/forecast/?location=CAXX0401&day=2", "data\\weather\\weather_fc.dat");
+		result = dui_download_retry("/api/weather/forecast/?location=CAXX0401&day=2", "data\\weather\\weather_fc.dat");
 	}
 	
 	// If forecast info was downloaded correctly, or if no download was requested, read from the data file.
