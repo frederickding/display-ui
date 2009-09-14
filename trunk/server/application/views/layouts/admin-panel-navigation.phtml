@@ -20,7 +20,7 @@ echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, a
 	</ul>
 	<ul class="sidebar-nav">
 		<li id="sidebar-nav-headlines"<?php if($this->active == 'headlines') echo ' class="active"'; ?>>
-			<a href="#" title="Headlines">Headlines</a>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'index')); ?>" title="Headlines">Headlines</a>
 		</li>
 		<li id="sidebar-nav-multimedia"<?php if($this->active == 'multimedia') echo ' class="active"'; ?>>
 			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'index')); ?>" title="Media">Multimedia</a>
