@@ -59,4 +59,32 @@ class Admin_HeadlinesController extends Zend_Controller_Action
 		$HeadlinesModel = new Admin_Model_Headlines();
 		$this->view->headlinesList = $HeadlinesModel->fetchHeadlines($this->auth_session->username);
 	}
+	/**
+	 * Shows a confirmation page for deletion of an item
+	 */
+	public function deleteAction ()
+	{
+		$this->view->id = (int) $this->_getParam('id');
+		$HeadlinesModel = new Admin_Model_Headlines();
+		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->deleteCrsf;
+		$this->view->canDelete = $HeadlinesModel->canModify($this->auth_session->username, $this->view->id);
+	}
+	public function deleteProcessAction ()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->removeHelper('layout');
+		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecrsf') == $this->auth_session->deleteCsrf) {
+			$HeadlinesModel = new Admin_Model_Headlines();
+			$id = (int) $this->_getParam('id', 0);
+			if ($this->_getParam('deleteconf', 'No!') == 'Yes!') {
+				if ($HeadlinesModel->deleteHeadline($id)) {
+					return $this->getResponse()->setBody('Successfully deleted.');
+				} else {
+					return $this->getResponse()->setBody('Deletion failed.');
+				}
+			}
+		}
+		return $this->getResponse()->setBody('Nothing was deleted. <a href="javascript:history.back(1);">Go back.</a>');
+	}
 }

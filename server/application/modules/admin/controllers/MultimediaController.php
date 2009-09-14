@@ -151,9 +151,6 @@ class Admin_MultimediaController extends Zend_Controller_Action
 				'required' => TRUE));
 		$activates->addFilter('Alnum');
 		$expires->addFilter('Alnum');
-		$hash = new Zend_Form_Element_Hash('uploadnonce',
-			array('salt' => 'unique'));
-		$hash->removeDecorator('label');
 		$weight = new Zend_Form_Element_Select('mediumweight',
 			array('label' => 'Weight'));
 		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(
@@ -182,7 +179,7 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			'mediumtitle' => $title , 'mediumactivatenow' => $immediateActive ,
 			'mediumactivation' => $activates , 'mediumexpiration' => $expires ,
 			'mediumweight' => $weight , 'mediumclients' => $clients ,
-			'mediumfile' => $file , 'uploadnonce' => $hash ,
+			'mediumfile' => $file ,
 			'mediasubmit' => $submit , 'mediareset' => $reset));
 		return $form;
 	}
