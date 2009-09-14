@@ -85,8 +85,8 @@ ul.quick-actions li { list-style-type: square; }
 							<div class="widgets-widget-content">
 								<table cellspacing="0" class="status-report">
 									<tr id="status-report-clients">
-										<td class="number"><a href="#clients"><?php echo $this->statusReport['clients']; ?></a></td>
-										<td><a href="#clients">TV clients</a></td>
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>"><?php echo $this->statusReport['clients']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>">TV clients</a></td>
 									</tr>
 									<tr id="status-report-headlines">
 										<td class="number"><a href="#headlines"><?php echo $this->statusReport['headlines']; ?></a></td>
@@ -99,12 +99,12 @@ ul.quick-actions li { list-style-type: square; }
 								</table>
 								<table cellspacing="0" class="status-report">
 									<tr id="status-report-videos">
-										<td class="number"><a href="#videos"><?php echo $this->statusReport['videos']; ?></a></td>
-										<td><a href="#videos">videos</a></td>
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['videos']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">videos</a></td>
 									</tr>
 									<tr id="status-report-pictures">
-										<td class="number"><a href="#pics"><?php echo $this->statusReport['images']; ?></a></td>
-										<td><a href="#pics">pictures</a></td>
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['images']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">pictures</a></td>
 									</tr>
 <?php /*									<tr id="status-report-texts">
 										<td class="number"><a href="#texts">0</a></td>
