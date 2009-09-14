@@ -38,7 +38,6 @@ td.admin, th.admin { width: 20%; }
 }
 ');
 ?>
-
 <table cellspacing="0" id="clients-list">
 	<tr class="heading">
 		<th class="id">ID</th>
@@ -46,16 +45,17 @@ td.admin, th.admin { width: 20%; }
 		<th class="last_active">Last Active</th>
 		<th class="admin">Administrator</th>
 	</tr>
+<?php foreach($this->clientsList as $c) { ?>
 	<tr class="body">
-		<td class="id">1</td>
-		<td class="sys_name">devtesting</td>
-		<td class="last_active">2009-09-07 23:08:15</td>
-		<td class="admin">administrator</td>
+		<td class="id"><?php echo $c['id']; ?></td>
+		<td class="sys_name"><?php echo $c['sys_name']; ?></td>
+		<td class="last_active"><?php echo $c['last_active']; ?></td>
+		<td class="admin"><?php echo $c['admin']; ?></td>
 	</tr>
-	<tr class="body">
-		<td class="id">1</td>
-		<td class="sys_name">devtesting</td>
-		<td class="last_active">2009-09-07 23:08:15</td>
-		<td class="admin">administrator</td>
-	</tr>
+<?php } ?>
 </table>
+<p><small>Display UI Server does <em>not</em> provide a control panel method to
+delete clients, as doing so can be very damaging. Instead, the system administrator
+must manually remove the appropriate entry from the <code>dui_clients</code> table.
+For administrators: it is a good practice to remove the ID of a deleted client
+from the <code>clients</code> column of any media items.</small></p>

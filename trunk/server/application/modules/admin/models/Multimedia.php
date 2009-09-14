@@ -72,6 +72,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'expires' => $_data['mediumexpiration'] , 'active' => 1 ,
 				'type' => $type , 'clients' => $clients ,
 				'weight' => (int) $_data['mediumweight'] ,
+				// FIXME: MASSIVELY BROKEN OVERWRITING WITH DUPLICATE FILENAMES
 				'content' => $_data['mediumfile'] . ';' . $mime);
 			// insert and return the value of the auto-increment ID
 			$this->db->insert('dui_media', $insertData);
@@ -97,7 +98,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'id' , 'sys_name'))->join(array('u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')', array())->order('c.id ASC')->limit($_limit);
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
-				$query->where('u.id = ?', $_admin);
+				$query->where('u.id = ?', $_admin, 'INTEGER');
 			} else {
 				// treat is as the username
 				$query->where('u.username = ?', $_admin);
