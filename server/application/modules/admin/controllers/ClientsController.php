@@ -56,5 +56,7 @@ class Admin_ClientsController extends Zend_Controller_Action
 	}
 	public function listAction ()
 	{
+		$ClientsModel = new Admin_Model_Clients();
+		$this->view->clientsList = $ClientsModel->fetchClients($this->auth_session->username);
 	}
 }

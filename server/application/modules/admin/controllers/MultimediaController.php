@@ -89,6 +89,7 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		$form = $this->uploadForm();
 		if ($form->isValid($_POST)) {
 			// assign the values and receive the file
+			// FIXME: MASSIVELY BROKEN OVERWRITING!
 			$values = $form->getValues();
 			$MediaModel = new Admin_Model_Multimedia();
 			$this->view->id = $MediaModel->insertMultimedia($values);

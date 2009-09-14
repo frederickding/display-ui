@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `dui_media` (
   `id`			int(10) unsigned NOT NULL auto_increment,
   `title`		varchar(64) NOT NULL,
   `activates`	datetime NOT NULL,
-  `expires`		datetime NOT NULL,
+  `expires`		datetime NULL,
   `active`		tinyint(1) NOT NULL,
   `type`		varchar(32) NOT NULL,
   `clients`		varchar(64) NULL,
