@@ -37,7 +37,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 			$numberOf = $this->db->fetchOne($this->db->select()->from('dui_media', 'COUNT(*)'));
 			$batch = $this->db->select()->from('dui_media', array('id' ,
 				'title' ,
-				'active' => 'UTC_TIMESTAMP() > activates AND UTC_TIMESTAMP() < expires' ,
+				'active' => 'UTC_TIMESTAMP() > activates AND (UTC_TIMESTAMP() < expires OR expires IS NULL)' ,
 				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)') ,
 				'type' , 'weight'))->order('id DESC')->limitPage($_page, $_limit)->query()->fetchAll(Zend_Db::FETCH_ASSOC);
 			$firstOne = ($_page - 1) * ($_limit) + 1;
