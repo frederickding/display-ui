@@ -1,12 +1,7 @@
 /*
  * jQuery Form Plugin
- * version: 2.28 (10-MAY-2009)
- * @requires jQuery v1.2.2 or later
- *
- * Examples and documentation at: http://malsup.com/jquery/form/
- * Dual licensed under the MIT and GPL licenses:
+ * Incorporated into Display UI Server under the MIT license:
  *   http://www.opensource.org/licenses/mit-license.php
- *   http://www.gnu.org/licenses/gpl.html
  */
 ;(function($) {
 

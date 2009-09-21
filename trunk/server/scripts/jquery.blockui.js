@@ -1,13 +1,9 @@
 ﻿/*
  * jQuery blockUI plugin
- * Version 2.23 (21-JUN-2009)
- * @requires jQuery v1.2.3 or later
  *
- * Examples at: http://malsup.com/jquery/block/
  * Copyright (c) 2007-2008 M. Alsup
- * Dual licensed under the MIT and GPL licenses:
+ * Incorporated into Display UI Server under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
  *
  * Thanks to Amir-Hossein Sobhi for some excellent contributions!
  */
