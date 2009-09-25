@@ -26,6 +26,8 @@
  */
 class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 {
+	const IMAGE_TYPE = 'image';
+	const VIDEO_TYPE = 'video';
 	/**
 	 * Fetches all relevant details about multimedia in the database
 	 * @param int $_limit
@@ -169,6 +171,26 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				$result = $result && $resultFile;
 			}
 			return (bool) $result;
+		}
+		return FALSE;
+	}
+	public function getMedium ($_id)
+	{
+		$_id = (int) $_id;
+		if (! is_null($this->db)) {
+			$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
+			$query = $this->db->select()->from('dui_media', array(
+				'filename' => new Zend_Db_Expr('SUBSTR(`content`, 1, LOCATE(\';\', `content`)-1)'),
+				'mime' => new Zend_Db_Expr('SUBSTR(`content`, LOCATE(\';\', `content`)+1, CHAR_LENGTH(`content`))'),
+				'type',
+				'data' => new Zend_Db_Expr($this->db->quoteIdentifier('data').' IS NULL'),
+				'fileBinary' => 'data'
+			))->where('id = ?', $_id, 'INTEGER')->limit(1);
+			$queryR = $this->db->fetchRow($query);
+			if ($queryR->data == 1 && $queryR->type == self::IMAGE_TYPE) {
+				$queryR->fileBinary = file_get_contents(realpath(MEDIA_DIR . '/' . $queryR->filename));
+			}
+			return $queryR;
 		}
 		return FALSE;
 	}
