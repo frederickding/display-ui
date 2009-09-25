@@ -127,6 +127,20 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		}
 		return $this->getResponse()->setBody('Nothing was deleted. <a href="javascript:history.back(1);">Go back.</a>');
 	}
+	public function viewAction ()
+	{
+		$MediaModel = new Admin_Model_Multimedia();
+		$this->view->id = (int) $this->_getParam('id', 0);
+		$query = $MediaModel->getMedium($this->view->id);
+		if ($query->type == Admin_Model_Multimedia::IMAGE_TYPE) {
+			$this->view->canShow = TRUE;
+			$this->view->fileBinary = $query->fileBinary;
+			$this->view->mimeType = $query->mime;
+		} else {
+			$this->view->canShow = FALSE;
+			$this->view->type = $query->type;
+		}
+	}
 	/**
 	 * Produces the Zend_Form that is used for upload functionality
 	 * @return Zend_Form
