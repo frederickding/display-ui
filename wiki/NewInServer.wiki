@@ -1,0 +1,12 @@
+#summary Brief summaries of new features introduced in new versions of the server.
+
+= Introduction =
+
+This document _summarizes_ the *new features* introduced in new versions of the server. It is not a comprehensive changelog; the [http://code.google.com/p/display-ui/source/list commit log] contains the details of every committed change. Instead, this document should give you the reasons you need to upgrade to a newer version.
+
+= What's New in Display UI Server =
+== Version 0.2 series ==
+This is the first published version of the server; we began tagging alpha releases of the server beginning at version 0.2. It includes a partially functional administrative interface and a full API (not yet documented) compatible with the client in the 0.3.5 series.
+=== Version 0.2.4alpha ===
+  * It is now possible to *view* image items on the list of multimedia through the "View" link.
+  * There is now *a form to add headlines* in the headlines management section, more flexible than QuickLine — expiry and category can be set.
