@@ -9,4 +9,5 @@ This document _summarizes_ the *new features* introduced in new versions of the 
 This is the first published version of the server; we began tagging alpha releases of the server beginning at version 0.2. It includes a partially functional administrative interface and a full API (not yet documented) compatible with the client in the 0.3.5 series.
 === Version 0.2.4alpha ===
   * It is now possible to *view* image items on the list of multimedia through the "View" link.
+  * User experience on the multimedia upload form is improved by attaching descriptions/hints to the form fields that need them, instead of a list at the top of the page.
   * There is now *a form to add headlines* in the headlines management section, more flexible than QuickLine — expiry and category can be set.
