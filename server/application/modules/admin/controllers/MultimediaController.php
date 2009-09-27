@@ -33,7 +33,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		// ALWAYS check if authenticated
 		if (! $this->auth_session->authenticated) {
 			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
-				'module' => 'admin' , 'controller' => 'login' ,
+				'module' => 'admin' ,
+				'controller' => 'login' ,
 				'action' => 'index')));
 		}
 		// configuration object
@@ -66,7 +67,9 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		$mediaData = $MediaModel->fetchMultimedia($this->view->page);
 		$this->view->mediaTotal = $mediaData[0];
 		$this->view->mediaData = $mediaData[1];
-		$this->view->mediaRange = array($mediaData[2] , $mediaData[3]);
+		$this->view->mediaRange = array(
+			$mediaData[2] ,
+			$mediaData[3]);
 	}
 	/**
 	 * Shows a form for uploading media into the system
@@ -83,7 +86,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 	{
 		if (! $this->getRequest()->isPost()) {
 			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
-				'module' => 'admin' , 'controller' => 'multimedia' ,
+				'module' => 'admin' ,
+				'controller' => 'multimedia' ,
 				'action' => 'upload')));
 		}
 		$form = $this->uploadForm();
@@ -152,53 +156,85 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		unset($MediaModel);
 		$this->view->doctype('XHTML1_STRICT');
 		$title = new Zend_Form_Element_Text('mediumtitle',
-			array('label' => 'Title' , 'required' => TRUE));
-		$title->addValidator('StringLength', FALSE, array(1 , 63));
+			array(
+				'label' => 'Title' ,
+				'required' => TRUE));
+		$title->addValidator('StringLength', FALSE, array(
+			1 ,
+			63));
 		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow',
-			array('label' => 'Immediately activate?' , 'required' => TRUE));
-		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No');
+			array(
+				'label' => 'Immediately activate?' ,
+				'required' => TRUE));
+		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No')->setDescription('Will this item begin showing immediately or at a later date?');
 		$activates = new Zend_Form_Element_Text('mediumactivation',
-			array('label' => 'Start showing on (YYYY-MM-DD)' ,
+			array(
+				'label' => 'Start showing on (YYYY-MM-DD)' ,
 				'required' => FALSE));
 		$expires = new Zend_Form_Element_Text('mediumexpiration',
-			array('label' => 'Stop showing on (YYYY-MM-DD)' ,
+			array(
+				'label' => 'Stop showing on (YYYY-MM-DD)' ,
 				'required' => FALSE));
 		$activates->addFilter('Alnum');
 		$expires->addFilter('Alnum');
 		$duration = new Zend_Form_Element_Text('mediumduration',
-			array('label' => 'Length to show image')
-		);
-		$duration->setValue('15');
+			array(
+				'label' => 'Length to show image'));
+		$duration->setValue('15')->setDescription('This value is ignored for videos.');
 		$weight = new Zend_Form_Element_Select('mediumweight',
-			array('label' => 'Weight'));
+			array(
+				'label' => 'Weight'));
 		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(
-			1 , 10));
-		$weight->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
+			1 ,
+			10))->setDescription('A higher weight usually results in the file showing more frequently.')->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
 		$submit = new Zend_Form_Element_Submit('mediasubmit',
-			array('label' => 'Upload!'));
-		$submit->setDecorators(array('ViewHelper'));
+			array(
+				'label' => 'Upload!'));
+		$submit->setDecorators(array(
+			'ViewHelper'));
 		$reset = new Zend_Form_Element_Reset('mediareset',
-			array('label' => 'Reset'));
-		$reset->setDecorators(array('ViewHelper'));
+			array(
+				'label' => 'Reset'));
+		$reset->setDecorators(array(
+			'ViewHelper'));
 		$file = new Zend_Form_Element_File('mediumfile',
-			array('label' => 'Media file' , 'required' => TRUE));
+			array(
+				'label' => 'Media file' ,
+				'required' => TRUE));
 		$file->addValidator('count', FALSE, 1)->addValidator('Extension', FALSE, array(
-			'jpg' , 'jpeg' , 'png' , 'mov' , 'mp4' , 'avi' , 'wmv' , 'mkv'))->setDestination(MEDIA_DIR);
+			'jpg' ,
+			'jpeg' ,
+			'png' ,
+			'mov' ,
+			'mp4' ,
+			'avi' ,
+			'wmv' ,
+			'mkv'))->setDestination(MEDIA_DIR)->setDescription('Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV).');
 		$clients = new Zend_Form_Element_Multiselect('mediumclients',
-			array('label' => 'Show on these clients' , 'required' => TRUE));
+			array(
+				'label' => 'Show on these clients' ,
+				'required' => TRUE));
+		$clients->setDescription('You can hold down Shift or Ctrl to select multiple clients.');
 		foreach ($listClients as $c) {
 			$clients->addMultiOption($c['id'], $c['sys_name']);
 		}
 		// file can be any mime type or extension, we're not checking it
 		// form handling part will use the mime type and insert it into the db
 		$form = new Zend_Form();
-		$form->setAction($this->view->url(array('module' => 'admin' ,
-			'controller' => 'multimedia' , 'action' => 'upload-process')))->setMethod('post')->setAttrib('id', 'mediaupload')->addElements(array(
-			'mediumtitle' => $title , 'mediumactivatenow' => $immediateActive ,
-			'mediumactivation' => $activates , 'mediumexpiration' => $expires ,
-			'mediumclients' => $clients , 'mediumweight' => $weight ,
-			'mediumduration' => $duration, 'mediumfile' => $file ,
-			'mediasubmit' => $submit , 'mediareset' => $reset));
+		$form->setAction($this->view->url(array(
+			'module' => 'admin' ,
+			'controller' => 'multimedia' ,
+			'action' => 'upload-process')))->setMethod('post')->setAttrib('id', 'mediaupload')->addElements(array(
+			'mediumtitle' => $title ,
+			'mediumclients' => $clients ,
+			'mediumfile' => $file ,
+			'mediumactivatenow' => $immediateActive ,
+			'mediumactivation' => $activates ,
+			'mediumexpiration' => $expires ,
+			'mediumweight' => $weight ,
+			'mediumduration' => $duration ,
+			'mediasubmit' => $submit ,
+			'mediareset' => $reset));
 		return $form;
 	}
 }

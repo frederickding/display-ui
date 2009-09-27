@@ -16,6 +16,7 @@ label.optional:after { content: " (optional)"; color: #666666; }
 	-webkit-border-radius: 5px;
 	width: 75%;
 }
+form p.description, form p.hint { font-size: 75%; color: #666666; }
 ul.errors {
 	color: #bb2200;
 }
@@ -26,26 +27,23 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 		var val = $j(\'#mediumactivatenow-element input:checked\').val();
 		switch(val) {
 			case \'0\':
-				$j(\'#mediumactivation-label label\').removeClass(\'optional\');
 				$j(\'#mediumactivation-label, #mediumactivation-element\').show(\'slide\');
+				$j(\'#mediumactivation-label label\').removeClass(\'optional\');
 				break;
 			case \'1\':
 				$j(\'#mediumactivation-label, #mediumactivation-element\').hide(\'slide\');
 				$j(\'#mediumactivation-label label\').addClass(\'optional\');
 		}
 	});
+	$j("#hideoptional").click(function() {
+		$j(".optional").toggle(0, function() {
+			$j("#" + $j(this).attr("for") + ":not(#mediumactivation)").parent().toggle();
+		});
+		if($j(this).text() == "Hide optional fields.") $j(this).text("Show optional fields.");
+		else $j(this).text("Hide optional fields.");
+	});
 });');
 ?>
-<p><strong>It's easy to upload a media file to the Display UI system.</strong></p>
-<ul>
-	<li>Fill in a title for your own reference.</li>
-	<li>Set whether the file begins showing <em>now</em> or on a certain
-	date.</li>
-	<li>Optionally, set a higher weight to increase the frequency.</li>
-	<li>Select the clients on which you would like to show the file. You
-	can use <kbd>Ctrl</kbd> to select multiple clients.</li>
-	<li>Finally, upload a file in a supported format, like JPEG, PNG, MP4,
-	MOV, AVI, MKV, WMV, etc.</li>
-</ul>
+<p><strong>It's easy to upload a media file to the Display UI system.</strong> <a href="#" id="hideoptional">Hide optional fields.</a></p>
 <?php
 echo $this->form; ?>
