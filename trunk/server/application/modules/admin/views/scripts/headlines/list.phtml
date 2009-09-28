@@ -68,9 +68,9 @@ ul.errors {
 }
 ');
 $this->inlineScript()->appendScript('$j(document).ready(function() {
-	if(window.location.pathname.search(/insert-process/) == -1) {
-		$j("#headlineinsert").hide();
-	} else {
+	$j("#headlineinsert").hide();
+	if(window.location.pathname.search(/insert-process/) != -1) {
+		$j("#headlineinsert").show();
 		$j("#addheadlinelink").addClass("expanded");
 	}
 	$j("#addheadlinelink").click(function(event) {
