@@ -1,0 +1,51 @@
+<?php
+/* $pages1 = array(
+	array(
+		'label' => 'Dashboard',
+		'title' => 'Dashboard',
+		'module' => 'admin',
+		'controller' => 'index',
+		'action' => 'dashboard',
+		'id' => 'sidebar-nav-dashboard'
+	)
+);
+echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, array('ulClass' => 'sidebar-nav')); */
+?>
+<div class="yui-b" id="sidebar">
+	<div id="sidebar-icon"> <a href="<?php echo $this->baseUrl(''); ?>" title="<?php echo $this->systemName; ?>">Display UI Server</a> </div>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-dashboard"<?php if($this->active == 'dashboard') echo ' class="active"'; ?>>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'index', 'action' => 'dashboard')); ?>" title="Dashboard">Dashboard</a>
+		</li>
+	</ul>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-headlines"<?php if($this->active == 'headlines') echo ' class="active"'; ?>>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'index')); ?>" title="Headlines">Headlines</a>
+		</li>
+		<li id="sidebar-nav-multimedia"<?php if($this->active == 'multimedia') echo ' class="active"'; ?>>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'index')); ?>" title="Media">Multimedia</a>
+		</li>
+		<li id="sidebar-nav-weather"<?php if($this->active == 'weather') echo ' class="active"'; ?>>
+			<a href="#" title="Weather">Weather</a>
+		</li>
+		<li id="sidebar-nav-clients"<?php if($this->active == 'clients') echo ' class="active"'; ?>>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'index')); ?>" title="Clients">Clients</a>
+		</li>
+	</ul>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-users"<?php if($this->active == 'users') echo ' class="active"'; ?>>
+			<a href="#" title="Users">Users</a>
+		</li>
+		<li id="sidebar-nav-options"<?php if($this->active == 'options') echo ' class="active"'; ?>>
+			<a href="#" title="Options">Options</a>
+		</li>
+		<li id="sidebar-nav-backup"<?php if($this->active == 'backup') echo ' class="active"'; ?>>
+			<a href="#" title="Backup or restore">Backup</a>
+		</li>
+	</ul>
+	<ul class="sidebar-nav">
+		<li id="sidebar-nav-logout">
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'logout'), 'login'); ?>" title="Logout">Logout</a>
+		</li>
+	</ul>
+</div>

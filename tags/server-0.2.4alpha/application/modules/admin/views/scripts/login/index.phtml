@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Display UI Server | Login</title>
+<style type="text/css">
+<!--
+body {
+	margin: 0; padding: 0;
+	background-color: #206080;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 100%;
+}
+div {
+	padding: 0; margin: 0;
+}
+p {
+	line-height: 1.75;
+	font-size: 0.875em;
+	width: 40em;
+	margin-top: 1.75em; margin-bottom: 1.75em;
+}
+li {
+	font-size: 0.875em;
+	line-height: 1.75;
+}
+div#wrapper {
+	background-color: #FEFEFE;
+	width: 45em;
+	margin: 1em auto;
+	padding: 10px;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+div#header {
+	border-bottom: 1px #444 solid;
+	width: 35em;
+	text-align: center;
+	margin: 0 auto 2em auto;
+}
+div#body {
+	width: 30em;
+	margin: 1em auto;
+}
+h1 {
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: 2.25em;
+	margin: 1em 0;
+}
+h2, h3, h4, h5 {
+	font-weight: bold;
+}
+h2 {
+	font-size: 1.5em;
+}
+label {
+    font-weight: bold;
+}
+p+input, p+select {
+    margin-left: 10em;
+    margin-top: -3.75em;
+    width: 20em;
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 0.5em;
+    font-size: 0.875em;
+    display: block;
+}
+p.beforeinput {
+	margin-left: 2em;
+}
+input.submit {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 0.875em;
+	margin-right: 3em; margin-left: auto; margin-top: 1em;
+	padding: 0.5em; width: 5em;
+	display: block;
+}
+-->
+</style>
+</head>
+<body>
+<div id="wrapper">
+	<div id="header">
+		<h1>Log in to Display UI Server</h1>
+	</div>
+	<div id="body">
+		<form action="<?php echo $this->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'submit')); ?>" method="post" id="login_form" accept-charset="utf-8">
+		<div>
+			<p class="beforeinput"><label for="username">Username</label></p>
+			<input type="text" name="username" id="username" value="<?php if(!$this->valid) echo $this->username; ?>" />
+			<p class="beforeinput"><label for="password">Password</label></p>
+			<input type="password" name="password" id="password" />
+			<input class="submit" type="submit" value="Log in" />
+		</div>
+		</form>
+	</div>
+</div>
+</body>
+</html>
