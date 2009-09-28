@@ -1,0 +1,20 @@
+<?php
+$this->navActive = 'headlines';
+$this->title = 'Add Headlines';
+$this->headTitle('Add Headlines');
+?>
+<?php if($this->success) { ?>
+<p><strong>Great! Your headline was successfully added.</strong>
+<a href="<?php echo $this->url(array(
+			'module' => 'admin' ,
+			'controller' => 'headlines' ,
+			'action' => 'list'
+		));	?>">Manage headlines or add another one?</a></p>
+<?php } else { ?>
+<p><strong>Whoops, there was a problem inserting the headline into the database.</strong>
+<a href="<?php echo $this->url(array(
+			'module' => 'admin' ,
+			'controller' => 'headlines' ,
+			'action' => 'list'
+		));	?>">Go back to managing headlines.</a></p>
+<?php } ?>
