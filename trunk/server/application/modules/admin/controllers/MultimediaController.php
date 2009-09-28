@@ -165,8 +165,9 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow',
 			array(
 				'label' => 'Immediately activate?' ,
-				'required' => TRUE));
-		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No')->setDescription('Will this item begin showing immediately or at a later date?');
+				'required' => TRUE ,
+				'description' => 'Will this item begin showing immediately or at a later date?'));
+		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No');
 		$activates = new Zend_Form_Element_Text('mediumactivation',
 			array(
 				'label' => 'Start showing on (YYYY-MM-DD)' ,
@@ -175,18 +176,20 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			array(
 				'label' => 'Stop showing on (YYYY-MM-DD)' ,
 				'required' => FALSE));
-		$activates->addFilter('Alnum');
-		$expires->addFilter('Alnum');
+		$activates->addFilter('Digits');
+		$expires->addFilter('Digits');
 		$duration = new Zend_Form_Element_Text('mediumduration',
 			array(
-				'label' => 'Length to show image'));
-		$duration->setValue('15')->setDescription('This value is ignored for videos.');
+				'label' => 'Length to show image' ,
+				'description' => 'This value is ignored for videos.'));
+		$duration->setValue('15');
 		$weight = new Zend_Form_Element_Select('mediumweight',
 			array(
-				'label' => 'Weight'));
+				'label' => 'Weight' ,
+				'description' => 'A higher weight usually results in the file showing more frequently.'));
 		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(
 			1 ,
-			10))->setDescription('A higher weight usually results in the file showing more frequently.')->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
+			10))->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
 		$submit = new Zend_Form_Element_Submit('mediasubmit',
 			array(
 				'label' => 'Upload!'));
@@ -200,7 +203,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		$file = new Zend_Form_Element_File('mediumfile',
 			array(
 				'label' => 'Media file' ,
-				'required' => TRUE));
+				'required' => TRUE ,
+				'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV).'));
 		$file->addValidator('count', FALSE, 1)->addValidator('Extension', FALSE, array(
 			'jpg' ,
 			'jpeg' ,
@@ -209,12 +213,12 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			'mp4' ,
 			'avi' ,
 			'wmv' ,
-			'mkv'))->setDestination(MEDIA_DIR)->setDescription('Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV).');
+			'mkv'))->setDestination(MEDIA_DIR);
 		$clients = new Zend_Form_Element_Multiselect('mediumclients',
 			array(
 				'label' => 'Show on these clients' ,
-				'required' => TRUE));
-		$clients->setDescription('You can hold down Shift or Ctrl to select multiple clients.');
+				'required' => TRUE ,
+				'description' => 'You can hold down Shift or Ctrl to select multiple clients.'));
 		foreach ($listClients as $c) {
 			$clients->addMultiOption($c['id'], $c['sys_name']);
 		}

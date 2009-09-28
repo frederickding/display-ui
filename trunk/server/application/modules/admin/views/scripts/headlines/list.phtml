@@ -43,8 +43,46 @@ tr:hover td.expires, tr:hover td.active { color: inherit; }
 	padding: none;
 	margin: none;
 }
+form { font-size: 123.1%; }
+dd { margin-bottom: 1em; }
+input { margin-right: 0.25em; }
+label.optional { font-weight: normal; }
+label.optional:after { content: " (optional)"; color: #666666; }
+#addheadlinelink { color: inherit; }
+#addheadlinelink.expanded:before { content: "- "; font-weight: normal; color: #666666; }
+#addheadlinelink:not(.expanded):before { content: "+ "; font-weight: normal; color: #666666; }
+form p.description { font-size: 75%; }
+ul.errors {
+	color: #bb2200;
+}
+#headlineinsert {
+	margin: 1em auto;
+	border: 1px #aaaaaa solid;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	width: 100%;
+}
+#headlinemessage {
+	width: 95%;
+}
+');
+$this->inlineScript()->appendScript('$j(document).ready(function() {
+	if(window.location.pathname.search(/insert-process/) == -1) {
+		$j("#headlineinsert").hide();
+	} else {
+		$j("#addheadlinelink").addClass("expanded");
+	}
+	$j("#addheadlinelink").click(function(event) {
+		event.preventDefault();
+		$j("#headlineinsert").toggle("normal");
+		$j(this).toggleClass("expanded");
+	});
+});
 ');
 ?>
+<h2><a href="#" id="addheadlinelink">Add a headline</a></h2>
+<?php echo $this->insertForm; ?>
 <table cellspacing="0" id="headlines-list">
 	<tr class="heading">
 		<th class="id">ID</th>

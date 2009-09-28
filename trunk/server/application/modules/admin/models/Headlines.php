@@ -26,6 +26,11 @@
  */
 class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 {
+	/**
+	 * Fetch an array of headlines from the database table
+	 * @param int|string $_admin
+	 * @return array
+	 */
 	public function fetchHeadlines ($_admin)
 	{
 		if (! is_null($this->db)) {
@@ -36,10 +41,10 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 				'title' ,
 				'active' ,
 				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)') ,
-				'type'))
-			->join(array('c' => 'dui_clients'), 'h.client = c.id', array('sys_name'))
-			->join(array('u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array())
-			->order('id ASC');
+				'type'))->join(array(
+				'c' => 'dui_clients'), 'h.client = c.id', array(
+				'sys_name'))->join(array(
+				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array())->order('id ASC');
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
 				$select->where('u.id = ?', $_admin, 'INTEGER');
@@ -99,6 +104,28 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 		if (! is_null($this->db)) {
 			$result = $this->db->delete('dui_headlines', $this->db->quoteInto('id = ?', $_id, 'INTEGER'));
 			return (bool) $result;
+		}
+		return FALSE;
+	}
+	/**
+	 * Inserts a headline into the database from the Quickline form
+	 * @param string $_title
+	 * @param int $_clientId
+	 * @param string $_type
+	 * @return bool
+	 */
+	public function insertHeadline ($_title, $_clientId, $_type, $_expires = '')
+	{
+		if (! is_null($this->db)) {
+			$this->db->insert('dui_headlines', array(
+				'title' => trim($_title) ,
+				'active' => 1 ,
+				// make it expire in 1 month by default
+				'expires' => (! empty($_expires) && is_numeric($_expires)) ? $_expires : new Zend_Db_Expr(
+					'DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)') ,
+				'type' => $_type ,
+				'client' => $_clientId));
+			if ($this->db->lastInsertId()) return TRUE;
 		}
 		return FALSE;
 	}
