@@ -32,6 +32,7 @@ p {
 	font-size: 123.1%;
 	color: #383a3b;
 }
+dt label { font-weight: bold; }
 input[type=submit], input[type=reset] {
 	background-color: #efefef;
 	border: 1px #efefef solid;
