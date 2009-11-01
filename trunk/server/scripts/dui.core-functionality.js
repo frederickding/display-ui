@@ -23,7 +23,7 @@ var DisplayUI = {
 	 */
 	showSidebar : function () {
 		if($j('body').hasClass('first-load')) {
-			$j('div#sidebar').hide().animate({opacity: 1.0}, 1000).fadeIn(2000);
+			$j('div#sidebar').hide().animate({opacity: 1.0}, 500).fadeIn(1000);
 		}
 	},
 	/**
