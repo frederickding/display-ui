@@ -214,7 +214,7 @@ class InstallController extends Zend_Controller_Action
 			$this->_redirect($this->view->serverUrl()
 							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 		$this->_helper->viewRenderer->setNoRender();
-		$db = new Default_Model_Installsql(true);
+		$db = new Default_Model_InstallSql(true);
 		if(!$db->hasFirstUser()) {
 			// do stuff!
 			$req = $this->getRequest();
