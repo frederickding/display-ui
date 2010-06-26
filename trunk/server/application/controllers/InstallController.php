@@ -32,7 +32,7 @@ class InstallController extends Zend_Controller_Action
 		$this->session = new Zend_Session_Namespace('installer');
 		$this->view->inlineScript()
 			->appendFile('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js')
-			->appendFile('http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js')
+			->appendFile('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js')
 			->appendFile($this->view->baseUrl('scripts/jquery.qtip-1.0.0-rc3.min.js'));
 	}
 	/**
@@ -57,7 +57,7 @@ class InstallController extends Zend_Controller_Action
 							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 
 		// if PHP version is greater than 5.2.0, TRUE (pass)
-		$this->view->tests[0] = phpversion() >= '5.2.0';
+		$this->view->tests[0] = PHP_VERSION >= '5.2.0';
 		// hash is necessary
 		$this->view->tests[1] = extension_loaded('hash');
 		// curl?
