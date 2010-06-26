@@ -50,15 +50,15 @@ td.actions a.delete { color: #bb2200; }
 .image_type { color: #507b38; }
 .highlight {
 	background: #D7FFC1;
-	font-weight: bold;
 	text-align: center;
 	padding: 0.5em;
 	border-radius: 5px; border: 1px #ffffff solid;
 	-moz-border-radius: 5px;
 }
+#clicktoupload, #clicktoupload em { font-weight: bold; }
 ');
 ?>
-<p class="highlight"><a href="<?php echo $this->url(array(
+<p class="highlight" id="clicktoupload"><a href="<?php echo $this->url(array(
 		'module' => 'admin' ,
 		'controller' => 'multimedia' ,
 		'action' => 'upload'

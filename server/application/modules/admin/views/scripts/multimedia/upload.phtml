@@ -20,9 +20,16 @@ form p.description, form p.hint { font-size: 75%; color: #666666; }
 ul.errors {
 	color: #bb2200;
 }
+#hideoptional { display: none; }
 ');
 $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j(\'#mediumactivation-label, #mediumactivation-element\').hide();
+	function toggleOptional () {
+		$j(".optional").toggle(0, function() {
+			$j("#" + $j(this).attr("for") + ":not(#mediumactivation)").parent().toggle();
+		});
+	}
+	toggleOptional();
 	$j(\'#mediumactivatenow-element input\').change(function() {
 		var val = $j(\'#mediumactivatenow-element input:checked\').val();
 		switch(val) {
@@ -35,10 +42,9 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 				$j(\'#mediumactivation-label label\').addClass(\'optional\');
 		}
 	});
-	$j("#hideoptional").click(function() {
-		$j(".optional").toggle(0, function() {
-			$j("#" + $j(this).attr("for") + ":not(#mediumactivation)").parent().toggle();
-		});
+	$j("#hideoptional").css("display", "inline").text("Show optional fields.").click(function(event) {
+		event.preventDefault();
+		toggleOptional();
 		if($j(this).text() == "Hide optional fields.") $j(this).text("Show optional fields.");
 		else $j(this).text("Hide optional fields.");
 	});

@@ -26,9 +26,28 @@
  */
 class Api_Model_PlaylistItem
 {
+	/**
+	 * A single image in JPEG or PNG format
+	 */
 	const IMAGE_TYPE = 1;
+	/**
+	 * An unimplemented type of item that is a bullet-point text slide
+	 */
 	const TEXT_TYPE = 2;
+	/**
+	 * A single video file in a supported format
+	 */
 	const VIDEO_TYPE = 3;
+	/**
+	 * An unimplemented type of item that is an archive
+	 * containing a set of images (each valid in the IMAGE_TYPE)
+	 * to be played together.
+	 */
+	const IMAGESHOW_TYPE = 4;
+	/**
+	 * A simple alpha fade; custom transitions are currently unimplemented
+	 */
+	const FADE_TRANS = 0;
 	/**
 	 * Item type, one of the above
 	 * @var int
@@ -39,7 +58,6 @@ class Api_Model_PlaylistItem
 	 * @var int
 	 */
 	private $duration = 20;
-	const TRANS_FADE = 0;
 	/**
 	 * The transition between images
 	 * @var int
@@ -60,33 +78,40 @@ class Api_Model_PlaylistItem
 	 * @param int $trans
 	 * @return Api_Model_PlaylistItem fluent interface
 	 */
-	public function __construct($media_id, $type, $content, $duration = 20, $trans = 0)
+	public function __construct ($media_id, $type, $content, $duration = 20, $trans = 0)
 	{
 		$this->media_id = (int) $media_id;
-		if(1 <= $type && $type <= 3) {
+		if (1 <= $type && $type <= 3) {
 			$this->type = (int) $type;
-		} else die('Bad type for Api_Playlist_Item.');
+		} else
+			die('Bad type for Api_Playlist_Item.');
 		$this->duration = $duration;
 		$this->transition = (int) $trans;
-		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
+		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
 			$this->filename = $content['filename'];
-		} elseif($this->type == self::TEXT_TYPE) {
+		} elseif ($this->type == self::TEXT_TYPE) {
 			$this->filename = $content['filename'];
 		}
+	}
+	/**
+	 * @return int the item $type
+	 */
+	function getType ()
+	{
+		return $this->type;
 	}
 	/**
 	 * Produces a binary string containing all necessary item data
 	 * @return string
 	 */
-	public function __toString()
+	public function __toString ()
 	{
 		// TODO: add a byte (or bit) somewhere to force redownload
 		$binary = pack('cccV', $this->type, $this->duration, $this->transition, $this->media_id);
-		if($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
+		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
 			// 11 for the item/type headers and 5 for the extension
 			$binary .= pack('Va5', 11 + 5, pathinfo($this->filename, PATHINFO_EXTENSION));
 		}
 		return $binary;
 	}
-
 }
