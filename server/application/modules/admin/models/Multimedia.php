@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 {
 	const IMAGE_TYPE = 'image';
 	const VIDEO_TYPE = 'video';
+	const POWERPOINT_TYPE = 'ppt';
 	/**
 	 * Fetches all relevant details about multimedia in the database
 	 * @param int $_limit
@@ -37,14 +38,20 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 	{
 		if (! is_null($this->db)) { // only do something if DB is connected
 			$numberOf = $this->db->fetchOne($this->db->select()->from('dui_media', 'COUNT(*)'));
-			$batch = $this->db->select()->from('dui_media', array('id' ,
+			$batch = $this->db->select()->from('dui_media', array(
+				'id' ,
 				'title' ,
 				'active' => 'UTC_TIMESTAMP() > activates AND (UTC_TIMESTAMP() < expires OR expires IS NULL)' ,
 				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)') ,
-				'type' , 'weight'))->order('id DESC')->limitPage($_page, $_limit)->query()->fetchAll(Zend_Db::FETCH_ASSOC);
+				'type' ,
+				'weight'))->order('id DESC')->limitPage($_page, $_limit)->query()->fetchAll(Zend_Db::FETCH_ASSOC);
 			$firstOne = ($_page - 1) * ($_limit) + 1;
 			$lastOne = (count($batch) < $_limit) ? $firstOne + count($batch) - 1 : $firstOne + $_limit - 1;
-			return array($numberOf , $batch , $firstOne , $lastOne);
+			return array(
+				$numberOf ,
+				$batch ,
+				$firstOne ,
+				$lastOne);
 		}
 		return array();
 	}
@@ -57,10 +64,28 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 	public function insertMultimedia ($_data, $mime = 'application/octet-stream')
 	{
 		if (! is_null($this->db)) { // only do something if DB is connected
+			$extension = pathinfo($_data['mediumfile'], PATHINFO_EXTENSION);
 			// Build our dataset
-			$type = in_array(pathinfo($_data['mediumfile'], PATHINFO_EXTENSION), array(
-				'jpeg' , 'jpg' , 'png')) ? 'image' : (in_array(pathinfo($_data['mediumfile'], PATHINFO_EXTENSION), array(
-				'mov' , 'mp4' , 'avi' , 'wmv' , 'mkv')) ? 'video' : '');
+			$type = '';
+			if (in_array($extension, array(
+				'jpeg' ,
+				'jpg' ,
+				'png'))) {
+				$type = IMAGE_TYPE;
+			} elseif (in_array($extension, array(
+				'mov' ,
+				'mp4' ,
+				'avi' ,
+				'wmv' ,
+				'mkv'))) {
+				$type = VIDEO_TYPE;
+			} elseif (in_array($extension, array(
+				'ppt' ,
+				'pptx' ,
+				'pps' ,
+				'ppsx'))) {
+				$type = POWERPOINT_TYPE;
+			}
 			foreach ($_data['mediumclients'] as $c) {
 				$clients .= $c . ',';
 			}
@@ -72,14 +97,15 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'activates' => (($_data['mediumactivatenow']) ? new Zend_Db_Expr(
 					'UTC_TIMESTAMP()') : $_data['mediumactivation']) ,
 				'active' => 1 ,
-				'type' => $type , 'clients' => $clients ,
+				'type' => $type ,
+				'clients' => $clients ,
 				'weight' => (int) $_data['mediumweight'] ,
 				// FIXME: MASSIVELY BROKEN OVERWRITING WITH DUPLICATE FILENAMES
 				'content' => $_data['mediumfile'] . ';' . $mime);
 			if (! empty($_data['mediumexpiration'])) {
 				$insertData['expires'] = $_data['mediumexpiration'];
 			}
-			if($type == 'image') {
+			if ($type == 'image') {
 				if (! empty($_data['mediumduration']) && is_numeric($_data['mediumduration'])) {
 					$insertData['content'] .= ';' . $_data['mediumduration'];
 				}
@@ -104,8 +130,11 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 			/*
 			 * A complex SQL query to find ONLY clients to which the current user has access
 			 */
-			$query = $this->db->select()->from(array('c' => 'dui_clients'), array(
-				'id' , 'sys_name'))->join(array('u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')', array())->order('c.id ASC')->limit($_limit);
+			$query = $this->db->select()->from(array(
+				'c' => 'dui_clients'), array(
+				'id' ,
+				'sys_name'))->join(array(
+				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')', array())->order('c.id ASC')->limit($_limit);
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
 				$query->where('u.id = ?', $_admin, 'INTEGER');
@@ -136,8 +165,10 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 			 * a clients column. We have to use SQL to find admins who have access to clients
 			 * which are listed in the media item.
 			 */
-			$query = $this->db->select()->from(array('m' => 'dui_media'), array(
-				'm.id'))->joinInner(array('c' => 'dui_clients'), 'm.clients REGEXP CONCAT( \'(^|[0-9]*,)\', c.id, \'(,|$)\' )', array())->joinInner(array(
+			$query = $this->db->select()->from(array(
+				'm' => 'dui_media'), array(
+				'm.id'))->joinInner(array(
+				'c' => 'dui_clients'), 'm.clients REGEXP CONCAT( \'(^|[0-9]*,)\', c.id, \'(,|$)\' )', array())->joinInner(array(
 				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array())->where('m.id = ?', $_id)->limit(1);
 			// Oops, debugging code.
 			// error_log($query->assemble());
@@ -162,8 +193,10 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 		if (! is_null($this->db)) {
 			$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
 			$query = $this->db->select()->from('dui_media', array(
-				'filename' => new Zend_Db_Expr('SUBSTR(`content`, 1, LOCATE(\';\', `content`)-1)'),
-				'data' => new Zend_Db_Expr($this->db->quoteIdentifier('data').' IS NULL')))->where('id = ?', $_id, 'INTEGER')->limit(1);
+				'filename' => new Zend_Db_Expr(
+					'SUBSTR(`content`, 1, LOCATE(\';\', `content`)-1)') ,
+				'data' => new Zend_Db_Expr(
+					$this->db->quoteIdentifier('data') . ' IS NULL')))->where('id = ?', $_id, 'INTEGER')->limit(1);
 			$queryR = $this->db->fetchRow($query);
 			$result = $this->db->delete('dui_media', $this->db->quoteInto('id = ?', $_id, 'INTEGER'));
 			if ($queryR->data == 1) {
@@ -180,12 +213,14 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 		if (! is_null($this->db)) {
 			$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
 			$query = $this->db->select()->from('dui_media', array(
-				'filename' => new Zend_Db_Expr('SUBSTR(`content`, 1, LOCATE(\';\', `content`)-1)'),
-				'mime' => new Zend_Db_Expr('SUBSTR(`content`, LOCATE(\';\', `content`)+1, CHAR_LENGTH(`content`))'),
-				'type',
-				'data' => new Zend_Db_Expr($this->db->quoteIdentifier('data').' IS NULL'),
-				'fileBinary' => 'data'
-			))->where('id = ?', $_id, 'INTEGER')->limit(1);
+				'filename' => new Zend_Db_Expr(
+					'SUBSTR(`content`, 1, LOCATE(\';\', `content`)-1)') ,
+				'mime' => new Zend_Db_Expr(
+					'SUBSTR(`content`, LOCATE(\';\', `content`)+1, CHAR_LENGTH(`content`))') ,
+				'type' ,
+				'data' => new Zend_Db_Expr(
+					$this->db->quoteIdentifier('data') . ' IS NULL') ,
+				'fileBinary' => 'data'))->where('id = ?', $_id, 'INTEGER')->limit(1);
 			$queryR = $this->db->fetchRow($query);
 			if ($queryR->data == 1 && $queryR->type == self::IMAGE_TYPE) {
 				$queryR->fileBinary = file_get_contents(realpath(MEDIA_DIR . '/' . $queryR->filename));

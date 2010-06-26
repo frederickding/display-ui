@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,14 +26,23 @@
  */
 class Admin_Model_Clients extends Default_Model_DatabaseAbstract
 {
+	/**
+	 * Retrieves an associative array of all clients to which the specified user
+	 * has access, based on his/her username or user ID.
+	 *
+	 * @param int|string $_admin	username or user ID
+	 * @return array an array of clients
+	 */
 	public function fetchClients ($_admin)
 	{
 		if (! is_null($this->db)) {
-			$select = $this->db->select()->from(array('c' => 'dui_clients'), array('id' ,
-				'sys_name' , 'last_active'))
-			->join(array('u' => 'dui_users'), 'c.admin = u.id', array(
-				'admin' => 'username'))
-			->order('id ASC');
+			$select = $this->db->select()->from(array(
+				'c' => 'dui_clients'), array(
+				'id' ,
+				'sys_name' ,
+				'last_active'))->join(array(
+				'u' => 'dui_users'), 'c.admin = u.id', array(
+				'admin' => 'username'))->order('id ASC');
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
 				$select->where('u.id = ?', $_admin, 'INTEGER');

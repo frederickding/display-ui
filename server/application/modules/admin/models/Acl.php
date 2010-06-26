@@ -100,7 +100,7 @@ class Admin_Model_Acl
 		// deny publishers all access to backup/restore functionality
 		$this->acl->deny('publisher', 'backuprestore', NULL)
 		// deny publishers write access to client system info
-				  ->deny('publisher', 'clients', array('add', 'edit', 'delete'))
+				  ->deny('publisher', 'clients', array('add', 'edit', 'delete', 'link'))
 		// deny publishers access to users resource
 				  ->deny('publisher', 'users', NULL)
 		// deny IT write access to content functionality

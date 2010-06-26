@@ -160,6 +160,9 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				case 'text':
 					$item['type'] = Api_Model_PlaylistItem::TEXT_TYPE;
 					break;
+				case 'ppt':
+					$item['type'] = Api_Model_PlaylistItem::POWERPOINT_TYPE;
+					break;
 				default:
 					$item['type'] = (int) 0;
 			}

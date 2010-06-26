@@ -45,6 +45,11 @@ class Api_Model_PlaylistItem
 	 */
 	const IMAGESHOW_TYPE = 4;
 	/**
+	 * An unimplemented type of item that is a PowerPoint file to be played
+	 * on a compatible Windows client with PowerPoint installed.
+	 */
+	const POWERPOINT_TYPE = 5;
+	/**
 	 * A simple alpha fade; custom transitions are currently unimplemented
 	 */
 	const FADE_TRANS = 0;
@@ -81,13 +86,14 @@ class Api_Model_PlaylistItem
 	public function __construct ($media_id, $type, $content, $duration = 20, $trans = 0)
 	{
 		$this->media_id = (int) $media_id;
-		if (1 <= $type && $type <= 3) {
+		if (1 <= $type && $type <= 5) {
 			$this->type = (int) $type;
 		} else
+			// throw new Exception('Bad type for Api_Playlist_Item', 100);
 			die('Bad type for Api_Playlist_Item.');
 		$this->duration = $duration;
 		$this->transition = (int) $trans;
-		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
+		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE || $this->type == self::POWERPOINT_TYPE) {
 			$this->filename = $content['filename'];
 		} elseif ($this->type == self::TEXT_TYPE) {
 			$this->filename = $content['filename'];
@@ -108,7 +114,7 @@ class Api_Model_PlaylistItem
 	{
 		// TODO: add a byte (or bit) somewhere to force redownload
 		$binary = pack('cccV', $this->type, $this->duration, $this->transition, $this->media_id);
-		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE) {
+		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE || $this->type == self::POWERPOINT_TYPE) {
 			// 11 for the item/type headers and 5 for the extension
 			$binary .= pack('Va5', 11 + 5, pathinfo($this->filename, PATHINFO_EXTENSION));
 		}
