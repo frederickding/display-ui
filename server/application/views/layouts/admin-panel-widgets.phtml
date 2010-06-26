@@ -50,6 +50,9 @@ echo $this->headMeta() . "\n"; ?>
 		event.preventDefault();
 		DisplayUI.logout();
 	});
+	$j(\'div.widgets-widget h2\').click(function (event) {
+		DisplayUI.toggleWidget($j(this));
+	});
 });'); ?>
 <!-- Processing took <?php echo number_format(microtime(TRUE) - PERFORMANCE_TIMER, 5); ?> seconds -->
 </body>

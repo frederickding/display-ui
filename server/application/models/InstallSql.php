@@ -24,7 +24,7 @@
 /**
  * Provides database access for the installer
  */
-class Default_Model_Installsql extends Default_Model_DatabaseAbstract
+class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 {
 	private $_driver;
 	private $_host;
