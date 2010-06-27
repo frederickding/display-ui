@@ -35,7 +35,10 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
 				'module' => 'admin' ,
 				'controller' => 'login' ,
-				'action' => 'index')));
+				'action' => 'index')) . '?redirect=' . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => $this->_request->getControllerName() ,
+				'action' => $this->_request->getActionName())));
 		}
 		// configuration object
 		if (Zend_Registry::isRegistered('configuration_ini')) {
@@ -204,7 +207,7 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			array(
 				'label' => 'Media file' ,
 				'required' => TRUE ,
-				'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV).'));
+				'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, PPT(X), PPS(X)).'));
 		$file->addValidator('count', FALSE, 1)->addValidator('Extension', FALSE, array(
 			'jpg' ,
 			'jpeg' ,
@@ -213,7 +216,11 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			'mp4' ,
 			'avi' ,
 			'wmv' ,
-			'mkv'))->setDestination(MEDIA_DIR);
+			'mkv' ,
+			'ppt' ,
+			'pptx' ,
+			'pps' ,
+			'ppsx'))->setDestination(MEDIA_DIR);
 		$clients = new Zend_Form_Element_Multiselect('mediumclients',
 			array(
 				'label' => 'Show on these clients' ,

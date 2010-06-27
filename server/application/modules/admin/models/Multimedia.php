@@ -67,24 +67,25 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 			$extension = pathinfo($_data['mediumfile'], PATHINFO_EXTENSION);
 			// Build our dataset
 			$type = '';
+			$clients = '';
 			if (in_array($extension, array(
 				'jpeg' ,
 				'jpg' ,
 				'png'))) {
-				$type = IMAGE_TYPE;
+				$type = self::IMAGE_TYPE;
 			} elseif (in_array($extension, array(
 				'mov' ,
 				'mp4' ,
 				'avi' ,
 				'wmv' ,
 				'mkv'))) {
-				$type = VIDEO_TYPE;
+				$type = self::VIDEO_TYPE;
 			} elseif (in_array($extension, array(
 				'ppt' ,
 				'pptx' ,
 				'pps' ,
 				'ppsx'))) {
-				$type = POWERPOINT_TYPE;
+				$type = self::POWERPOINT_TYPE;
 			}
 			foreach ($_data['mediumclients'] as $c) {
 				$clients .= $c . ',';
