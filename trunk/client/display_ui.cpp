@@ -38,8 +38,8 @@
 
 // because dshow.h does REALLY stupid stuff
 // (see line 7673 of strsafe.h. WTF, microsoft)
-#undef sprintf
-#undef strcat
+//#undef sprintf
+//#undef strcat
 
 #include "resource.h"
 #include "display_ui.h"
@@ -114,9 +114,9 @@ void update_playlist(void *p) {
 
 // Reads headline data from a file
 void load_headlines(){
-	FILE *fp = fopen("data\\headlines.dat", "r");
-	
-	if(fp) {
+	FILE *fp;
+		
+	if(!fopen_s(&fp, "data\\headlines.dat", "r")){
 		if(g_headline_txt) {
 			free(g_headline_txt);
 		}
@@ -556,26 +556,26 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 				// Print progress message for images.
 				image_element_t *img = (image_element_t *)g_current_elem->data;
 				if(g_current_elem->progress_total){
-					sprintf(msg, "Progress: %d%%\nFile: %s\n%d/%d bytes.", (int)(g_current_elem->progress_now/g_current_elem->progress_total * 100), 
+					sprintf_s(msg, 64, "Progress: %d%%\nFile: %s\n%d/%d bytes.", (int)(g_current_elem->progress_now/g_current_elem->progress_total * 100), 
 						img->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
 				}else{
 					// Avoid division by zero if total is unknown.
-					sprintf(msg, "File: %s\n%d bytes downloaded.", img->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
+					sprintf_s(msg, 64, "File: %s\n%d bytes downloaded.", img->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
 				}
 				
 			}else if(g_current_elem->type == 3){
 				// Print progress message for videos.
 				video_element_t *vid = (video_element_t *)g_current_elem->data;
 				if(g_current_elem->progress_total){
-					sprintf(msg, "Progress: %d%%\nFile: %s\n%d/%d bytes.", (int)(g_current_elem->progress_now/g_current_elem->progress_total * 100), 
+					sprintf_s(msg, 64, "Progress: %d%%\nFile: %s\n%d/%d bytes.", (int)(g_current_elem->progress_now/g_current_elem->progress_total * 100), 
 						vid->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
 				}else{
 					// Avoid division by zero if total is unknown.
-					sprintf(msg, "File: %s\n%d bytes downloaded.", vid->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
+					sprintf_s(msg, 64, "File: %s\n%d bytes downloaded.", vid->filename, (int)g_current_elem->progress_now, (int)g_current_elem->progress_total);
 				}
 				
 			}else{
-				sprintf(msg, "%d bytes downloaded.", (int)g_current_elem->progress_now);
+				sprintf_s(msg, 64, "%d bytes downloaded.", (int)g_current_elem->progress_now);
 			}
 
 			SelectObject(hdcMem, g_font_dejavusans_cond_bold_24);
@@ -607,11 +607,11 @@ void repaint_content(HWND hWnd, HDC hdcMem, PAINTSTRUCT ps){
 void repaint_weather(HDC hdcMem, PAINTSTRUCT ps){
 	
 	char *days_abbr[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-	tm *ptm;
+	tm newtime;
 	time_t rawtime;
 	
 	time (&rawtime);
-	ptm = localtime(&rawtime);
+	localtime_s(&newtime, &rawtime);
 
 	// Get current weather data.
 	weather_t *current = weather_getcurrent();
@@ -682,15 +682,15 @@ void repaint_weather(HDC hdcMem, PAINTSTRUCT ps){
 		textBound.right = CONTENT_WIDTH + 145; textBound.bottom = CONTENT_TOP + 228 + 30;
 		
 		// Draw day name for first day
-		DrawTextA(hdcMem, days_abbr[ptm->tm_wday == 6 ? 0 : ptm->tm_wday + 1], 
-				strlen(days_abbr[ptm->tm_wday == 6 ? 0 : ptm->tm_wday + 1]), &textBound, DT_RIGHT);
+		DrawTextA(hdcMem, days_abbr[newtime.tm_wday == 6 ? 0 : newtime.tm_wday + 1], 
+				strlen(days_abbr[newtime.tm_wday == 6 ? 0 : newtime.tm_wday + 1]), &textBound, DT_RIGHT);
 		
 		textBound.left = CONTENT_WIDTH + 150; textBound.top = CONTENT_TOP + 228;
 		textBound.right = CONTENT_WIDTH + 150 + 145; textBound.bottom = CONTENT_TOP + 228 + 30;
 		
 		// Draw day name for second day. Make sure that day loops back correctly for weekends.
-		DrawTextA(hdcMem, days_abbr[ptm->tm_wday == 6 ? 1 : (ptm->tm_wday == 5 ? 0 : ptm->tm_wday + 2)], 
-				strlen(days_abbr[ptm->tm_wday == 6 ? 1 : (ptm->tm_wday == 5 ? 0 : ptm->tm_wday + 2)]), &textBound, DT_RIGHT);
+		DrawTextA(hdcMem, days_abbr[newtime.tm_wday == 6 ? 1 : (newtime.tm_wday == 5 ? 0 : newtime.tm_wday + 2)], 
+				strlen(days_abbr[newtime.tm_wday == 6 ? 1 : (newtime.tm_wday == 5 ? 0 : newtime.tm_wday + 2)]), &textBound, DT_RIGHT);
 
 		
 		// If both weather forecast icons are done loading, draw them
@@ -723,13 +723,13 @@ void repaint_weather(HDC hdcMem, PAINTSTRUCT ps){
 		// Draw high and low temps for both forecast days
 
 		char high[8];		
-		sprintf(high, "hi %s", forecast[0]->temp_hi);
+		sprintf_s(high, 8, "hi %s", forecast[0]->temp_hi);
 		textBound.left = CONTENT_WIDTH; textBound.top = CONTENT_TOP + 328;
 		textBound.right = CONTENT_WIDTH + 120; textBound.bottom = CONTENT_TOP + 328 + 40;
 		SelectObject(hdcMem, g_font_dejavusans_cond_bold_32);
 		DrawTextA(hdcMem, high, strlen(high), &textBound, DT_RIGHT);
 
-		sprintf(high, "hi %s", forecast[1]->temp_hi);
+		sprintf_s(high, 8, "hi %s", forecast[1]->temp_hi);
 		textBound.left = CONTENT_WIDTH + 150; textBound.top = CONTENT_TOP + 328;
 		textBound.right = CONTENT_WIDTH + 150 + 120; textBound.bottom = CONTENT_TOP + 328 + 40;
 		DrawTextA(hdcMem, high, strlen(high), &textBound, DT_RIGHT);
@@ -760,28 +760,28 @@ void repaint_header(HDC hdcMem, PAINTSTRUCT ps){
 	char *days_abbr[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 	
 	time_t rawtime;
-	tm *ptm;
+	tm newtime;
 	char datetimestr[17];
 	
 	time (&rawtime);
-	ptm = localtime(&rawtime);
+	localtime_s(&newtime, &rawtime);
 	
 	// Draw background image
 	StretchDIBits(hdcMem, 0, TOP_SPACER, DISPLAY_WIDTH, CONTENT_TOP - TOP_SPACER, 0, 0, DISPLAY_WIDTH, CONTENT_TOP - TOP_SPACER, 
 		FreeImage_GetBits(g_fbmp_header), FreeImage_GetInfo(g_fbmp_header), DIB_RGB_COLORS, SRCCOPY);
 	
 	// Draw date in format [month day, year]
-	strftime(datetimestr, 16, "%b %d, %Y", ptm);
+	strftime(datetimestr, 16, "%b %d, %Y", &newtime);
 	SetBkMode(hdcMem, TRANSPARENT); 
 	SetTextColor(hdcMem, RGB(255, 255, 255));
 	SelectObject(hdcMem, g_font_dejavusans_bold_20);
-	TextOut(hdcMem, CONTENT_WIDTH - 260, TOP_SPACER + 25, days[ptm->tm_wday], strlen(days[ptm->tm_wday]));
+	TextOut(hdcMem, CONTENT_WIDTH - 260, TOP_SPACER + 25, days[newtime.tm_wday], strlen(days[newtime.tm_wday]));
 	SelectObject(hdcMem, g_font_dejavusans_cond_bold_32);
 	TextOut(hdcMem, CONTENT_WIDTH - 263, TOP_SPACER + 50, datetimestr, strlen(datetimestr));
 	
 	// Draw time in 24-hr format
 	memset(datetimestr, 0, 17);
-	strftime(datetimestr, 16, "%H:%M:%S", ptm);
+	strftime(datetimestr, 16, "%H:%M:%S", &newtime);
 	SelectObject(hdcMem, g_font_dejavusans_cond_bold_58);
 	TextOut(hdcMem, CONTENT_WIDTH + 20, TOP_SPACER + 27, datetimestr, strlen(datetimestr));
 	
@@ -825,11 +825,12 @@ void repaint_headlines(HDC hdcMem, PAINTSTRUCT ps){
 //				end in &. If it does not have additional params, it should not end in ? as it will be appended. 
 //				Examples:	/api/weather/current/?location=CAXX0401    -- with additional params
 //							/api/playlists/fetch/					   -- without additional params
-void make_url(char *dest, char *url){
+//		full_url_ln: Length in bytes of buffer pointed to by dest
+void make_url(char *dest, char *url, int full_url_ln){
 	if(strchr(url, '?') == NULL){
-		sprintf(dest, "%s%s?sys_name=%s&sig=%s", config_get_url(), url, config_get_sysname(), config_get_sig());
+		sprintf_s(dest, full_url_ln, "%s%s?sys_name=%s&sig=%s", config_get_url(), url, config_get_sysname(), config_get_sig());
 	}else{
-		sprintf(dest, "%s%s&sys_name=%s&sig=%s", config_get_url(), url, config_get_sysname(), config_get_sig());
+		sprintf_s(dest, full_url_ln, "%s%s&sys_name=%s&sig=%s", config_get_url(), url, config_get_sysname(), config_get_sig());
 	}
 }
 
@@ -912,7 +913,7 @@ int download_curl(char *url, char *dest_file, bool show_progress, void *callback
 //					overwritten if it does exist.
 int download_curl(char *url, char *dest_file){
 	char *temp_dest = (char *) malloc(strlen(dest_file) + 5);
-	sprintf(temp_dest, "%s.tmp", dest_file);
+	sprintf_s(temp_dest, strlen(dest_file) + 5, "%s.tmp", dest_file);
 	
 	int ret = download_curl(url, temp_dest, false, NULL, NULL);
 	
@@ -943,12 +944,13 @@ int download_curl(char *url, char *dest_file){
 //		arg:		Parameter that is passed to the callback function. Can be NULL if the callback does not
 //					use it. This parameter is ignored if show_progress is FALSE.
 int dui_download(char *url, char *dest_file, bool show_progress, void *callback, void *arg){
-
-	char *full_url = (char *) malloc(strlen(config_get_url()) + strlen(url) + strlen("&sys_name=&sig=")
-									+ strlen(config_get_sysname()) + strlen(config_get_sig()) + 1);
+	
+	int full_url_ln = strlen(config_get_url()) + strlen(url) + strlen("&sys_name=&sig=")
+		+ strlen(config_get_sysname()) + strlen(config_get_sig()) + 1;
+	char *full_url = (char *) malloc(full_url_ln);
 	char *temp_dest = (char *) malloc(strlen(dest_file) + 5);
-	make_url(full_url, url);
-	sprintf(temp_dest, "%s.tmp", dest_file);
+	make_url(full_url, url, full_url_ln);
+	sprintf_s(temp_dest, strlen(dest_file) + 5, "%s.tmp", dest_file);
 
 	int ret = download_curl(full_url, temp_dest, show_progress, callback, arg);
 

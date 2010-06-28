@@ -21,7 +21,7 @@ int config_load(){
 	char path[MAX_PATH + 16];
 	
 	GetCurrentDirectory(MAX_PATH, path);
-	strcat(path, "\\display_ui.ini");
+	strcat_s(path, MAX_PATH + 16, "\\display_ui.ini");
 	debug_print("[config_load] ini path: %s\n", path);
 	
 	GetPrivateProfileString("system", "api_key", "undefined", g_api_key, 65, path);
@@ -43,7 +43,7 @@ int config_load(){
 	VerQueryValue(version_info, "\\", (void **)&vs_ffi, &vs_ffi_size);
 	debug_print("[config_load] vs_ffi: given %d, req'd %d\n", sizeof(VS_FIXEDFILEINFO), vs_ffi_size);
 
-	sprintf(g_version, "%d.%d.%d.%d", HIWORD(vs_ffi->dwFileVersionMS), LOWORD(vs_ffi->dwFileVersionMS), 
+	sprintf_s(g_version, "%d.%d.%d.%d", HIWORD(vs_ffi->dwFileVersionMS), LOWORD(vs_ffi->dwFileVersionMS), 
 		HIWORD(vs_ffi->dwFileVersionLS), LOWORD(vs_ffi->dwFileVersionLS));
 	
 	debug_print("[config_load] file version: %s\n", g_version);
@@ -59,10 +59,10 @@ int config_load(){
 	osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osver);
 
-	sprintf(g_winver, "%d.%d", osver.dwMajorVersion, osver.dwMinorVersion);
+	sprintf_s(g_winver, "%d.%d", osver.dwMajorVersion, osver.dwMinorVersion);
 	debug_print("[config_load] windows version: %s\n", g_winver);
 	
-	sprintf(g_useragent, "Mozilla/5.0 (compatible; Windows NT %s) DisplayUIClient/%s", g_winver, g_version);
+	sprintf_s(g_useragent, "Mozilla/5.0 (compatible; Windows NT %s) DisplayUIClient/%s", g_winver, g_version);
 	
 	debug_print("[config_load] user agent: %s\n", g_useragent);
 	
@@ -73,17 +73,17 @@ int config_load(){
 void config_generate_sig() {
 	char date[11];
 	time_t rawtime;
-	tm * ptm;
+	tm newtime;
 
 
 	debug_print("[config_generate_sig] api key: %s\n", g_api_key);
 	debug_print("[config_generate_sig] sys_name: %s\n", g_sys_name);
 	debug_print("[config_generate_sig] g_server_url: %s\n", g_server_url);
 
-	time (&rawtime);
-	ptm = gmtime (&rawtime);
+	time(&rawtime);
+	gmtime_s(&newtime, &rawtime);
 	
-	strftime(date, 11, "%Y-%m-%d", ptm);
+	strftime(date, 11, "%Y-%m-%d", &newtime);
 	
 	debug_print("[config_generate_sig] date: %s\n", date);
 
@@ -99,8 +99,8 @@ void config_generate_sig() {
 		for(int i = 0; i < 20; i++) {
 			char temp[3];
 			memset(temp, 0, 3);
-			sprintf(temp, "%02x", Message_Digest[i]);
-			strcat(g_sig, temp);
+			sprintf_s(temp, 3, "%02x", Message_Digest[i]);
+			strcat_s(g_sig, 41, temp);
 		}
 	} else {
 		// TODO: handle errors

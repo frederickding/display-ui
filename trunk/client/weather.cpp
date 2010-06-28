@@ -75,18 +75,18 @@ unsigned long weather_update(void *p, bool download_new){
 
 	// Read from the file if download was OK, or if redownload wasn't requested
 	if(result == CURLE_OK || !download_new){
-		FILE *fp = fopen("data\\weather\\weather_c.dat", "r");
+		FILE *fp;
 
-		if(fp){
+		if(!fopen_s(&fp, "data\\weather\\weather_c.dat", "r")){
 			int temp = 0;
-			fscanf(fp, "%d", &current.condition);
-			fscanf(fp, "%d", &temp);
+			fscanf_s(fp, "%d", &current.condition);
+			fscanf_s(fp, "%d", &temp);
 			
 			// YESSSS no more widechar crap. GDI owns.
-			sprintf(current.temp, "%d°C", temp);
+			sprintf_s(current.temp, 6, "%d°C", temp);
 
 			int length;
-			fscanf(fp, "%d ", &length);
+			fscanf_s(fp, "%d ", &length);
 			if(current.description) free(current.description);
 			current.description = (char *) malloc(length + 2);
 
@@ -99,12 +99,12 @@ unsigned long weather_update(void *p, bool download_new){
 
 			char imgurl[48];
 			time_t rawtime;
-			tm *ptm;
+			tm newtime;
 			time (&rawtime);
-			ptm = localtime(&rawtime);
+			localtime_s(&newtime, &rawtime);
 
 			// Create URL based on condition and time of day
-			sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%d%c.png", current.condition, (ptm->tm_hour < 6 || ptm->tm_hour > 19) ? 'n' : 'd');
+			sprintf_s(imgurl, 48, "http://l.yimg.com/a/i/us/nws/weather/gr/%d%c.png", current.condition, (newtime.tm_hour < 6 || newtime.tm_hour > 19) ? 'n' : 'd');
 			
 			// Download a weather icon
 			download_curl(imgurl, "img\\current.png");
@@ -135,21 +135,21 @@ unsigned long weather_update(void *p, bool download_new){
 	
 	// If forecast info was downloaded correctly, or if no download was requested, read from the data file.
 	if(result == CURLE_OK || !download_new) {
-		FILE *fp = fopen("data\\weather\\weather_fc.dat", "r");
-
-		if(fp) {
+		FILE *fp;
+		
+		if(!fopen_s(&fp, "data\\weather\\weather_fc.dat", "r")) {
 			for(int i = 0; i < 2; i++){
 				int temp_hi = 0;
 				int temp_lo = 0;
-				fscanf(fp, "\n%d", &forecast[i]->condition);
-				fscanf(fp, "%d", &temp_hi);
-				fscanf(fp, "%d", &temp_lo);
+				fscanf_s(fp, "\n%d", &forecast[i]->condition);
+				fscanf_s(fp, "%d", &temp_hi);
+				fscanf_s(fp, "%d", &temp_lo);
 
-				sprintf(forecast[i]->temp_hi, "%d°", temp_hi);
-				sprintf(forecast[i]->temp_lo, "%d", temp_lo);
+				sprintf_s(forecast[i]->temp_hi, 6, "%d°", temp_hi);
+				sprintf_s(forecast[i]->temp_lo, 6, "%d", temp_lo);
 
 				int length;
-				fscanf(fp, "%d ", &length);
+				fscanf_s(fp, "%d ", &length);
 				if(forecast[i]->description) free(forecast[i]->description);
 				forecast[i]->description = (char *) malloc(length + 1);
 
@@ -162,8 +162,8 @@ unsigned long weather_update(void *p, bool download_new){
 				char filename[19];
 
 				// Create URL based on condition and filename based on FC day number
-				sprintf(imgurl, "http://l.yimg.com/a/i/us/nws/weather/gr/%dd.png", forecast[i]->condition);
-				sprintf(filename, "img\\forecast_%d.png", i);
+				sprintf_s(imgurl, 48, "http://l.yimg.com/a/i/us/nws/weather/gr/%dd.png", forecast[i]->condition);
+				sprintf_s(filename, 19, "img\\forecast_%d.png", i);
 				
 				download_curl(imgurl, filename);
 				
