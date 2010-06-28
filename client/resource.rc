@@ -76,7 +76,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,3,5,2
+ FILEVERSION 0,3,9,24
  PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x20L
 #ifdef _DEBUG
@@ -90,10 +90,10 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "1001004b0"
+        BLOCK "1001009b0"
         BEGIN
             VALUE "FileDescription", "Display UI Client Executable\0"
-            VALUE "FileVersion", "0, 3, 5, 2\0"
+            VALUE "FileVersion", "0, 3, 9, 24\0"
             VALUE "InternalName", "display_ui\0"
             VALUE "LegalCopyright", "Copyright (C) 2009 Kirill Peretoltchine & Frederick Ding\0"
             VALUE "OriginalFilename", "display_ui.exe\0"

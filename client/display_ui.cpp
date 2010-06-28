@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <Qedit.h>
+//#include <Qedit.h>
 #include <dshow.h>
 
 #include <curl\curl.h>
@@ -159,9 +159,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	RegisterClassEx(&wc);
 	
 	debug_init();
-	weather_init();
 	config_load();
+
 	config_generate_sig();
+
+	weather_init();
 
 #ifdef FULLSCREEN
 	
@@ -254,9 +256,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		g_fbmp_headlines2		= FreeImage_Load(FIF_JPEG, "img\\headlines-2.jpg", JPEG_DEFAULT);
 #endif		
 		g_fbmp_weatherbg		= FreeImage_Load(FIF_PNG, "img\\partlycloudy.png", PNG_DEFAULT);
-		g_fbmp_weathergrad	= FreeImage_Load(FIF_PNG, "img\\weathergrad.png", PNG_DEFAULT);
+		g_fbmp_weathergrad		= FreeImage_Load(FIF_PNG, "img\\weathergrad.png", PNG_DEFAULT);
 		g_fbmp_headlines1		= FreeImage_Load(FIF_JPEG, "img\\headlines-1.jpg", JPEG_DEFAULT);
-		g_fbmp_loading		= FreeImage_Load(FIF_PNG, "img\\loading.png", PNG_DEFAULT);
+		g_fbmp_loading			= FreeImage_Load(FIF_PNG, "img\\loading.png", PNG_DEFAULT);
 
 		// Initialize global fonts to use throughout application
 		g_font_dejavusans_bold_20 = MakeFont("DejaVu Sans", true, false, false, 20);
@@ -370,6 +372,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		// Unload everything when program is shut down.
 		playlist_unload();
+		
+		debug_print("[msg loop] playlist unloaded!\n");
 
 		FreeImage_Unload(g_fbmp_bg);
 		FreeImage_Unload(g_fbmp_header);
@@ -388,10 +392,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteObject(g_font_dejavusans_cond_bold_32);
 		DeleteObject(g_font_dejavusans_cond_bold_42);
 		DeleteObject(g_font_dejavusans_cond_bold_58);
-		
+
+		debug_print("[msg loop] fonts and graphics unloaded!\n");
 		debug_close();
+		debug_print("[msg loop] debug unloaded!\n");
 		weather_exit();
+		debug_print("[msg loop] weather unloaded!\n");
 		video_shutdown();
+		debug_print("[msg loop] video unloaded!\n");
 		//bmp->~Bitmap();
 		//content_bg->~Image();
 		PostQuitMessage(0);
@@ -937,7 +945,7 @@ int download_curl(char *url, char *dest_file){
 int dui_download(char *url, char *dest_file, bool show_progress, void *callback, void *arg){
 
 	char *full_url = (char *) malloc(strlen(config_get_url()) + strlen(url) + strlen("&sys_name=&sig=")
-									+ strlen(config_get_sysname()) + strlen(config_get_sig()));
+									+ strlen(config_get_sysname()) + strlen(config_get_sig()) + 1);
 	char *temp_dest = (char *) malloc(strlen(dest_file) + 5);
 	make_url(full_url, url);
 	sprintf(temp_dest, "%s.tmp", dest_file);
@@ -948,8 +956,8 @@ int dui_download(char *url, char *dest_file, bool show_progress, void *callback,
 		MoveFileEx(temp_dest, dest_file, MOVEFILE_REPLACE_EXISTING);
 	}
 
-	free(full_url);
-	free(temp_dest);
+	if(full_url) free(full_url);
+	if(temp_dest) free(temp_dest);
 
 	return ret;
 }

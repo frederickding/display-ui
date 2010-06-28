@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <Qedit.h>
+//#include <Qedit.h>
 #include <dshow.h>
 
 #include <curl\curl.h>
@@ -420,7 +420,7 @@ void playlist_unload(){
 			image_element_t *current_img = (image_element_t *) current->data;
 			debug_print("[playlist_unload -- image] unloading %s...\n", current_img->filename);
 			if(current_img->fbmp_image) FreeImage_Unload(current_img->fbmp_image);
-			if(current_img->filename) free(current_img->filename);
+			//if(current_img->filename) free(current_img->filename);
 			DeleteObject(current_img->hbm);
 			DeleteDC(current_img->hdc);
 			free(current_img);

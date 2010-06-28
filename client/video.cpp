@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include <Qedit.h>
+//#include <Qedit.h>
 #include <dshow.h>
 
 #include "display_ui.h"
