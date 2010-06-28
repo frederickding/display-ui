@@ -11,7 +11,7 @@ char g_sys_name[65];
 char g_sig[41];
 char g_version[24];
 char g_winver[12];
-char g_useragent[64];
+char g_useragent[128];
 
 // length of server url cannot exceed 255 characters!
 char g_server_url[256];
@@ -37,16 +37,18 @@ int config_load(){
 	char *version_info = (char *)malloc(version_info_size);
 	GetFileVersionInfo("display_ui.exe", NULL, version_info_size, version_info);
 	
-	VS_FIXEDFILEINFO *vs_ffi = (VS_FIXEDFILEINFO *) malloc(sizeof(VS_FIXEDFILEINFO));
+	VS_FIXEDFILEINFO *vs_ffi;// = (VS_FIXEDFILEINFO *) malloc(sizeof(VS_FIXEDFILEINFO));
 
 	unsigned int vs_ffi_size;
 	VerQueryValue(version_info, "\\", (void **)&vs_ffi, &vs_ffi_size);
+	debug_print("[config_load] vs_ffi: given %d, req'd %d\n", sizeof(VS_FIXEDFILEINFO), vs_ffi_size);
 
 	sprintf(g_version, "%d.%d.%d.%d", HIWORD(vs_ffi->dwFileVersionMS), LOWORD(vs_ffi->dwFileVersionMS), 
 		HIWORD(vs_ffi->dwFileVersionLS), LOWORD(vs_ffi->dwFileVersionLS));
 	
 	debug_print("[config_load] file version: %s\n", g_version);
-
+	
+	//free(vs_ffi);
 	free(version_info);
 	
 	
@@ -72,11 +74,19 @@ void config_generate_sig() {
 	char date[11];
 	time_t rawtime;
 	tm * ptm;
+
+
+	debug_print("[config_generate_sig] api key: %s\n", g_api_key);
+	debug_print("[config_generate_sig] sys_name: %s\n", g_sys_name);
+	debug_print("[config_generate_sig] g_server_url: %s\n", g_server_url);
+
 	time (&rawtime);
 	ptm = gmtime (&rawtime);
 	
 	strftime(date, 11, "%Y-%m-%d", ptm);
 	
+	debug_print("[config_generate_sig] date: %s\n", date);
+
 	memset(g_sig, 0, 41);
 	
 	// SHA1 hash the produced string
@@ -87,7 +97,8 @@ void config_generate_sig() {
 	SHA1Input(&sha, (const unsigned char *) date, strlen(date));
 	if(!SHA1Result(&sha, Message_Digest)) {
 		for(int i = 0; i < 20; i++) {
-			char temp[2];
+			char temp[3];
+			memset(temp, 0, 3);
 			sprintf(temp, "%02x", Message_Digest[i]);
 			strcat(g_sig, temp);
 		}
