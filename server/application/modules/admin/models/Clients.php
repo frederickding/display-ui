@@ -41,7 +41,7 @@ class Admin_Model_Clients extends Default_Model_DatabaseAbstract
 				'id' ,
 				'sys_name' ,
 				'last_active'))->join(array(
-				'u' => 'dui_users'), 'c.admin = u.id', array(
+				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array(
 				'admin' => 'username'))->order('id ASC');
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
