@@ -62,6 +62,7 @@ class Api_MediaController extends Zend_Controller_Action
 				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
 				->setHeader('Content-Length', $query['filesize'], TRUE)
 				->setHeader('Content-Disposition', 'attachment; filename="'.$query['filename'].'"', TRUE)
+				->setHeader('X-DUI-File-Source', 'database')
 				->setBody($query['data']);
 			} elseif($isStoredDb === 0) {
 				$query = $MediaModel->retrieveFromFile($medium);
@@ -70,6 +71,7 @@ class Api_MediaController extends Zend_Controller_Action
 					$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
 					->setHeader('Content-Length', $query['filesize'], TRUE)
 					->setHeader('Content-Disposition', 'attachment; filename="' . basename($query['filename']) . '"', TRUE)
+					->setHeader('X-DUI-File-Source', 'filesystem')
 					->sendHeaders();
 					$this->getResponse()->clearBody();
 					readfile($query['filename']);

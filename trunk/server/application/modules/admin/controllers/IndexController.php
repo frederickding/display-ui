@@ -62,6 +62,13 @@ class Admin_IndexController extends Zend_Controller_Action
 			)));
 		}
 	}
+	public function phpinfoAction ()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		if ($this->auth_session->authenticated) {
+			$this->_response->setBody(phpinfo());
+		}
+	}
 	public function dashboardAction ()
 	{
 		$this->_helper->layout()->setLayout('AdminPanelWidgets');
