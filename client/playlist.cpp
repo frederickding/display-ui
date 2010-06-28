@@ -31,9 +31,9 @@
 
 // because dshow.h does REALLY stupid stuff
 // (see line 7673 of strsafe.h. WTF, microsoft)
-#undef sprintf
-#undef swprintf
-#undef strcat
+//#undef sprintf_s
+//#undef swprintf
+//#undef strcat
 
 #include "display_ui.h"
 #include "freeimage.h"
@@ -85,8 +85,9 @@ bool g_downloading_plst = false;
 extern playlist_element_t *g_current_elem;
 
 bool file_exists(const char * filename){
-    if (FILE * file = fopen(filename, "r")){
-        fclose(file);
+	FILE *fp;
+    if(!fopen_s(&fp, filename, "r")){
+        fclose(fp);
         return true;
     }
     return false;
@@ -115,7 +116,7 @@ void playlist_image_doload(void *p){
 	
 	debug_print("[playlist_image_doload] downloading image... %s\n", new_img->filename);
 
-	sprintf(download_src, "/api/media/download/?id=%d", element->id);
+	sprintf_s(download_src, "/api/media/download/?id=%d", element->id);
 	
 	// Download the image if it doesn't exist yet.
 	// TODO: Do some sort of check to see if image on the server differs from the local copy.
@@ -209,7 +210,7 @@ void playlist_video_doload(void *p){
 	debug_print("[playlist_video_doload] downloading video... %s\n", new_vid->filename);
 	
 	// Download the video from the server.
-	sprintf(download_src, "/api/media/download/?id=%d", element->id);
+	sprintf_s(download_src, 39, "/api/media/download/?id=%d", element->id);
 	if(!file_exists(new_vid->filename)){
 		if(dui_download(download_src, new_vid->filename, true, (void *)playlist_media_dl_progress_cb, (void *)element) != CURLE_OK){
 			debug_print("[playlist_video_doload] image download failed! %s\n", download_src);
@@ -247,7 +248,7 @@ int playlist_load_raw(){
 	FILE *playlist_file;
 
 	if(file_exists("data\\playlist.dat")){
-		playlist_file = fopen("data\\playlist.dat", "r");
+		fopen_s(&playlist_file, "data\\playlist.dat", "r");
 
 		fseek(playlist_file, 0, SEEK_END);
 		g_playlist_raw_size = ftell(playlist_file);
@@ -303,7 +304,7 @@ void playlist_process_raw(HWND hwnd){
 			memset(new_img, 0, sizeof(image_element_t));
 			
 			// Filenames are [id].[ext]
-			sprintf(new_img->filename, "media\\%d.%s", current->id, current_img->ext);
+			sprintf_s(new_img->filename, 22, "media\\%d.%s", current->id, current_img->ext);
 			
 			debug_print("[playlist_process_raw] filename: %s\n", new_img->filename);
 			
@@ -319,8 +320,9 @@ void playlist_process_raw(HWND hwnd){
 			memset(new_vid, 0, sizeof(video_element_t));
 			
 			// Need widechar version of filename for DShow
-			sprintf(new_vid->filename, "media\\%d.%s", current->id, current_vid->ext);
-			mbstowcs(new_vid->filename_w, new_vid->filename, strlen(new_vid->filename));
+			sprintf_s(new_vid->filename, 22, "media\\%d.%s", current->id, current_vid->ext);
+			size_t blah;
+			mbstowcs_s(&blah, new_vid->filename_w, 22, new_vid->filename, strlen(new_vid->filename));
 			
 			debug_print("[playlist_process_raw] filename: %s\n", new_vid->filename);
 			debug_print("[playlist_process_raw] wfilename: %ws\n", new_vid->filename_w);
