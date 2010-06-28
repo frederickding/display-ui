@@ -223,7 +223,7 @@ void playlist_video_doload(void *p){
 	element->ready = true;
 }
 
-// Dumps all playlist elements to the debug file.
+// Dumps all playlist elements to the debug file. 
 void playlist_dumpitems(){
 	playlist_element_t *current = g_playlist.first;
 
