@@ -65,13 +65,15 @@ class Api_MediaController extends Zend_Controller_Action
 				->setBody($query['data']);
 			} elseif($isStoredDb === 0) {
 				$query = $MediaModel->retrieveFromFile($medium);
-				if($query !== FALSE) {
-				// get it from the filesystem
-				$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
-				->setHeader('Content-Length', $query['filesize'], TRUE)
-				->setHeader('Content-Disposition', 'attachment; filename="'.basename($query['filename']).'"', TRUE)
-				->sendHeaders();
-				readfile($query['filename']);
+				if ($query !== FALSE) {
+					// get it from the filesystem
+					$this->getResponse()->setHeader('Content-Type', $query['mime'], TRUE)
+					->setHeader('Content-Length', $query['filesize'], TRUE)
+					->setHeader('Content-Disposition', 'attachment; filename="' . basename($query['filename']) . '"', TRUE)
+					->sendHeaders();
+					if (Zend_Application::getEnvironment() == 'development' || Zend_Application::getEnvironment() == 'testing')
+						error_log($query['filename']);
+					readfile($query['filename']);
 				} else {
 					$this->getResponse()->setHttpResponseCode(404)
 					->setHeader('Content-Type', 'text/plain', TRUE)
