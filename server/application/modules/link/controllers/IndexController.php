@@ -49,6 +49,14 @@ class Link_IndexController extends Zend_Controller_Action
 	public function indexAction ()
 	{
 		$this->_helper->layout()->setLayout('SimpleBlue');
+		$client_auth = new Api_Model_Authenticator();
+		$clients_model = new Admin_Model_Clients();
+		$list_clients = $clients_model->fetchClients($this->auth_session->username);
+		$this->view->api_keys = array();
+		for($i = 0; $i < count($list_clients); $i++) {
+			$this->view->api_keys[$i][0] = $list_clients[$i]['sys_name'];
+			$this->view->api_keys[$i][1] = $client_auth->apiKey($list_clients[$i]['sys_name']);
+		}
 	}
 	public function unauthorizedAction ()
 	{

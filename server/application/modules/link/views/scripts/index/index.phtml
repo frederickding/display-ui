@@ -7,6 +7,8 @@ $this->headTitle('Link a client');
 	<div id="body">
 		<p>This tool will provide you with the information needed to configure
 		the Display UI Client software for this server.</p>
-
+		<?php foreach($this->api_keys as $ak) {
+			echo $ak[0] . ": " . $ak[1] . "\n";
+		} ?>
 		<p><a href="<?php echo $this->baseUrl(''); ?>">Return to the front page</a></p>
 	</div>

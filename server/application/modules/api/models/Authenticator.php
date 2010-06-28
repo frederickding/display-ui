@@ -46,7 +46,7 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 	public function __construct ()
 	{
 		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
-		$this->_secret = $config->production->server->install->secret;
+		$this->_secret = $config->server->install->secret;
 		unset($config);
 		$this->_date = gmdate('Y-m-d');
 	}
