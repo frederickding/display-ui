@@ -66,10 +66,17 @@ class Admin_LoginController extends Zend_Controller_Action
 			}
 		} else {
 			$this->session->authenticated = FALSE;
-			$this->_redirect($this->view->serverUrl() . $this->view->url(array(
-				'module' => 'admin' ,
-				'controller' => 'login' ,
-				'action' => 'index')) . '?username=' . $_user);
+			if (! empty($_redir) && $_redir[0] == '/') {
+				$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+					'module' => 'admin' ,
+					'controller' => 'login' ,
+					'action' => 'index')) . '?username=' . $_user . '&redirect=' . $_redir);
+			} else {
+				$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+					'module' => 'admin' ,
+					'controller' => 'login' ,
+					'action' => 'index')) . '?username=' . $_user);
+			}
 		}
 	}
 	public function logoutAction ()

@@ -35,8 +35,10 @@ class Admin_ClientsController extends Zend_Controller_Action
 			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
 				'module' => 'admin' ,
 				'controller' => 'login' ,
-				'action' => 'index'
-			)));
+				'action' => 'index')) . '?redirect=' . $this->view->url(array(
+				'module' => 'admin' ,
+				'controller' => $this->_request->getControllerName() ,
+				'action' => $this->_request->getActionName())));
 		}
 			// configuration object
 		if(Zend_Registry::isRegistered('configuration_ini')) {
