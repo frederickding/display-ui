@@ -28,6 +28,7 @@
 class Api_Model_YWeather
 {
 	private $_location;
+	private $_city = '';
 	private $_conditions;
 	private $_forecast;
 	/**
@@ -37,11 +38,11 @@ class Api_Model_YWeather
 	 * retrieve location-based weather data.
 	 * @param string $location current location as ZIP code or ID
 	 */
-	public function __construct ($location='CAXX0401')
+	public function __construct ($location)
 	{
 		// Default location is used:
-		// CAXX0401 (Richmond Hill)
-		$this->_location = (!empty($location)) ? $location : 'CAXX0401';
+		// CAXX0504 (Toronto, ON, Canada)
+		$this->_location = (!empty($location)) ? $location : 'CAXX0504';
 		Zend_Feed::registerNamespace('yweather', 'http://xml.weather.yahoo.com/ns/rss/1.0');
 	}
 	/**
@@ -55,6 +56,14 @@ class Api_Model_YWeather
 		$channel = new Zend_Feed_Rss('http://weather.yahooapis.com/forecastrss?u=c&p='
 									. $this->_location);
 		return $channel;
+	}
+	public function getCity ()
+	{
+		if($this->_city == '')
+		{
+			$this->_city = $this->retrieve()->{'yweather:location'}->getDOM()->getAttribute('city');
+		}
+		return $this->_city;
 	}
 	/**
 	 * Current conditions processor
