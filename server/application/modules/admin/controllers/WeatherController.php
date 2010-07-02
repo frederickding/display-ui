@@ -54,6 +54,13 @@ class Admin_WeatherController extends Zend_Controller_Action
 	}
 	public function indexAction ()
 	{
-		// TODO: more functionality
+		$this->_forward('list');
+	}
+	public function listAction ()
+	{
+		$WeatherModel = new Admin_Model_Weather();
+		$list = $WeatherModel->fetchClients($this->auth_session->username);
+		$this->view->clientsList = $list;
+
 	}
 }
