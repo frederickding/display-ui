@@ -1,0 +1,44 @@
+<?php
+$this->navActive = 'multimedia';
+$this->title = 'Delete Multimedia';
+$this->headTitle('Multimedia');
+$this->headStyle()->appendStyle('input[type=submit] {
+	margin-right: 0.5em;
+}');
+$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#deletesuccess").hide();
+	$j("#deletemedia").ajaxForm({
+		resetForm: false,
+		target: "#deletesuccess",
+		url : "'.$this->url(array('module' => 'admin' , 'controller' => 'multimedia' , 'action' => 'delete-process')).'",
+		beforeSubmit : function() {
+			$j("#deletemedia").block({
+				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
+			});
+		},
+		success : function() {
+			$j("#deletemedia").unblock().empty();
+			$j("#deletesuccess").show("slide");
+		}
+	});
+});');
+?>
+<?php if ($this->canDelete) { ?>
+<p><strong>Are you sure you want to delete the media item with the ID of <?php echo $this->id; ?>?</strong></p>
+<p>Deletion is irreversible and will remove the file and its database
+entry from the server. The only way to recover from accidental deletion
+is reverting to an older backup of the database and files.</p>
+<form id="deletemedia" action="" method="get">
+<input type="hidden" name="id" id="deleteid" value="<?php echo $this->id; ?>" />
+<input type="hidden" name="deletecsrf" id="deletecsrf" value="<?php echo $this->csrf; ?>" />
+<p><input type="submit" name="deleteconf" id="deleteconf-1" value="Yes!" />
+<input type="submit" name="deleteconf" id="deleteconf-0" value="No!" /></p>
+</form>
+<p id="deletesuccess"></p>
+<noscript>
+<p>You need JavaScript for deletion functionality to work.</p>
+</noscript>
+<?php } else { ?>
+<p><strong>Whoops, you don't have write access to the item with the ID of <?php	echo $this->id;	?>.</strong>
+<a href="javascript:history.back(1);">Go back.</a></p>
+<?php } ?>

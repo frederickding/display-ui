@@ -1,0 +1,12 @@
+<?php
+$this->navActive = 'multimedia';
+$this->title = 'Upload Multimedia';
+$this->headTitle('Upload Multimedia');
+?>
+<p><strong>Great! Your upload was successful.</strong>
+<a href="<?php echo $this->url(array(
+			'module' => 'admin' ,
+			'controller' => 'multimedia' ,
+			'action' => 'upload'
+		));	?>">Add another file?</a></p>
+<p>Your file was stored as ID <?php echo $this->id; ?> in the media table.</p>
