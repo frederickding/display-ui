@@ -9,5 +9,5 @@ RewriteRule ^.*$ index.php [NC,L]
 
 # Send version information in HTTP headers
 <IfModule mod_headers.c>
-Header add X-Software "Display UI Server/0.3.1-alpha, Zend Framework/1.10.6"
+Header add X-Software "Display UI Server/0.3.1-alpha, Zend Framework/1.10.8"
 </IfModule>
