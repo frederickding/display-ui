@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,13 +32,18 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		$this->auth_session = new Zend_Session_Namespace('auth');
 		// ALWAYS check if authenticated
 		if (! $this->auth_session->authenticated) {
-			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
+			return $this->_redirect($this->view
+				->serverUrl() . $this->view
+				->url(array(
 				'module' => 'admin' ,
 				'controller' => 'login' ,
-				'action' => 'index')) . '?redirect=' . $this->view->url(array(
+				'action' => 'index')) . '?redirect=' . $this->view
+				->url(array(
 				'module' => 'admin' ,
-				'controller' => $this->_request->getControllerName() ,
-				'action' => $this->_request->getActionName())));
+				'controller' => $this->_request
+					->getControllerName() ,
+				'action' => $this->_request
+					->getActionName())));
 		}
 		// configuration object
 		if (Zend_Registry::isRegistered('configuration_ini')) {
@@ -50,7 +55,9 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		}
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
-		$this->_helper->layout()->setLayout('AdminPanelWidgets');
+		$this->_helper
+			->layout()
+			->setLayout('AdminPanelWidgets');
 		return TRUE;
 	}
 	/**
@@ -87,8 +94,11 @@ class Admin_MultimediaController extends Zend_Controller_Action
 	 */
 	public function uploadProcessAction ()
 	{
-		if (! $this->getRequest()->isPost()) {
-			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
+		if (! $this->getRequest()
+			->isPost()) {
+			return $this->_redirect($this->view
+				->serverUrl() . $this->view
+				->url(array(
 				'module' => 'admin' ,
 				'controller' => 'multimedia' ,
 				'action' => 'upload')));
@@ -119,20 +129,25 @@ class Admin_MultimediaController extends Zend_Controller_Action
 	}
 	public function deleteProcessAction ()
 	{
-		$this->_helper->viewRenderer->setNoRender();
-		$this->_helper->removeHelper('layout');
+		$this->_helper->viewRenderer
+			->setNoRender();
+		$this->_helper
+			->removeHelper('layout');
 		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecrsf') == $this->auth_session->deleteCsrf) {
 			$MediaModel = new Admin_Model_Multimedia();
 			$id = (int) $this->_getParam('id', 0);
 			if ($this->_getParam('deleteconf', 'No!') == 'Yes!') {
 				if ($MediaModel->deleteMultimedia($id)) {
-					return $this->getResponse()->setBody('Successfully deleted.');
+					return $this->getResponse()
+						->setBody('Successfully deleted.');
 				} else {
-					return $this->getResponse()->setBody('Deletion failed.');
+					return $this->getResponse()
+						->setBody('Deletion failed.');
 				}
 			}
 		}
-		return $this->getResponse()->setBody('Nothing was deleted. <a href="javascript:history.back(1);">Go back.</a>');
+		return $this->getResponse()
+			->setBody('Nothing was deleted. <a href="javascript:history.back(1);">Go back.</a>');
 	}
 	public function viewAction ()
 	{
@@ -157,7 +172,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		$MediaModel = new Admin_Model_Multimedia();
 		$listClients = $MediaModel->fetchClients($this->auth_session->username);
 		unset($MediaModel);
-		$this->view->doctype('XHTML1_STRICT');
+		$this->view
+			->doctype('XHTML1_STRICT');
 		$title = new Zend_Form_Element_Text('mediumtitle',
 			array(
 				'label' => 'Title' ,
@@ -170,7 +186,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 				'label' => 'Immediately activate?' ,
 				'required' => TRUE ,
 				'description' => 'Will this item begin showing immediately or at a later date?'));
-		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No');
+		$immediateActive->addMultiOption('1', 'Yes')
+			->addMultiOption('0', 'No');
 		$activates = new Zend_Form_Element_Text('mediumactivation',
 			array(
 				'label' => 'Start showing on (YYYY-MM-DD)' ,
@@ -190,9 +207,11 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			array(
 				'label' => 'Weight' ,
 				'description' => 'A higher weight usually results in the file showing more frequently.'));
-		$weight->addValidator('int', FALSE)->addValidator('between', FALSE, array(
+		$weight->addValidator('int', FALSE)
+			->addValidator('between', FALSE, array(
 			1 ,
-			10))->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
+			10))
+			->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
 		$submit = new Zend_Form_Element_Submit('mediasubmit',
 			array(
 				'label' => 'Upload!'));
@@ -208,7 +227,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 				'label' => 'Media file' ,
 				'required' => TRUE ,
 				'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, PPT(X), PPS(X)).'));
-		$file->addValidator('count', FALSE, 1)->addValidator('Extension', FALSE, array(
+		$file->addValidator('count', FALSE, 1)
+			->addValidator('Extension', FALSE, array(
 			'jpg' ,
 			'jpeg' ,
 			'png' ,
@@ -220,7 +240,8 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			'ppt' ,
 			'pptx' ,
 			'pps' ,
-			'ppsx'))->setDestination(MEDIA_DIR);
+			'ppsx'))
+			->setDestination(MEDIA_DIR);
 		$clients = new Zend_Form_Element_Multiselect('mediumclients',
 			array(
 				'label' => 'Show on these clients' ,
@@ -232,10 +253,14 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		// file can be any mime type or extension, we're not checking it
 		// form handling part will use the mime type and insert it into the db
 		$form = new Zend_Form();
-		$form->setAction($this->view->url(array(
+		$form->setAction($this->view
+			->url(array(
 			'module' => 'admin' ,
 			'controller' => 'multimedia' ,
-			'action' => 'upload-process')))->setMethod('post')->setAttrib('id', 'mediaupload')->addElements(array(
+			'action' => 'upload-process')))
+			->setMethod('post')
+			->setAttrib('id', 'mediaupload')
+			->addElements(array(
 			'mediumtitle' => $title ,
 			'mediumclients' => $clients ,
 			'mediumfile' => $file ,

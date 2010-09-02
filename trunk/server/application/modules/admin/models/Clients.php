@@ -36,13 +36,17 @@ class Admin_Model_Clients extends Default_Model_DatabaseAbstract
 	public function fetchClients ($_admin)
 	{
 		if (! is_null($this->db)) {
-			$select = $this->db->select()->from(array(
+			$select = $this->db
+				->select()
+				->from(array(
 				'c' => 'dui_clients'), array(
 				'id' ,
 				'sys_name' ,
-				'last_active'))->join(array(
+				'last_active'))
+				->join(array(
 				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array(
-				'admin' => 'username'))->order('id ASC');
+				'admin' => 'username'))
+				->order('id ASC');
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
 				$select->where('u.id = ?', $_admin, 'INTEGER');
@@ -50,7 +54,8 @@ class Admin_Model_Clients extends Default_Model_DatabaseAbstract
 				// treat is as the username
 				$select->where('u.username = ?', $_admin);
 			}
-			$result = $select->query()->fetchAll(Zend_Db::FETCH_ASSOC);
+			$result = $select->query()
+				->fetchAll(Zend_Db::FETCH_ASSOC);
 			// error_log($select->assemble());
 			return $result;
 		}

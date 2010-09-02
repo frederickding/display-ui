@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,20 +33,36 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 	public function fetchStatusReport ()
 	{
 		if (! is_null($this->db)) { // only do something if DB is connected
-			$query = $this->db->select()->from('information_schema.TABLES', array(
+			$query = $this->db
+				->select()
+				->from('information_schema.TABLES', array(
 				'TABLE_NAME' ,
-				'TABLE_ROWS'
-			))->where('TABLE_NAME LIKE \'dui_%\'');
-			$result = $this->db->fetchPairs($query);
-			$result2 = $this->db->fetchOne($this->db->select()->from('dui_media', 'COUNT(*)')->where('type = \'image\''));
-			$result3 = $this->db->fetchOne($this->db->select()->from('dui_media', 'COUNT(*)')->where('type = \'video\''));
+				'TABLE_ROWS'))
+				->where('TABLE_NAME LIKE \'dui_%\'');
+			$result = $this->db
+				->fetchPairs($query);
+			$result2 = $this->db
+				->fetchOne($this->db
+				->select()
+				->from('dui_media', 'COUNT(*)')
+				->where('type = ?', Admin_Model_Multimedia::IMAGE_TYPE));
+			$result3 = $this->db
+				->fetchOne($this->db
+				->select()
+				->from('dui_media', 'COUNT(*)')
+				->where('type = ?', Admin_Model_Multimedia::VIDEO_TYPE));
+			$result4 = $this->db
+				->fetchOne($this->db
+				->select()
+				->from('dui_media', 'COUNT(*)')
+				->where('type = ?', Admin_Model_Multimedia::POWERPOINT_TYPE));
 			return array(
 				'clients' => $result['dui_clients'] ,
 				'headlines' => $result['dui_headlines'] ,
 				'users' => $result['dui_users'] ,
 				'images' => $result2 ,
-				'videos' => $result3
-			);
+				'videos' => $result3 ,
+				'powerpoints' => $result4);
 		}
 		return array();
 	}
@@ -58,16 +74,23 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 	public function fetchActiveClients ($_limit = 5)
 	{
 		if (! is_null($this->db)) {
-				/* select only clients that submitted API queries within the past 12 hours,
+			/* select only clients that submitted API queries within the past 12 hours,
 			 * and order them by last_active time
 			 */
-			$query = $this->db->select()->from('dui_clients', array(
+			$query = $this->db
+				->select()
+				->from('dui_clients', array(
 				'id' ,
 				'sys_name' ,
 				'last_active' ,
-				'time_diff' => new Zend_Db_Expr('TIMESTAMPDIFF (MINUTE, ' . $this->db->quoteIdentifier('last_active') . ', UTC_TIMESTAMP() )')
-			))->where('TIMESTAMPDIFF (HOUR, ' . $this->db->quoteIdentifier('last_active') . ', UTC_TIMESTAMP() ) < 12')
-			->order('last_active DESC')->limit($_limit)->query();
+				'time_diff' => new Zend_Db_Expr(
+					'TIMESTAMPDIFF (MINUTE, ' . $this->db
+						->quoteIdentifier('last_active') . ', UTC_TIMESTAMP() )')))
+				->where('TIMESTAMPDIFF (HOUR, ' . $this->db
+				->quoteIdentifier('last_active') . ', UTC_TIMESTAMP() ) < 12')
+				->order('last_active DESC')
+				->limit($_limit)
+				->query();
 			// fetch the query
 			$resultset = $query->fetchAll(Zend_Db::FETCH_ASSOC);
 			return $resultset;
@@ -86,18 +109,25 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 			/*
 			 * A complex SQL query to find ONLY clients to which the current user has access
 			 */
-			$query = $this->db->select()->from(array('c' => 'dui_clients'), array('id', 'sys_name'))
-			->join(array('u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')' , array())
-			->order('c.id ASC')
-			->limit($_limit);
-			if(is_int($_admin)) {
+			$query = $this->db
+				->select()
+				->from(array(
+				'c' => 'dui_clients'), array(
+				'id' ,
+				'sys_name'))
+				->join(array(
+				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT(\'(^|[0-9]*,)\', u.id, \'(,|$)\')', array())
+				->order('c.id ASC')
+				->limit($_limit);
+			if (is_int($_admin)) {
 				// treat it as the integer user ID
 				$query->where('u.id = ?', $_admin);
 			} else {
 				// treat is as the username
 				$query->where('u.username = ?', $_admin);
 			}
-			return $query->query()->fetchAll(Zend_Db::FETCH_ASSOC);
+			return $query->query()
+				->fetchAll(Zend_Db::FETCH_ASSOC);
 		}
 		return array();
 	}
@@ -110,15 +140,16 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 	public function insertQuickline ($_title, $_clientId)
 	{
 		if (! is_null($this->db)) {
-			$this->db->insert('dui_headlines', array(
-				'title' => trim($_title),
-				'active' => 1 ,
-				// make it expire in 1 month by default
-				'expires' => new Zend_Db_Expr('DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)') ,
+			$this->db
+				->insert('dui_headlines', array(
+				'title' => trim($_title) ,
+				'active' => 1 ,  // make it expire in 1 month by default
+				'expires' => new Zend_Db_Expr(
+					'DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)') ,
 				'type' => 'news' ,
-				'client' => $_clientId
-			));
-			if($this->db->lastInsertId()) return TRUE;
+				'client' => $_clientId));
+			if ($this->db
+				->lastInsertId()) return TRUE;
 		}
 		return FALSE;
 	}

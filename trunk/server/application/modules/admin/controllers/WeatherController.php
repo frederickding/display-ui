@@ -32,13 +32,18 @@ class Admin_WeatherController extends Zend_Controller_Action
 		$this->auth_session = new Zend_Session_Namespace('auth');
 		// ALWAYS check if authenticated
 		if (! $this->auth_session->authenticated) {
-			return $this->_redirect($this->view->serverUrl() . $this->view->url(array(
+			return $this->_redirect($this->view
+				->serverUrl() . $this->view
+				->url(array(
 				'module' => 'admin' ,
 				'controller' => 'login' ,
-				'action' => 'index')) . '?redirect=' . $this->view->url(array(
+				'action' => 'index')) . '?redirect=' . $this->view
+				->url(array(
 				'module' => 'admin' ,
-				'controller' => $this->_request->getControllerName() ,
-				'action' => $this->_request->getActionName())));
+				'controller' => $this->_request
+					->getControllerName() ,
+				'action' => $this->_request
+					->getActionName())));
 		}
 		// configuration object
 		if (Zend_Registry::isRegistered('configuration_ini')) {
@@ -50,7 +55,9 @@ class Admin_WeatherController extends Zend_Controller_Action
 		}
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
-		$this->_helper->layout()->setLayout('AdminPanelWidgets');
+		$this->_helper
+			->layout()
+			->setLayout('AdminPanelWidgets');
 	}
 	public function indexAction ()
 	{
@@ -61,6 +68,5 @@ class Admin_WeatherController extends Zend_Controller_Action
 		$WeatherModel = new Admin_Model_Weather();
 		$list = $WeatherModel->fetchClients($this->auth_session->username);
 		$this->view->clientsList = $list;
-
 	}
 }

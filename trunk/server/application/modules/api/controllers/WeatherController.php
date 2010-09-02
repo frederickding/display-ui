@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,8 @@ class Api_WeatherController extends Zend_Controller_Action
 	public function currentAction ()
 	{
 		// don't let Zend Framework render a view
-		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->viewRenderer
+			->setNoRender();
 		$YWeather = new Api_Model_YWeather($this->_getParam('location'));
 		// authenticate the request
 		$Authenticator = new Api_Model_Authenticator();
@@ -51,16 +52,14 @@ class Api_WeatherController extends Zend_Controller_Action
 		$signature = $this->_getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// target format: CC TT\nSL DESCRIPTION
-			$this->getResponse()->setHeader('Content-Type', 'text/plain', true)
-								->setBody($YWeather->conditions('code').' '
-								.$YWeather->conditions('temp')."\n"
-								.strlen($YWeather->conditions('description')).' '
-								.strtolower($YWeather->conditions('description')));
+			$this->getResponse()
+				->setHeader('Content-Type', 'text/plain', true)
+				->setBody($YWeather->conditions('code') . ' ' . $YWeather->conditions('temp') . "\n" . strlen($YWeather->conditions('description')) . ' ' . strtolower($YWeather->conditions('description')));
 		} else {
-			$this->getResponse()->setHttpResponseCode(401);
+			$this->getResponse()
+				->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
-			$this->view->explanation = 'All API calls to this service '
-				. 'must include a valid system identifier and request signature.';
+			$this->view->explanation = 'All API calls to this service ' . 'must include a valid system identifier and request signature.';
 			$this->render('index');
 		}
 	}
@@ -72,51 +71,36 @@ class Api_WeatherController extends Zend_Controller_Action
 	public function forecastAction ()
 	{
 		// don't let Zend Framework render a view
-		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->viewRenderer
+			->setNoRender();
 		$YWeather = new Api_Model_YWeather($this->_getParam('location'));
 		// authenticate the request
 		$Authenticator = new Api_Model_Authenticator();
 		$sys_name = $this->_getParam('sys_name');
 		$signature = $this->_getParam('sig');
 		if ($Authenticator->verify($sys_name, $signature)) {
-			$this->getResponse()->setHeader('Content-Type', 'text/plain', true);
-			// target format: CC HI LO\nSL DESCRIPTION 
+			$this->getResponse()
+				->setHeader('Content-Type', 'text/plain', true);
+			// target format: CC HI LO\nSL DESCRIPTION
 			switch ($this->_getParam('day')) {
 				case 1:
-					$this->getResponse()->setBody(
-						$YWeather->forecast(1, 'code') . ' '
-						.$YWeather->forecast(1, 'high') . ' '
-						.$YWeather->forecast(1, 'low') . "\n"
-						.strlen($YWeather->forecast(1, 'description')) . ' '
-						.strtolower($YWeather->forecast(1, 'description')));
+					$this->getResponse()
+						->setBody($YWeather->forecast(1, 'code') . ' ' . $YWeather->forecast(1, 'high') . ' ' . $YWeather->forecast(1, 'low') . "\n" . strlen($YWeather->forecast(1, 'description')) . ' ' . strtolower($YWeather->forecast(1, 'description')));
 					break;
 				case 0:
-					$this->getResponse()->setBody(
-						$YWeather->forecast(0, 'code') . ' '
-						.$YWeather->forecast(0, 'high') . ' '
-						.$YWeather->forecast(0, 'low') . "\n"
-						.strlen($YWeather->forecast(0, 'description')) . ' '
-						.strtolower($YWeather->forecast(0, 'description')));
+					$this->getResponse()
+						->setBody($YWeather->forecast(0, 'code') . ' ' . $YWeather->forecast(0, 'high') . ' ' . $YWeather->forecast(0, 'low') . "\n" . strlen($YWeather->forecast(0, 'description')) . ' ' . strtolower($YWeather->forecast(0, 'description')));
 					break;
 				default:
-					$this->getResponse()->setBody(
-						$YWeather->forecast(0, 'code') . ' '
-						.$YWeather->forecast(0, 'high') . ' '
-						.$YWeather->forecast(0, 'low') . "\n"
-						.strlen($YWeather->forecast(0, 'description')) . ' '
-						.strtolower($YWeather->forecast(0, 'description')))
-					->appendBody("\n"
-						.$YWeather->forecast(1, 'code') . ' '
-						.$YWeather->forecast(1, 'high') . ' '
-						.$YWeather->forecast(1, 'low') . "\n"
-						.strlen($YWeather->forecast(1, 'description')) . ' '
-						.strtolower($YWeather->forecast(1, 'description')));
+					$this->getResponse()
+						->setBody($YWeather->forecast(0, 'code') . ' ' . $YWeather->forecast(0, 'high') . ' ' . $YWeather->forecast(0, 'low') . "\n" . strlen($YWeather->forecast(0, 'description')) . ' ' . strtolower($YWeather->forecast(0, 'description')))
+						->appendBody("\n" . $YWeather->forecast(1, 'code') . ' ' . $YWeather->forecast(1, 'high') . ' ' . $YWeather->forecast(1, 'low') . "\n" . strlen($YWeather->forecast(1, 'description')) . ' ' . strtolower($YWeather->forecast(1, 'description')));
 			}
 		} else {
-			$this->getResponse()->setHttpResponseCode(401);
+			$this->getResponse()
+				->setHttpResponseCode(401);
 			$this->view->message = 'Unauthenticated Request';
-			$this->view->explanation = 'All API calls to this service '
-				. 'must include a valid system identifier and request signature.';
+			$this->view->explanation = 'All API calls to this service ' . 'must include a valid system identifier and request signature.';
 			$this->render('index');
 		}
 	}
@@ -130,14 +114,18 @@ class Api_WeatherController extends Zend_Controller_Action
 	public function imageAction ()
 	{
 		// don't let Zend Framework render a view
-		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->viewRenderer
+			->setNoRender();
 		$_code = ($this->_getParam('code')) ? $this->_getParam('code') : '34';
-		if($this->getRequest()->getParam('location')) {
-			$YWeather = new Api_Model_YWeather($this->getRequest()->getParam('location'));
+		if ($this->getRequest()
+			->getParam('location')) {
+			$YWeather = new Api_Model_YWeather(
+				$this->getRequest()
+					->getParam('location'));
 			$_code = $YWeather->conditions('code');
 			unset($YWeather);
 		}
-		$image = 'http://l.yimg.com/a/i/us/nws/weather/gr/'.$_code.'d.png';
+		$image = 'http://l.yimg.com/a/i/us/nws/weather/gr/' . $_code . 'd.png';
 		$this->_redirect($image);
 	}
 }
