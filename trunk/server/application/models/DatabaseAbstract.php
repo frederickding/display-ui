@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,20 +51,22 @@ abstract class Default_Model_DatabaseAbstract
 			if (Zend_Registry::isRegistered('db_adapter')) {
 				$this->db = Zend_Registry::get('db_adapter');
 			} else {
-				$config = new Zend_Config_Ini(CONFIG_DIR . '/database.ini', APPLICATION_ENV);
+				$config = new Zend_Config_Ini(CONFIG_DIR . '/database.ini',
+					APPLICATION_ENV);
 				try {
 					$this->db = Zend_Db::factory($config->database);
-					$this->db->getConnection();
+					$this->db
+						->getConnection();
 					Zend_Registry::set('db_adapter', $this->db);
 					unset($config);
 				} catch (Zend_Db_Adapter_Exception $e) {
 					$this->db = NULL;
 					die('Could not connect to database');
-					// couldn't connect
+						// couldn't connect
 				} catch (Zend_Exception $e) {
 					$this->db = NULL;
 					die('Could not load adapter class');
-					// couldn't load Adapter class
+						// couldn't load Adapter class
 				}
 			}
 		}
@@ -76,7 +78,9 @@ abstract class Default_Model_DatabaseAbstract
 	public function disconnectDatabase ()
 	{
 		if (! is_null($this->db)) {
-			if ($this->db->isConnected() && $this->db->closeConnection()) return TRUE;
+			if ($this->db
+				->isConnected() && $this->db
+				->closeConnection()) return TRUE;
 		}
 		return FALSE;
 	}
