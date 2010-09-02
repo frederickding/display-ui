@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,27 +33,28 @@ class Api_PlaylistsController extends Zend_Controller_Action
 	 * a 300-series redirect is possible but not preferred, and the _forward()
 	 * internal redirect is also not used.
 	 */
-	public function indexAction()
+	public function indexAction ()
 	{
-		$this->_helper->viewRenderer->setNoRender();
-		$this->getResponse()->setHttpResponseCode(400)
-		->setHeader('Content-Type', 'text/plain', TRUE)
-		->setBody('API method does not exist; try /api/playlists/fetch/');
+		$this->_helper->viewRenderer
+			->setNoRender();
+		$this->getResponse()
+			->setHttpResponseCode(400)
+			->setHeader('Content-Type', 'text/plain', TRUE)
+			->setBody('API method does not exist; try /api/playlists/fetch/');
 	}
 	/**
 	 * Fetches an unplayed playlist from the database
 	 *
 	 * If this is not possible, redirects the client to the generate action.
 	 */
-	public function fetchAction()
+	public function fetchAction ()
 	{
-		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->viewRenderer
+			->setNoRender();
 		$Authenticator = new Api_Model_Authenticator();
-		
 		// load our parameters from POST/GET
 		$sys_name = $this->_getParam('sys_name');
 		$signature = $this->_getParam('sig');
-		
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// we don't need the Authenticator model anymore
 			unset($Authenticator);
@@ -62,31 +63,32 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			// get the data
 			$raw_data = $PlaylistsModel->fetch($sys_name);
 			// if it was not successfully fetched, generate a playlist instead
-			if($raw_data === FALSE) {
-				$this->_helper->redirector->gotoUrlAndExit(
-					'api/playlists/generate/?sys_name='.$sys_name.'&sig='.$signature,
-					array('code' => 307));
+			if ($raw_data === FALSE) {
+				$this->_helper->redirector
+					->gotoUrlAndExit('api/playlists/generate/?sys_name=' . $sys_name . '&sig=' . $signature, array(
+					'code' => 307));
 			}
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
-			$this->getResponse()->setHeader('Content-Type', 'application/x-dui-playlist', TRUE)
-			->setHeader('Content-Disposition', 'attachment; filename=playlist.dat', TRUE)
-			->setBody($PlaylistsModel->buildBinary($raw_data[2]));
+			$this->getResponse()
+				->setHeader('Content-Type', 'application/x-dui-playlist', TRUE)
+				->setHeader('Content-Disposition', 'attachment; filename=playlist.dat', TRUE)
+				->setBody($PlaylistsModel->buildBinary($raw_data[2]));
 		} else {
-			$this->getResponse()->setHttpResponseCode(401)
-			->setHeader('Content-Type', 'text/plain', TRUE)
-			->setBody('Playlists inaccessible; access denied.');
+			$this->getResponse()
+				->setHttpResponseCode(401)
+				->setHeader('Content-Type', 'text/plain', TRUE)
+				->setBody('Playlists inaccessible; access denied.');
 		}
 	}
-	public function generateAction()
+	public function generateAction ()
 	{
-		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->viewRenderer
+			->setNoRender();
 		$Authenticator = new Api_Model_Authenticator();
-		
 		// load our parameters from POST/GET
 		$sys_name = $this->_getParam('sys_name');
 		$signature = $this->_getParam('sig');
-		
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// we don't need $signature or the Authenticator model anymore
 			unset($signature, $Authenticator);
@@ -97,13 +99,15 @@ class Api_PlaylistsController extends Zend_Controller_Action
 			$raw_data = $PlaylistsModel->fetch($sys_name, $playlist_id);
 			// mark it as played in the db
 			$PlaylistsModel->updatePlayed($raw_data[0]);
-			$this->getResponse()->setHeader('Content-Type', 'application/x-dui-playlist', TRUE)
-			->setHeader('Content-Disposition', 'attachment; filename=playlist.dat', TRUE)
-			->setBody($PlaylistsModel->buildBinary($raw_data[2]));
+			$this->getResponse()
+				->setHeader('Content-Type', 'application/x-dui-playlist', TRUE)
+				->setHeader('Content-Disposition', 'attachment; filename=playlist.dat', TRUE)
+				->setBody($PlaylistsModel->buildBinary($raw_data[2]));
 		} else {
-			$this->getResponse()->setHttpResponseCode(401)
-			->setHeader('Content-Type', 'text/plain', TRUE)
-			->setBody('Playlists inaccessible; access denied.');
+			$this->getResponse()
+				->setHttpResponseCode(401)
+				->setHeader('Content-Type', 'text/plain', TRUE)
+				->setBody('Playlists inaccessible; access denied.');
 		}
 	}
 }

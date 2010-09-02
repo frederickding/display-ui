@@ -26,74 +26,60 @@
  */
 class Admin_Model_Weather extends Default_Model_DatabaseAbstract
 {
-    private $YWeather = null;
-    private $_cities = array();
-    /**
-     * Retrieves an associative array of all clients to which the specified user
-     * has access, based on his/her username or user ID, including associated
-     * information about the clients' location.
-     *
-     * @param int|string $_admin	username or user ID
-     * @return array an array of clients
-     */
-    public function fetchClients ($_admin)
-    {
-        if (! is_null($this->db)) {
-            $select = $this->db
-                ->select()
-                ->from(
-            array(
-            'c' => 'dui_clients'),
-            array('id',
-            'sys_name',
-            'location',
-            'link' => "CONCAT('http://weather.yahoo.com/forecast/',location,'_c.html')"))
-                ->join(
-            array(
-            'u' => 'dui_users'),
-            'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ',
-            array(
-            'admin' => 'username'))
-                ->order(
-            'id ASC');
-            if (is_int($_admin)) {
-                // treat it as the integer user ID
-                $select->where(
-                'u.id = ?',
-                $_admin,
-                'INTEGER');
-            } else {
-                // treat is as the username
-                $select->where(
-                'u.username = ?',
-                $_admin);
-            }
-            $result = $select->query()
-                ->fetchAll(
-            Zend_Db::FETCH_ASSOC);
-            foreach ($result as &$row) {
-                $row['city'] = $this->getCity(
-                $row['location']);
-            }
-            return $result;
-        }
-        return array();
-    }
-    /**
-     * Retrieves the name of a city based on a YWeather API location.
-     *
-     * @param string $_location
-     * @return string name of city
-     */
-    public function getCity ($_location)
-    {
-        // this scheme ensures the location is cached
-        if (!isset(
-        $this->_cities[$_location])) {
-            $YWeather = new Api_Model_YWeather(
-            $_location);
-            $this->_cities[$_location] = $YWeather->getCity();
-        }
-        return $this->_cities[$_location];
-    }
+	private $YWeather = null;
+	private $_cities = array();
+	/**
+	 * Retrieves an associative array of all clients to which the specified user
+	 * has access, based on his/her username or user ID, including associated
+	 * information about the clients' location.
+	 *
+	 * @param int|string $_admin	username or user ID
+	 * @return array an array of clients
+	 */
+	public function fetchClients ($_admin)
+	{
+		if (! is_null($this->db)) {
+			$select = $this->db
+				->select()
+				->from(array(
+				'c' => 'dui_clients'), array(
+				'id' ,
+				'sys_name' ,
+				'location' ,
+				'link' => "CONCAT('http://weather.yahoo.com/forecast/',location,'_c.html')"))
+				->join(array(
+				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array(
+				'admin' => 'username'))
+				->order('id ASC');
+			if (is_int($_admin)) {
+				// treat it as the integer user ID
+				$select->where('u.id = ?', $_admin, 'INTEGER');
+			} else {
+				// treat is as the username
+				$select->where('u.username = ?', $_admin);
+			}
+			$result = $select->query()
+				->fetchAll(Zend_Db::FETCH_ASSOC);
+			foreach ($result as &$row) {
+				$row['city'] = $this->getCity($row['location']);
+			}
+			return $result;
+		}
+		return array();
+	}
+	/**
+	 * Retrieves the name of a city based on a YWeather API location.
+	 *
+	 * @param string $_location
+	 * @return string name of city
+	 */
+	public function getCity ($_location)
+	{
+		// this scheme ensures the location is cached
+		if (! isset($this->_cities[$_location])) {
+			$YWeather = new Api_Model_YWeather($_location);
+			$this->_cities[$_location] = $YWeather->getCity();
+		}
+		return $this->_cities[$_location];
+	}
 }

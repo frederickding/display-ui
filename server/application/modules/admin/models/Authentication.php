@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,7 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	/**
 	 * Sets up the PasswordHash class and the database
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		$this->PasswordHash = new Default_Model_PasswordHash(8, FALSE);
 		parent::__construct();
@@ -45,24 +45,30 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	 * @param string $_password
 	 * @return boolean
 	 */
-	public function checkPassword($_user, $_password)
+	public function checkPassword ($_user, $_password)
 	{
-		$query = $this->db->quoteInto('SELECT password FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$result = $this->db->fetchOne($query);
-		if($this->PasswordHash->CheckPassword($_password, $result)) {
+		$query = $this->db
+			->quoteInto('SELECT password FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$result = $this->db
+			->fetchOne($query);
+		if ($this->PasswordHash
+			->CheckPassword($_password, $result)) {
 			return TRUE;
-		} else return FALSE;
+		} else
+			return FALSE;
 	}
 	/**
 	 * Checks whether a given user exists
 	 * @param string $_user
 	 * @return boolean|int On true, returns User ID
 	 */
-	public function userExists($_user)
+	public function userExists ($_user)
 	{
-		$query = $this->db->quoteInto('SELECT id FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$result = $this->db->fetchOne($query);
-		if(!empty($result)) return (int) $result;
+		$query = $this->db
+			->quoteInto('SELECT id FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$result = $this->db
+			->fetchOne($query);
+		if (! empty($result)) return (int) $result;
 		else return FALSE;
 	}
 	/**
@@ -72,33 +78,38 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	 * @param string $_newpass
 	 * @return boolean
 	 */
-	public function changePassword($_user, $_oldpass, $_newpass)
+	public function changePassword ($_user, $_oldpass, $_newpass)
 	{
 		// $result1 should have the user ID if old pass matches
 		// or boolean false if old password is invalid
 		$result1 = $this->checkPassword($_user, $_oldpass);
-		if($result1) {
+		if ($result1) {
 			$query = array(
-				'password' => $this->PasswordHash->HashPassword($_newpass),
-				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')
-			);
-			return $this->db->update('dui_users', $query, 'id = '.$result1);
-		} else return FALSE;
+				'password' => $this->PasswordHash
+					->HashPassword($_newpass) ,
+				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'));
+			return $this->db
+				->update('dui_users', $query, 'id = ' . $result1);
+		} else
+			return FALSE;
 	}
 	/**
 	 * Finds the ACL role of the given user
 	 * @param string|int $_user
 	 * @return string one of 'publisher', 'it' or 'admin', or when not found, ''
 	 */
-	public function userRole($_user)
+	public function userRole ($_user)
 	{
-		if(is_int($_user)) {
-			$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE id = ? LIMIT 1', $_user);
+		if (is_int($_user)) {
+			$query = $this->db
+				->quoteInto('SELECT acl_role FROM dui_users WHERE id = ? LIMIT 1', $_user);
 		} else {
-			$query = $this->db->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
+			$query = $this->db
+				->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
 		}
-		$result = $this->db->fetchOne($query);
-		if(!empty($result)) return $result;
+		$result = $this->db
+			->fetchOne($query);
+		if (! empty($result)) return $result;
 		else return '';
 	}
 }

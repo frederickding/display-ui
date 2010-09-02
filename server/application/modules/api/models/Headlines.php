@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@
  * @license http://code.google.com/p/display-ui/wiki/License Apache License 2.0
  * @version $Id$
  */
- /**
+/**
  * Provides logic for the Headlines API
  */
 class Api_Model_Headlines extends Default_Model_DatabaseAbstract
@@ -33,22 +33,25 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	 * @param string $_type [optional]
 	 * @return array
 	 */
-	public function fetch($_number = 25, $_sys_name, $_type = NULL)
+	public function fetch ($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
-		$query = $this->db->select()
-					->from(array('h' => 'dui_headlines'), 'title')
-					->joinInner(array('c' => 'dui_clients'),
-						'h.client = c.id OR h.client IS NULL', array())
-					->where('h.active = 1')
-					->where('h.expires > UTC_TIMESTAMP()')
-					->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
-					->order('RAND()')
-					->limit($_number);
-		if(!is_null($_type)) {
+		$query = $this->db
+			->select()
+			->from(array(
+			'h' => 'dui_headlines'), 'title')
+			->joinInner(array(
+			'c' => 'dui_clients'), 'h.client = c.id OR h.client IS NULL', array())
+			->where('h.active = 1')
+			->where('h.expires > UTC_TIMESTAMP()')
+			->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
+			->order('RAND()')
+			->limit($_number);
+		if (! is_null($_type)) {
 			$query = $query->where('h.type = ?', $_type);
 		}
-		return $query->query()->fetchAll(Zend_Db::FETCH_COLUMN);
+		return $query->query()
+			->fetchAll(Zend_Db::FETCH_COLUMN);
 	}
 	/**
 	 * Retrieves the headlines from the database, creates a | delimited string
@@ -57,27 +60,30 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	 * @param string $_type [optional]
 	 * @return string
 	 */
-	public function fetchConcatenated($_number = 25, $_sys_name, $_type = NULL)
+	public function fetchConcatenated ($_number = 25, $_sys_name, $_type = NULL)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
-		$query = $this->db->select()
-					->from(array('h' => 'dui_headlines'), 'title')
-					->joinInner(array('c' => 'dui_clients'),
-						'h.client = c.id OR h.client IS NULL', array())
-					->where('h.active = 1')
-					->where('h.expires > UTC_TIMESTAMP()')
-					->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
-					->order('RAND()')
-					->limit($_number);
-		if(!is_null($_type)) {
+		$query = $this->db
+			->select()
+			->from(array(
+			'h' => 'dui_headlines'), 'title')
+			->joinInner(array(
+			'c' => 'dui_clients'), 'h.client = c.id OR h.client IS NULL', array())
+			->where('h.active = 1')
+			->where('h.expires > UTC_TIMESTAMP()')
+			->where('c.sys_name = ? OR h.client IS NULL', $_sys_name)
+			->order('RAND()')
+			->limit($_number);
+		if (! is_null($_type)) {
 			$query = $query->where('h.type = ?', $_type);
 		}
-		$headlines = $query->query()->fetchAll(Zend_Db::FETCH_COLUMN);
+		$headlines = $query->query()
+			->fetchAll(Zend_Db::FETCH_COLUMN);
 		$result = '';
-		foreach($headlines as $headline) {
+		foreach ($headlines as $headline) {
 			$result .= $headline . '  |  ';
 		}
-		$result = substr($result, 0, -5);
+		$result = substr($result, 0, - 5);
 		return $result;
 	}
 }

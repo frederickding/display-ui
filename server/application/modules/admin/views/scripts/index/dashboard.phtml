@@ -36,7 +36,7 @@ else $this->inlineScript()->appendScript('$j(document).ready(function() {
 	});
 });');
 $this->headStyle()->appendStyle('table.status-report {
-	width: 50%;
+	width: 49%;
 	float: left;
 }
 table.status-report td {
@@ -54,7 +54,7 @@ table.status-report td.number {
 #status-report-users { color: #505050; }
 #status-report-videos { color: #551b7a; }
 #status-report-pictures { color: #507B38; }
-#status-report-texts { color: #bb2200; }
+#status-report-ppts { color: #bb2200; }
 table.status-report a { border-bottom: none; color: inherit; }
 table.status-report tr:nth-child(even) { background-color: #efefef; }
 .active-clients-name { font-size: 123.1%; }
@@ -112,10 +112,10 @@ ul.quick-actions li { list-style-type: square; }
 										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['images']; ?></a></td>
 										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">pictures</a></td>
 									</tr>
-<?php /*									<tr id="status-report-texts">
-										<td class="number"><a href="#texts">0</a></td>
-										<td><a href="#texts">text slides</a></td>
-									</tr> */ ?>
+									<tr id="status-report-ppts">
+										<td class="number"><a href="#ppts"><?php echo $this->statusReport['powerpoints']; ?></a></td>
+										<td><a href="#ppts">PowerPoints</a></td>
+									</tr>
 								</table>
 								<div class="clear"></div>
 							</div>
@@ -144,7 +144,9 @@ echo $this->url(array('module' => 'admin', 'controller' => 'multimedia' , 'actio
 ?>">Upload multimedia</a></li>
 									<li>Refresh caches</li>
 									<li>Make a backup</li>
-									<li>Link a client installation</li>
+									<li><a href="<?php
+echo $this->url(array('module' => 'link', 'controller' => 'index' , 'action' => 'index'));
+?>">Link a client installation</a></li>
 									<li>Tweak system options</li>
 								</ul>
 							</div>

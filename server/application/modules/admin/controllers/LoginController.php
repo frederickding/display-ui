@@ -31,7 +31,7 @@ class Admin_LoginController extends Zend_Controller_Action
 		// initiate a session for the installer
 		$this->session = new Zend_Session_Namespace('auth');
 		// make the ACL
-		if(!Zend_Registry::isRegistered('dui_acl')) {
+		if (! Zend_Registry::isRegistered('dui_acl')) {
 			$acl = new Admin_Model_Acl();
 			Zend_Registry::set('dui_acl', $acl);
 		}
@@ -40,39 +40,47 @@ class Admin_LoginController extends Zend_Controller_Action
 	{
 		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 		$_redir = $this->_getParam('redirect', '');
-		if(!empty($_redir) && $_redir[0] == '/')
-			$this->view->assign('redirect', $_redir);
-		else
-			$this->view->assign('redirect', '');
+		if (! empty($_redir) && $_redir[0] == '/') $this->view
+			->assign('redirect', $_redir);
+		else $this->view
+			->assign('redirect', '');
 	}
 	public function submitAction ()
 	{
-		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->viewRenderer
+			->setNoRender();
 		$_user = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 		$_password = trim($this->_getParam('password'));
 		$_redir = $this->_getParam('redirect');
 		$Auth = new Admin_Model_Authentication();
 		if ($Auth->checkPassword($_user, $_password)) {
-			$this->session->authenticated = TRUE;
+			$this->session->authenticated = true;
 			$this->session->username = $_user;
 			if (! empty($_redir) && $_redir[0] == '/') {
-				$this->_redirect($this->view->serverUrl() . $_redir);
+				$this->_redirect($this->view
+					->serverUrl() . $_redir);
 			} else {
 				// send them to the dashboard
-				$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				$this->_redirect($this->view
+					->serverUrl() . $this->view
+					->url(array(
 					'module' => 'admin' ,
 					'controller' => 'index' ,
 					'action' => 'dashboard')));
 			}
 		} else {
-			$this->session->authenticated = FALSE;
+			$this->session->authenticated = false;
 			if (! empty($_redir) && $_redir[0] == '/') {
-				$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				$this->_redirect($this->view
+					->serverUrl() . $this->view
+					->url(array(
 					'module' => 'admin' ,
 					'controller' => 'login' ,
 					'action' => 'index')) . '?username=' . $_user . '&redirect=' . $_redir);
 			} else {
-				$this->_redirect($this->view->serverUrl() . $this->view->url(array(
+				$this->_redirect($this->view
+					->serverUrl() . $this->view
+					->url(array(
 					'module' => 'admin' ,
 					'controller' => 'login' ,
 					'action' => 'index')) . '?username=' . $_user);
@@ -81,8 +89,10 @@ class Admin_LoginController extends Zend_Controller_Action
 	}
 	public function logoutAction ()
 	{
-		$this->_helper->layout()->setLayout('SimpleBlue');
-		$this->session->authenticated = FALSE;
+		$this->_helper
+			->layout()
+			->setLayout('SimpleBlue');
+		$this->session->authenticated = false;
 		unset($this->session->username);
 	}
 }

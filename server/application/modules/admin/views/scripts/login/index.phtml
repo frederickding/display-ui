@@ -94,6 +94,8 @@ input.submit {
 			<input type="text" name="username" id="username" value="<?php if(!$this->valid) echo $this->username; ?>" />
 			<p class="beforeinput"><label for="password">Password</label></p>
 			<input type="password" name="password" id="password" />
+			<p class="beforeinput"><label for="password">Yubikey</label></p>
+			<input type="text" name="yubikey" id="yubikey" disabled="disabled" value="soon to be implemented" />
 			<input class="submit" type="submit" value="Log in" />
 			<input type="hidden" name="redirect" id="redirect" value="<?php echo $this->redirect; ?>" />
 		</div>

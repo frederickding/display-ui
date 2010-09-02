@@ -1,5 +1,5 @@
-#Tue Aug 31 20:32:58 EDT 2010
+#Thu Sep 02 17:09:39 EDT 2010
 eclipse.preferences.version=1
 include_path=0;/Display UI Server
-org.eclipse.php.core.phpForamtterIndentationSize=4
-org.eclipse.php.core.phpForamtterUseTabs=false
+org.eclipse.php.core.phpForamtterIndentationSize=1
+org.eclipse.php.core.phpForamtterUseTabs=true

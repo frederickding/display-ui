@@ -7,9 +7,9 @@
  * you may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at
- * 		http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * or the full licensing terms for this project at
- * 		http://code.google.com/p/display-ui/wiki/License
+ * http://code.google.com/p/display-ui/wiki/License
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,8 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 	 */
 	public function __construct ()
 	{
-		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini', 'production');
+		$config = new Zend_Config_Ini(CONFIG_DIR . '/configuration.ini',
+			'production');
 		$this->_secret = $config->server->install->secret;
 		unset($config);
 		$this->_date = gmdate('Y-m-d');
@@ -67,7 +68,8 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 		elseif (sha1($this->apiKey($sys_name) . $this->_date) == $signature) {
 			$this->updateActivity($sys_name);
 			return TRUE;
-		} else return FALSE;
+		} else
+			return FALSE;
 	}
 	/**
 	 * API key generator method
@@ -85,10 +87,11 @@ class Api_Model_Authenticator extends Default_Model_DatabaseAbstract
 	public function updateActivity ($sys_name)
 	{
 		$this->connectDatabase();
-		$result = $this->db->update('dui_clients',
-			array('last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')),
-			$this->db->quoteInto('sys_name = ?', $sys_name));
-		if($result == 1) return TRUE;
+		$result = $this->db
+			->update('dui_clients', array(
+			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')), $this->db
+			->quoteInto('sys_name = ?', $sys_name));
+		if ($result == 1) return TRUE;
 		else return FALSE;
 	}
 }
