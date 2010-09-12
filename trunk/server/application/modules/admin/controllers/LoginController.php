@@ -38,8 +38,19 @@ class Admin_LoginController extends Zend_Controller_Action
 	}
 	public function indexAction ()
 	{
-		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 		$_redir = $this->_getParam('redirect', '');
+		if ($this->session->authenticated) {
+			// no need to log in again, send them on their way
+			if (! empty($_redir) && $_redir[0] == '/') $this->_redirect($this->view
+				->serverUrl() . $_redir);
+			else $this->_redirect($this->view
+				->serverUrl() . $this->view
+				->url(array(
+				'module' => 'admin' ,
+				'controller' => 'index' ,
+				'action' => 'dashboard')));
+		}
+		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
 		if (! empty($_redir) && $_redir[0] == '/') $this->view
 			->assign('redirect', $_redir);
 		else $this->view

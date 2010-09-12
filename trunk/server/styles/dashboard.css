@@ -177,6 +177,7 @@ ul.sidebar-nav li {
 }
 #sidebar-nav-dashboard a { background-image: url(../images/icons/menu/dashboard.png); }
 #sidebar-nav-headlines a { background-image: url(../images/icons/menu/headlines.png); }
+#sidebar-nav-calendar a { background-image: url(../images/icons/menu/calendar.png); }
 #sidebar-nav-multimedia a { background-image: url(../images/icons/menu/multimedia.png); }
 #sidebar-nav-weather a { background-image: url(../images/icons/menu/weather.png); }
 #sidebar-nav-clients a { background-image: url(../images/icons/menu/clients.png); }

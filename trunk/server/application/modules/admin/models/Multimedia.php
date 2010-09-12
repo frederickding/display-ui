@@ -46,7 +46,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				->from('dui_media', array(
 				'id' ,
 				'title' ,
-				'active' => 'UTC_TIMESTAMP() > activates AND (UTC_TIMESTAMP() < expires OR expires IS NULL)' ,
+				'active' => 'UTC_TIMESTAMP() > activates AND (UTC_TIMESTAMP() < expires OR expires IS NULL) AND active = 1' ,
 				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)') ,
 				'type' ,
 				'weight'))

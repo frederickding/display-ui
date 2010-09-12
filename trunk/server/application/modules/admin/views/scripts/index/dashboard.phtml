@@ -113,8 +113,8 @@ ul.quick-actions li { list-style-type: square; }
 										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">pictures</a></td>
 									</tr>
 									<tr id="status-report-ppts">
-										<td class="number"><a href="#ppts"><?php echo $this->statusReport['powerpoints']; ?></a></td>
-										<td><a href="#ppts">PowerPoints</a></td>
+										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['powerpoints']; ?></a></td>
+										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">PowerPoints</a></td>
 									</tr>
 								</table>
 								<div class="clear"></div>
