@@ -146,10 +146,9 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			/* first element is now filename / path
 			 * second element is MIME type
 			 * third element if it exists is duration
-			 * REMEMBER PHP ARRAY INDICES START AT 0
 			 */
 			// set a default duration of 20 seconds
-			if (! $medium['content'][2]) $medium['content'][2] = 20;
+			if (! isset($medium['content'][2]) || ! is_int($medium['content'][2])) $medium['content'][2] = 20;
 			$playlist[] = array(
 				'type' => $medium['type'] ,
 				'filename' => $medium['content'][0] ,
