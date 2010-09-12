@@ -117,6 +117,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				REGEXP CONCAT( '(^|[0-9]*,)', c.`id` , '(,|$)' ) ) */
 				->where('c.sys_name = ?', $_sys_name)
 			->where('UTC_TIMESTAMP() > m.activates AND (UTC_TIMESTAMP() < m.expires OR m.expires IS NULL)')
+			->where('m.active = 1')
 			->order('m.weight DESC')
 			->limit($_number);
 		$result = $query->query()
