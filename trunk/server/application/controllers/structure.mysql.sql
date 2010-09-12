@@ -1,101 +1,121 @@
--- -----------------------------------------------------------------------------
--- SQL database structure for Display UI Server
--- -----------------------------------------------------------------------------
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
---
--- Table structure for table `dui_users`
---
 
-DROP TABLE IF EXISTS `dui_users`;
-CREATE TABLE IF NOT EXISTS `dui_users` (
-  `id`			int(10) unsigned NOT NULL auto_increment,
-  `username`	varchar(64) NOT NULL,
-  `password`	varchar(64) NOT NULL,
-  `email`		varchar(128) NOT NULL,
-  `last_active`	datetime NOT NULL,
-  `acl_role`	varchar(64) NOT NULL,
-  PRIMARY KEY  (`id`,`username`),
-  KEY `email` (`email`)
-) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- -----------------------------------------------------
+-- Table `dui_users`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_users` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `username` VARCHAR(64) NOT NULL ,
+  `password` VARCHAR(64) NOT NULL ,
+  `email` VARCHAR(128) NOT NULL ,
+  `last_active` DATETIME NOT NULL ,
+  `acl_role` VARCHAR(64) NOT NULL ,
+  PRIMARY KEY (`id`, `username`) ,
+  INDEX `email` (`email` ASC) )
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
 
---
--- Table structure for table `dui_clients`
---
 
-DROP TABLE IF EXISTS `dui_clients`;
-CREATE TABLE IF NOT EXISTS `dui_clients` (
-  `id`			int(10) unsigned NOT NULL auto_increment,
-  `sys_name`	varchar(64) NOT NULL,
-  `last_active`	datetime NOT NULL,
-  `admin`		int(10) unsigned NOT NULL,
-  `users`		varchar(64) NOT NULL,
-  `location`	varchar(16) NOT NULL,
-  PRIMARY KEY  (`id`)
-) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- -----------------------------------------------------
+-- Table `dui_clients`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_clients` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `sys_name` VARCHAR(64) NOT NULL ,
+  `last_active` DATETIME NOT NULL ,
+  `admin` INT(10) UNSIGNED NOT NULL ,
+  `users` VARCHAR(64) NOT NULL ,
+  `location` VARCHAR(16) NOT NULL ,
+  PRIMARY KEY (`id`) )
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
 
---
--- Table structure for table `dui_headlines`
---
 
-DROP TABLE IF EXISTS `dui_headlines`;
-CREATE TABLE IF NOT EXISTS `dui_headlines` (
-  `id`			int(10) unsigned NOT NULL auto_increment,
-  `title`		varchar(256) NOT NULL,
-  `active`		tinyint(1) NOT NULL,
-  `expires`		datetime NOT NULL,
-  `type`		varchar(32) NOT NULL,
-  `client`		int(10) unsigned NOT NULL,
-  PRIMARY KEY  (`id`),
-  KEY `title` (`title`),
-  KEY `type` (`type`)
-) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- -----------------------------------------------------
+-- Table `dui_headlines`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_headlines` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `title` VARCHAR(256) NOT NULL ,
+  `active` TINYINT(1) NOT NULL ,
+  `expires` DATETIME NOT NULL ,
+  `type` VARCHAR(32) NOT NULL ,
+  `client` INT(10) UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `title` (`title` ASC) ,
+  INDEX `type` (`type` ASC) )
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
 
---
--- Table structure for table `dui_options`
---
 
-DROP TABLE IF EXISTS `dui_options`;
-CREATE TABLE IF NOT EXISTS `dui_options` (
-  `id`			int(10) unsigned NOT NULL auto_increment,
-  `option_name`	varchar(64) NOT NULL,
-  `option_value` mediumtext NOT NULL,
-  `client_id`	int(10) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY  (`id`),
-  KEY `option_name` (`option_name`)
-) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- -----------------------------------------------------
+-- Table `dui_options`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_options` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `option_name` VARCHAR(64) NOT NULL ,
+  `option_value` MEDIUMTEXT NOT NULL ,
+  `client_id` INT(10) UNSIGNED NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`id`) ,
+  INDEX `option_name` (`option_name` ASC) )
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
 
---
--- Table structure for table `dui_media`
---
 
-DROP TABLE IF EXISTS `dui_media`;
-CREATE TABLE IF NOT EXISTS `dui_media` (
-  `id`			int(10) unsigned NOT NULL auto_increment,
-  `title`		varchar(64) NOT NULL,
-  `activates`	datetime NOT NULL,
-  `expires`		datetime NULL,
-  `active`		tinyint(1) NOT NULL,
-  `type`		varchar(32) NOT NULL,
-  `clients`		varchar(64) NULL,
-  `weight`		smallint NOT NULL DEFAULT 1,
-  `content`		varchar(128) NOT NULL,
-  `data`		mediumblob NULL,
-  PRIMARY KEY (`id`),
-  KEY `title` (`title`)
-) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- -----------------------------------------------------
+-- Table `dui_media`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_media` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `title` VARCHAR(64) NOT NULL ,
+  `activates` DATETIME NOT NULL ,
+  `expires` DATETIME NULL DEFAULT NULL ,
+  `active` TINYINT(1) NOT NULL ,
+  `type` VARCHAR(32) NOT NULL ,
+  `clients` VARCHAR(64) NULL DEFAULT NULL ,
+  `weight` SMALLINT NOT NULL DEFAULT 1 ,
+  `content` VARCHAR(128) NOT NULL ,
+  `data` MEDIUMBLOB NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `title` (`title` ASC) )
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
 
---
--- Table structure for table `dui_playlists`
---
 
-DROP TABLE IF EXISTS `dui_playlists`;
-CREATE TABLE IF NOT EXISTS `dui_playlists` (
-  `id`			int(10) unsigned NOT NULL auto_increment,
-  `generated`	datetime NOT NULL,
-  `revision`	tinyint NOT NULL DEFAULT 1,
-  `client`		int(10) unsigned NOT NULL,
-  `played`		datetime NULL,
-  `content`		mediumtext NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `client` (`client`)
-) DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- -----------------------------------------------------
+-- Table `dui_playlists`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_playlists` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `generated` DATETIME NOT NULL ,
+  `revision` TINYINT NOT NULL DEFAULT 1 ,
+  `client` INT(10) UNSIGNED NOT NULL ,
+  `played` DATETIME NULL DEFAULT NULL ,
+  `content` MEDIUMTEXT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `client` (`client` ASC) )
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `dui_calendar`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dui_calendar` (
+  `event_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(18) NOT NULL ,
+  `time` DATETIME NOT NULL ,
+  `visible` TINYINT(1)  NOT NULL DEFAULT true ,
+  `type` ENUM('once','weekly') NOT NULL DEFAULT 'once' ,
+  `client` INT(10) UNSIGNED NULL ,
+  PRIMARY KEY (`event_id`) ,
+  INDEX `client` (`client` ASC) );
+
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
