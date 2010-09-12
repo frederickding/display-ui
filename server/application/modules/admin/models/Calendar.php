@@ -1,8 +1,8 @@
 <?php
 /**
- * Calendar model
+ * Calendar model for administrative interface
  *
- * Copyright 2010 Frederick Ding<br />
+ * Copyright 2009 Frederick Ding<br />
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  *
@@ -21,7 +21,10 @@
  * @license http://code.google.com/p/display-ui/wiki/License Apache License 2.0
  * @version $Id$
  */
-class Api_Model_Calendar extends Default_Model_DatabaseAbstract
+/**
+ * Calendar-related functionality
+ */
+class Admin_Model_Calendar extends Default_Model_DatabaseAbstract
 {
 	/**
 	 * A Zend_Db_Table object for the calendar table; makes accessing it much
@@ -37,33 +40,18 @@ class Api_Model_Calendar extends Default_Model_DatabaseAbstract
 				'db' => $this->db ,
 				'name' => 'dui_calendar'));
 	}
-	public function getAllEvents ($client)
+	public function getAllEvents ()
 	{
-		if (is_numeric($client)) {
-			$select = $this->table
-				->select(true)
-				->where('client = ?', $client)
-				->where('time < NOW() + INTERVAL 7 DAY AND time > DATE(NOW())')
-				->orWhere('type = "weekly"')
-				->order('type ASC')
-				->order('time ASC');
-		} else {
-			// treat as sysName
-			$select = $this->table
-				->select(true)
-				->columns(array(
-				'name' ,
-				'time' ,
-				'type' ,
-				'today' => new Zend_Db_Expr('DATE(time) = CURDATE()')))
-				->joinInner('dui_clients', 'dui_calendar.client = dui_clients.id', '')
-				->where('time < NOW() + INTERVAL 7 DAY AND time > DATE(NOW())')
-				->orWhere('type = "weekly"')
-				->order('type ASC')
-				->order('time ASC');
-		}
-		$events = $this->table
-			->fetchAll($select);
+		$select = $this->db
+			->select()
+			->from('dui_calendar', '*')
+			->joinInner('dui_clients', 'dui_calendar.client = dui_clients.id', 'dui_clients.sys_name')
+			->where('time < NOW() + INTERVAL 7 DAY')
+			->orWhere('type = "weekly"')
+			->order('type ASC')
+			->order('time ASC');
+		$events = $select->query()
+			->fetchAll(Zend_Db::FETCH_OBJ);
 		return $events;
 	}
 	public function insertEvent ($name, $time, $client, $visible = true, $type = 'once')
@@ -81,18 +69,15 @@ class Api_Model_Calendar extends Default_Model_DatabaseAbstract
 			'type' => $type ,
 			'client' => $client));
 	}
-	public function formatEvents (Zend_Db_Table_Rowset_Abstract $events)
+	public function deleteEvent ($id)
 	{
-		$return = $events->count() . "\n";
-		foreach ($events as $e) {
-			if ($e->type == 'weekly') {
-				// show the weekday
-				$return .= date('D g:i', strtotime($e->time)) . "\n" . $e->name . "\n";
-			} else if ($e->today == 1) {
-				$return .= date('H:i', strtotime($e->time)) . "\n" . $e->name . "\n";
-			} else
-				$return .= date('M j', strtotime($e->time)) . "\n" . $e->name . "\n";
+		$_id = (int) $id;
+		if (! is_null($this->db)) {
+			$result = $this->table
+				->delete($this->db
+				->quoteInto('event_id = ?', $_id, 'INTEGER'));
+			return (bool) $result;
 		}
-		return $return;
+		return false;
 	}
 }

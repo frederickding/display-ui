@@ -1,16 +1,3 @@
-<?php
-/* $pages1 = array(
-	array(
-		'label' => 'Dashboard',
-		'title' => 'Dashboard',
-		'module' => 'admin',
-		'controller' => 'index',
-		'action' => 'dashboard',
-		'id' => 'sidebar-nav-dashboard'
-	)
-);
-echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, array('ulClass' => 'sidebar-nav')); */
-?>
 <div class="yui-b" id="sidebar">
 	<div id="sidebar-icon"> <a href="<?php echo $this->baseUrl(''); ?>" title="<?php echo $this->systemName; ?>">Display UI Server</a> </div>
 	<ul class="sidebar-nav">
@@ -21,6 +8,9 @@ echo $this->navigation(new Zend_Navigation($pages1))->menu()->renderMenu(NULL, a
 	<ul class="sidebar-nav">
 		<li id="sidebar-nav-headlines"<?php if($this->active == 'headlines') echo ' class="active"'; ?>>
 			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'index')); ?>" title="Headlines">Headlines</a>
+		</li>
+		<li id="sidebar-nav-calendar"<?php if($this->active == 'calendar') echo ' class="active"'; ?>>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'calendar', 'action' => 'index')); ?>" title="Calendar">Calendar</a>
 		</li>
 		<li id="sidebar-nav-multimedia"<?php if($this->active == 'multimedia') echo ' class="active"'; ?>>
 			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'index')); ?>" title="Media">Multimedia</a>
