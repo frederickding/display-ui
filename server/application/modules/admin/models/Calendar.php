@@ -46,8 +46,6 @@ class Admin_Model_Calendar extends Default_Model_DatabaseAbstract
 			->select()
 			->from('dui_calendar', '*')
 			->joinInner('dui_clients', 'dui_calendar.client = dui_clients.id', 'dui_clients.sys_name')
-			->where('time < NOW() + INTERVAL 7 DAY')
-			->orWhere('type = "weekly"')
 			->order('type ASC')
 			->order('time ASC');
 		$events = $select->query()
