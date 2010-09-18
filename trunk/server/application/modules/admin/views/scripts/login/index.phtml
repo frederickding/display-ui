@@ -79,6 +79,14 @@ input.submit {
 	padding: 0.5em; width: 5em;
 	display: block;
 }
+p.error {
+	padding: 0.5em;
+	color: #500000;
+	background-color: #f5afb0;
+	width: 20em;
+	margin-left: 10em;
+	border: 1px solid #CA4455;
+}
 -->
 </style>
 </head>
@@ -89,13 +97,20 @@ input.submit {
 	</div>
 	<div id="body">
 		<form action="<?php echo $this->url(array('module' => 'admin', 'controller' => 'login', 'action' => 'submit')); ?>" method="post" id="login_form" accept-charset="utf-8">
+<?php if(isset($this->loginErrorDetails)) {
+	if($this->loginErrorDetails == 'userpass') { ?>
+		<p class="error">Username/password authentication failed.</p>
+<?php } elseif($this->loginErrorDetails == 'yubikey') { ?>
+		<p class="error">Invalid one-time password from Yubikey.</p>
+<?php }
+} ?>
 		<div>
 			<p class="beforeinput"><label for="username">Username</label></p>
 			<input type="text" name="username" id="username" value="<?php if(!$this->valid) echo $this->username; ?>" />
 			<p class="beforeinput"><label for="password">Password</label></p>
 			<input type="password" name="password" id="password" />
 			<p class="beforeinput"><label for="password">Yubikey</label></p>
-			<input type="text" name="yubikey" id="yubikey" disabled="disabled" value="soon to be implemented" />
+			<input type="text" name="yubikey" id="yubikey" />
 			<input class="submit" type="submit" value="Log in" />
 			<input type="hidden" name="redirect" id="redirect" value="<?php echo $this->redirect; ?>" />
 		</div>

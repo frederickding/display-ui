@@ -13,8 +13,10 @@ CREATE  TABLE IF NOT EXISTS `dui_users` (
   `email` VARCHAR(128) NOT NULL ,
   `last_active` DATETIME NOT NULL ,
   `acl_role` VARCHAR(64) NOT NULL ,
+  `yubikey_public` CHAR(12) NULL ,
   PRIMARY KEY (`id`, `username`) ,
-  INDEX `email` (`email` ASC) )
+  INDEX `email` (`email` ASC) ,
+  UNIQUE INDEX `yubikey_public_UNIQUE` (`yubikey_public` ASC) )
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8;
 
@@ -105,11 +107,11 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `dui_calendar`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `dui_calendar` (
-  `event_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id` BIGINT UNSIGNED NOT NULL ,
   `name` VARCHAR(18) NOT NULL ,
   `time` DATETIME NOT NULL ,
   `visible` TINYINT(1)  NOT NULL DEFAULT true ,
-  `type` ENUM('once','weekly') NOT NULL DEFAULT 'once' ,
+  `type` ENUM('once','weekly') NOT NULL DEFAULT once ,
   `client` INT(10) UNSIGNED NULL ,
   PRIMARY KEY (`event_id`) ,
   INDEX `client` (`client` ASC) );
