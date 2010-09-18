@@ -51,11 +51,29 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 			->quoteInto('SELECT password FROM dui_users WHERE username = ? LIMIT 1', $_user);
 		$result = $this->db
 			->fetchOne($query);
-		if ($this->PasswordHash
-			->CheckPassword($_password, $result)) {
-			return TRUE;
+		return $this->PasswordHash
+			->CheckPassword($_password, $result);
+	}
+	public function checkYubikey ($_user, $_otp)
+	{
+		require_once 'Auth/Yubico.php';
+		$yubi = new Auth_Yubico(4566, 'Z4bAzdALPjtAATSYPvVlBalP+jM=');
+		// check for the public ID in the db
+		$query = $this->db
+			->quoteInto('SELECT yubikey_public FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$yubikeyPublicId = $this->db
+			->fetchOne($query);
+		$otpParts = $yubi->parsePasswordOTP($_otp);
+		// if it's null, no yubikey needed
+		if (is_null($yubikeyPublicId)) return true;
+		// if it's not null, compare the prefix of the OTP to the public ID
+		else if ($otpParts['prefix'] != $yubikeyPublicId) return false;
+		// all other steps passed, check against Yubico servers
+		$auth = $yubi->verify($_otp);
+		if (PEAR::isError($auth)) {
+			return false;
 		} else
-			return FALSE;
+			return true;
 	}
 	/**
 	 * Checks whether a given user exists

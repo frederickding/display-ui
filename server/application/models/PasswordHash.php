@@ -188,4 +188,3 @@ class Default_Model_PasswordHash
 		return $hash == $stored_hash;
 	}
 }
-?>

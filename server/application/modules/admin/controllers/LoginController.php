@@ -55,18 +55,29 @@ class Admin_LoginController extends Zend_Controller_Action
 			->assign('redirect', $_redir);
 		else $this->view
 			->assign('redirect', '');
+		if ($this->_getParam('failed', false) && isset($this->session->loginErrorDetails)) {
+			$this->view
+				->assign('loginErrorDetails', $this->session->loginErrorDetails);
+		} else {
+			unset($this->view->loginErrorDetails);
+		}
 	}
 	public function submitAction ()
 	{
 		$this->_helper->viewRenderer
 			->setNoRender();
 		$_user = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
-		$_password = trim($this->_getParam('password'));
+		$_password = $this->_getParam('password');
 		$_redir = $this->_getParam('redirect');
+		$_yubikey = $this->_getParam('yubikey');
 		$Auth = new Admin_Model_Authentication();
-		if ($Auth->checkPassword($_user, $_password)) {
+		$passwordValid = $Auth->checkPassword($_user, $_password);
+		$yubikeyValid = false;
+		if ($passwordValid) $yubikeyValid = $Auth->checkYubikey($_user, $_yubikey);
+		if ($passwordValid && $yubikeyValid) {
 			$this->session->authenticated = true;
 			$this->session->username = $_user;
+			unset($this->session->loginDebug);
 			if (! empty($_redir) && $_redir[0] == '/') {
 				$this->_redirect($this->view
 					->serverUrl() . $_redir);
@@ -80,6 +91,7 @@ class Admin_LoginController extends Zend_Controller_Action
 					'action' => 'dashboard')));
 			}
 		} else {
+			$this->session->loginErrorDetails = (! $passwordValid) ? 'userpass' : ((! $yubikeyValid) ? 'yubikey' : 'unknown');
 			$this->session->authenticated = false;
 			if (! empty($_redir) && $_redir[0] == '/') {
 				$this->_redirect($this->view
@@ -87,14 +99,14 @@ class Admin_LoginController extends Zend_Controller_Action
 					->url(array(
 					'module' => 'admin' ,
 					'controller' => 'login' ,
-					'action' => 'index')) . '?username=' . $_user . '&redirect=' . $_redir);
+					'action' => 'index')) . '?failed=1&username=' . $_user . '&redirect=' . $_redir);
 			} else {
 				$this->_redirect($this->view
 					->serverUrl() . $this->view
 					->url(array(
 					'module' => 'admin' ,
 					'controller' => 'login' ,
-					'action' => 'index')) . '?username=' . $_user);
+					'action' => 'index')) . '?failed=1&username=' . $_user);
 			}
 		}
 	}
