@@ -39,7 +39,7 @@ class Api_Model_PlaylistItem
 	 */
 	const VIDEO_TYPE = 3;
 	/**
-	 * An unimplemented type of item that is an archive
+	 * A type of item that is an archive
 	 * containing a set of images (each valid in the IMAGE_TYPE)
 	 * to be played together.
 	 */
@@ -50,10 +50,6 @@ class Api_Model_PlaylistItem
 	 */
 	const POWERPOINT_TYPE = 5;
 	/**
-	 * A simple alpha fade; custom transitions are currently unimplemented
-	 */
-	const FADE_TRANS = 0;
-	/**
 	 * Item type, one of the above
 	 * @var int
 	 */
@@ -63,11 +59,6 @@ class Api_Model_PlaylistItem
 	 * @var int
 	 */
 	private $duration = 20;
-	/**
-	 * The transition between images
-	 * @var int
-	 */
-	private $transition = 0;
 	private $filename = '';
 	/**
 	 * The ID of the item from the dui_media table
@@ -80,10 +71,9 @@ class Api_Model_PlaylistItem
 	 * @param int $type
 	 * @param array $content
 	 * @param int $duration
-	 * @param int $trans
 	 * @return Api_Model_PlaylistItem fluent interface
 	 */
-	public function __construct ($media_id, $type, $content, $duration = 20, $trans = 0)
+	public function __construct ($media_id, $type, $content, $duration = 20)
 	{
 		$this->media_id = (int) $media_id;
 		if (1 <= $type && $type <= 5) {
@@ -92,10 +82,11 @@ class Api_Model_PlaylistItem
 			// throw new Exception('Bad type for Api_Playlist_Item', 100);
 			die('Bad type for Api_Playlist_Item.');
 		$this->duration = $duration;
-		$this->transition = (int) $trans;
-		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE || $this->type == self::POWERPOINT_TYPE) {
+		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE ||
+		 $this->type == self::POWERPOINT_TYPE) {
 			$this->filename = $content['filename'];
-		} elseif ($this->type == self::TEXT_TYPE) {
+		} elseif ($this->type == self::TEXT_TYPE ||
+		 $this->type == self::IMAGESHOW_TYPE) {
 			$this->filename = $content['filename'];
 		}
 	}
@@ -106,17 +97,55 @@ class Api_Model_PlaylistItem
 	{
 		return $this->type;
 	}
+	function __toStringZip ()
+	{
+		if ($this->type != self::IMAGESHOW_TYPE) {
+			return false;
+		}
+		$zip = new ZipArchive();
+		if ($zip->open($this->filename) === true) {
+			$_list = array();
+			for ($i = 0; $i < $zip->numFiles; $i ++) {
+				$item = $zip->statIndex($i);
+				if (isset($item['name']) && in_array(
+				pathinfo($item['name'], PATHINFO_EXTENSION),
+				array(
+					'jpeg',
+					'jpg',
+					'png'))) {
+					$_list[$i] = $item['name'];
+				}
+			}
+			natsort($_list);
+			$_return = null;
+			foreach ($_list as $i => $filename) {
+				$_return .= pack('cccV', $this->type, $this->duration, $i,
+				$this->media_id);
+				$_return .= pack('Va5', 11 + 5,
+				pathinfo($filename, PATHINFO_EXTENSION));
+			}
+			$zip->close();
+			return $_return;
+		}
+		return false;
+	}
 	/**
 	 * Produces a binary string containing all necessary item data
 	 * @return string
 	 */
 	public function __toString ()
 	{
+		if ($this->type == self::IMAGESHOW_TYPE) {
+			return $this->__toStringZip();
+		}
 		// TODO: add a byte (or bit) somewhere to force redownload
-		$binary = pack('cccV', $this->type, $this->duration, $this->transition, $this->media_id);
-		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE || $this->type == self::POWERPOINT_TYPE) {
+		$binary = pack('cccV', $this->type, $this->duration, 0,
+		$this->media_id);
+		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE ||
+		 $this->type == self::POWERPOINT_TYPE) {
 			// 11 for the item/type headers and 5 for the extension
-			$binary .= pack('Va5', 11 + 5, pathinfo($this->filename, PATHINFO_EXTENSION));
+			$binary .= pack('Va5', 11 + 5,
+			pathinfo($this->filename, PATHINFO_EXTENSION));
 		}
 		return $binary;
 	}

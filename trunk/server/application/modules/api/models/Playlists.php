@@ -185,6 +185,9 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				case 'ppt':
 					$item['type'] = Api_Model_PlaylistItem::POWERPOINT_TYPE;
 					break;
+				case 'zip':
+					$item['type'] = Api_Model_PlaylistItem::IMAGESHOW_TYPE;
+					break;
 				default:
 					$item['type'] = (int) 0;
 			}

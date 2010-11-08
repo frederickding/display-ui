@@ -107,11 +107,11 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `dui_calendar`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `dui_calendar` (
-  `event_id` BIGINT UNSIGNED NOT NULL ,
+  `event_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(18) NOT NULL ,
   `time` DATETIME NOT NULL ,
   `visible` TINYINT(1)  NOT NULL DEFAULT true ,
-  `type` ENUM('once','weekly') NOT NULL DEFAULT once ,
+  `type` ENUM('once','weekly') NOT NULL DEFAULT 'once' ,
   `client` INT(10) UNSIGNED NULL ,
   PRIMARY KEY (`event_id`) ,
   INDEX `client` (`client` ASC) );

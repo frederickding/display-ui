@@ -33,11 +33,15 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 	 */
 	public function isStoredDb ($_id)
 	{
-		$result = $this->db
-			->fetchOne('SELECT data IS NOT NULL AS data' . ' FROM dui_media WHERE id = ? LIMIT 1', $_id);
-		if ($result == 1) return 1;
-		elseif ($result == 0) return 0;
-		else return - 1;
+		$result = $this->db->fetchOne(
+		'SELECT data IS NOT NULL AS data' .
+		 ' FROM dui_media WHERE id = ? LIMIT 1', $_id);
+		if ($result == 1)
+			return 1;
+		elseif ($result == 0)
+			return 0;
+		else
+			return - 1;
 	}
 	/**
 	 * Gets the data stored in the SQL database
@@ -46,13 +50,12 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 	 */
 	public function retrieveFromDb ($_id)
 	{
-		$this->db
-			->setFetchMode(Zend_Db::FETCH_ASSOC);
-		$result = $this->db
-			->select()
-			->from('dui_media', array(
-			'content' ,
-			'data' ,
+		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
+		$result = $this->db->select()
+			->from('dui_media',
+		array(
+			'content',
+			'data',
 			'data_size' => 'OCTET_LENGTH(data)'))
 			->where('id = ?', $_id)
 			->limit(1)
@@ -60,9 +63,9 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 			->fetch();
 		$content = explode(';', $result['content']);
 		return array(
-			'filename' => $content[0] ,
-			'mime' => $content[1] ,
-			'data' => $result['data'] ,
+			'filename' => $content[0],
+			'mime' => $content[1],
+			'data' => $result['data'],
 			'filesize' => $result['data_size']);
 	}
 	/**
@@ -72,23 +75,41 @@ class Api_Model_Media extends Default_Model_DatabaseAbstract
 	 */
 	public function retrieveFromFile ($_id)
 	{
-		$this->db
-			->setFetchMode(Zend_Db::FETCH_ASSOC);
-		$result = $this->db
-			->select()
+		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
+		$result = $this->db->select()
 			->from('dui_media', array(
+			'type',
 			'content'))
 			->where('id = ?', $_id)
 			->limit(1)
 			->query()
 			->fetch();
-		if (empty($result['content'])) return FALSE;
+		if (empty($result['content']))
+			return FALSE;
 		$content = explode(';', $result['content']);
 		$return = array(
-			'filename' => MEDIA_DIR . '/' . $content[0] ,
-			'mime' => $content[1] ,
+			'type' => $result['type'],
+			'filename' => MEDIA_DIR . '/' . $content[0],
+			'mime' => $content[1],
 			'filesize' => filesize(MEDIA_DIR . '/' . $content[0]));
-		if (! file_exists($return['filename']) || $return['filesize'] == 0) return FALSE;
+		if (! file_exists($return['filename']) || $return['filesize'] == 0)
+			return FALSE;
 		return $return;
+	}
+	public function getFromZipFile ($filename, $index)
+	{
+		$zip = new ZipArchive();
+		if ($zip->open($filename) === true) {
+			$file = $zip->getFromIndex($index);
+			if ($file !== false) {
+				$return = array($zip->getNameIndex($index), $file);
+				$zip->close();
+				return $return;
+			} else {
+				$zip->close();
+				return false;
+			}
+		}
+		return false;
 	}
 }

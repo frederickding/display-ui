@@ -2,7 +2,7 @@
 /**
  * Login for Admin module
  *
- * Copyright 2009 Frederick Ding<br />
+ * Copyright 2009-2010 Frederick Ding<br />
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  *
@@ -41,80 +41,83 @@ class Admin_LoginController extends Zend_Controller_Action
 		$_redir = $this->_getParam('redirect', '');
 		if ($this->session->authenticated) {
 			// no need to log in again, send them on their way
-			if (! empty($_redir) && $_redir[0] == '/') $this->_redirect($this->view
-				->serverUrl() . $_redir);
-			else $this->_redirect($this->view
-				->serverUrl() . $this->view
-				->url(array(
-				'module' => 'admin' ,
-				'controller' => 'index' ,
-				'action' => 'dashboard')));
+			if (! empty($_redir) && $_redir[0] == '/')
+				$this->_redirect($this->view->serverUrl() . $_redir);
+			else
+				$this->_redirect(
+				$this->view->serverUrl() . $this->view->url(
+				array(
+					'module' => 'admin',
+					'controller' => 'index',
+					'action' => 'dashboard')));
 		}
-		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
-		if (! empty($_redir) && $_redir[0] == '/') $this->view
-			->assign('redirect', $_redir);
-		else $this->view
-			->assign('redirect', '');
-		if ($this->_getParam('failed', false) && isset($this->session->loginErrorDetails)) {
-			$this->view
-				->assign('loginErrorDetails', $this->session->loginErrorDetails);
+		$this->view->username = preg_replace('/[^a-zA-Z0-9\s]/', '',
+		$this->_getParam('username'));
+		if (! empty($_redir) && $_redir[0] == '/')
+			$this->view->assign('redirect', $_redir);
+		else
+			$this->view->assign('redirect', '');
+		if ($this->_getParam('failed', false) &&
+		 isset($this->session->loginErrorDetails)) {
+			$this->view->assign('loginErrorDetails',
+			$this->session->loginErrorDetails);
 		} else {
 			unset($this->view->loginErrorDetails);
 		}
 	}
 	public function submitAction ()
 	{
-		$this->_helper->viewRenderer
-			->setNoRender();
-		$_user = preg_replace('/[^a-zA-Z0-9\s]/', '', $this->_getParam('username'));
+		$this->_helper->viewRenderer->setNoRender();
+		$_user = preg_replace('/[^a-zA-Z0-9\s]/', '',
+		$this->_getParam('username'));
 		$_password = $this->_getParam('password');
 		$_redir = $this->_getParam('redirect');
 		$_yubikey = $this->_getParam('yubikey');
 		$Auth = new Admin_Model_Authentication();
 		$passwordValid = $Auth->checkPassword($_user, $_password);
 		$yubikeyValid = false;
-		if ($passwordValid) $yubikeyValid = $Auth->checkYubikey($_user, $_yubikey);
+		if ($passwordValid)
+			$yubikeyValid = $Auth->checkYubikey($_user, $_yubikey);
 		if ($passwordValid && $yubikeyValid) {
 			$this->session->authenticated = true;
 			$this->session->username = $_user;
 			unset($this->session->loginDebug);
 			if (! empty($_redir) && $_redir[0] == '/') {
-				$this->_redirect($this->view
-					->serverUrl() . $_redir);
+				$this->_redirect($this->view->serverUrl() . $_redir);
 			} else {
 				// send them to the dashboard
-				$this->_redirect($this->view
-					->serverUrl() . $this->view
-					->url(array(
-					'module' => 'admin' ,
-					'controller' => 'index' ,
+				$this->_redirect(
+				$this->view->serverUrl() . $this->view->url(
+				array(
+					'module' => 'admin',
+					'controller' => 'index',
 					'action' => 'dashboard')));
 			}
 		} else {
 			$this->session->loginErrorDetails = (! $passwordValid) ? 'userpass' : ((! $yubikeyValid) ? 'yubikey' : 'unknown');
 			$this->session->authenticated = false;
 			if (! empty($_redir) && $_redir[0] == '/') {
-				$this->_redirect($this->view
-					->serverUrl() . $this->view
-					->url(array(
-					'module' => 'admin' ,
-					'controller' => 'login' ,
-					'action' => 'index')) . '?failed=1&username=' . $_user . '&redirect=' . $_redir);
+				$this->_redirect(
+				$this->view->serverUrl() .
+				 $this->view->url(
+				array(
+					'module' => 'admin',
+					'controller' => 'login',
+					'action' => 'index')) . '?failed=1&username=' . $_user .
+				 '&redirect=' . $_redir);
 			} else {
-				$this->_redirect($this->view
-					->serverUrl() . $this->view
-					->url(array(
-					'module' => 'admin' ,
-					'controller' => 'login' ,
+				$this->_redirect(
+				$this->view->serverUrl() . $this->view->url(
+				array(
+					'module' => 'admin',
+					'controller' => 'login',
 					'action' => 'index')) . '?failed=1&username=' . $_user);
 			}
 		}
 	}
 	public function logoutAction ()
 	{
-		$this->_helper
-			->layout()
-			->setLayout('SimpleBlue');
+		$this->_helper->layout()->setLayout('SimpleBlue');
 		$this->session->authenticated = false;
 		unset($this->session->username);
 	}
