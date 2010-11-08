@@ -35,8 +35,7 @@ class Api_MediaController extends Zend_Controller_Action
 	 */
 	public function indexAction ()
 	{
-		$this->_helper->viewRenderer
-			->setNoRender();
+		$this->_helper->viewRenderer->setNoRender();
 		$this->getResponse()
 			->setHttpResponseCode(400)
 			->setHeader('Content-Type', 'text/plain', TRUE)
@@ -44,13 +43,13 @@ class Api_MediaController extends Zend_Controller_Action
 	}
 	public function downloadAction ()
 	{
-		$this->_helper->viewRenderer
-			->setNoRender();
+		$this->_helper->viewRenderer->setNoRender();
 		$Authenticator = new Api_Model_Authenticator();
 		// load our parameters from POST/GET
 		$sys_name = $this->_getParam('sys_name');
 		$signature = $this->_getParam('sig');
 		$medium = $this->_getParam('id');
+		$zip_index = $this->_getParam('zip_index', 0); // TODO
 		if ($Authenticator->verify($sys_name, $signature)) {
 			// we don't need the Authenticator model anymore
 			unset($Authenticator);
@@ -62,28 +61,44 @@ class Api_MediaController extends Zend_Controller_Action
 				$this->getResponse()
 					->setHeader('Content-Type', $query['mime'], TRUE)
 					->setHeader('Content-Length', $query['filesize'], TRUE)
-					->setHeader('Content-Disposition', 'attachment; filename="' . $query['filename'] . '"', TRUE)
+					->setHeader('Content-Disposition',
+				'attachment; filename="' . $query['filename'] . '"', TRUE)
 					->setHeader('X-DUI-File-Source', 'database')
 					->setBody($query['data']);
 			} elseif ($isStoredDb === 0) {
 				$query = $MediaModel->retrieveFromFile($medium);
-				if ($query !== FALSE) {
+				if ($query !== FALSE && $query['type'] != 'zip') {
 					// get it from the filesystem
 					$this->getResponse()
 						->setHeader('Content-Type', $query['mime'], TRUE)
 						->setHeader('Content-Length', $query['filesize'], TRUE)
-						->setHeader('Content-Disposition', 'attachment; filename="' . basename($query['filename']) . '"', TRUE)
+						->setHeader('Content-Disposition',
+					'attachment; filename="' . basename($query['filename']) . '"',
+					TRUE)
 						->setHeader('X-DUI-File-Source', 'filesystem')
 						->sendHeaders();
-					$this->getResponse()
-						->clearBody();
+					$this->getResponse()->clearBody();
 					readfile($query['filename']);
 					die();
+				} elseif ($query !== FALSE && $query['type'] == 'zip') {
+					$file = $MediaModel->getFromZipFile($query['filename'],
+					$zip_index);
+					$this->getResponse()
+						->setHeader('Content-Type', 'application/octet-stream',
+					TRUE)
+						->setHeader('Content-Length', strlen($file[1]), TRUE)
+						->setHeader('Content-Disposition',
+					'attachment; filename="' . basename($file[0]) . '"', TRUE)
+						->setHeader('X-DUI-File-Source', 'archive')
+						->sendHeaders();
+					$this->getResopnse()->clearBody();
+					print $file[1];
 				} else {
 					$this->getResponse()
 						->setHttpResponseCode(404)
 						->setHeader('Content-Type', 'text/plain', TRUE)
-						->setBody('The media item could not be located on the filesystem.');
+						->setBody(
+					'The media item could not be located on the filesystem.');
 				}
 			} else {
 				$this->getResponse()

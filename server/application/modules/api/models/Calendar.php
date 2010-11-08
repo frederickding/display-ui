@@ -43,7 +43,7 @@ class Api_Model_Calendar extends Default_Model_DatabaseAbstract
 			$select = $this->table
 				->select(true)
 				->where('client = ?', $client)
-				->where('time < NOW() + INTERVAL 7 DAY AND time > DATE(NOW())')
+				->where('time < (NOW() + INTERVAL 7 DAY) AND time > DATE(NOW())')
 				->orWhere('type = "weekly"')
 				->order('type ASC')
 				->order('time ASC');
@@ -57,7 +57,7 @@ class Api_Model_Calendar extends Default_Model_DatabaseAbstract
 				'type' ,
 				'today' => new Zend_Db_Expr('DATE(time) = CURDATE()')))
 				->joinInner('dui_clients', 'dui_calendar.client = dui_clients.id', '')
-				->where('time < NOW() + INTERVAL 7 DAY AND time > DATE(NOW())')
+				->where('time < (NOW() + INTERVAL 7 DAY) AND time > DATE(NOW())')
 				->orWhere('type = "weekly"')
 				->order('type ASC')
 				->order('time ASC');
