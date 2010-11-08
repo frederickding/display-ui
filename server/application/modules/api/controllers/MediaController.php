@@ -91,7 +91,7 @@ class Api_MediaController extends Zend_Controller_Action
 					'attachment; filename="' . basename($file[0]) . '"', TRUE)
 						->setHeader('X-DUI-File-Source', 'archive')
 						->sendHeaders();
-					$this->getResopnse()->clearBody();
+					$this->getResponse()->clearBody();
 					print $file[1];
 				} else {
 					$this->getResponse()
