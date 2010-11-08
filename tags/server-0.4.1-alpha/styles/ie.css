@@ -1,0 +1,11 @@
+@charset "utf-8";
+/* Only IE uses this */
+
+#hd {
+	left: 17.1em;
+}
+#bd #yui-main .yui-b {
+	margin-left: 17.1em;
+}
+table.status-report tr + tr { background-color: #efefef; }
+table.status-report tr + tr + tr { background-color: #ffffff; }
