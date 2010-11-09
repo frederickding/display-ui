@@ -34,15 +34,14 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	 */
 	public function fetch ($_sys_name, $_id = NULL)
 	{
-		$this->db
-			->setFetchMode(Zend_Db::FETCH_OBJ);
+		$this->db->setFetchMode(Zend_Db::FETCH_OBJ);
 		if (is_null($_id)) {
-			$query = $this->db
-				->select()
+			$query = $this->db->select()
 				->from(array(
-				'p' => 'dui_playlists'), array(
-				'id' ,
-				'generated' ,
+				'p' => 'dui_playlists'),
+			array(
+				'id',
+				'generated',
 				'content'))
 				->joinInner(array(
 				'c' => 'dui_clients'), 'p.client = c.id', '')
@@ -51,19 +50,18 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				->order('RAND()')
 				->limit(1);
 		} else {
-			$query = $this->db
-				->select()
+			$query = $this->db->select()
 				->from(array(
-				'p' => 'dui_playlists'), array(
-				'id' ,
-				'generated' ,
+				'p' => 'dui_playlists'),
+			array(
+				'id',
+				'generated',
 				'content'))
 				->where('p.played IS NULL')
 				->where('p.id = ?', $_id)
 				->limit(1);
 		}
-		$result = $query->query()
-			->fetch();
+		$result = $query->query()->fetch();
 		/* $query = $this->db->quoteInto('SELECT p.`id`, p.`generated`, p.`content`
 			FROM `dui_playlists` AS p
 			INNER JOIN `dui_clients` AS c ON (p.`client`=c.`id`)
@@ -73,8 +71,8 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 		$result = $this->db->fetchRow($query); */
 		if (is_string($result->content)) {
 			return array(
-				$result->id ,
-				$result->generated ,
+				$result->id,
+				$result->generated,
 				$result->content);
 		} else
 			return FALSE;
@@ -90,8 +88,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 		$_id = (int) $_id;
 		$query = array(
 			'played' => new Zend_Db_Expr('UTC_TIMESTAMP()'));
-		return $this->db
-			->update('dui_playlists', $query, 'id = ' . $_id);
+		return $this->db->update('dui_playlists', $query, 'id = ' . $_id);
 	}
 	/**
 	 * Gets media from the media table
@@ -101,27 +98,26 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	 */
 	private function getMedia ($_sys_name, $_number = 20)
 	{
-		$this->db
-			->setFetchMode(Zend_Db::FETCH_ASSOC);
-		$query = $this->db
-			->select()
+		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
+		$query = $this->db->select()
 			->from(array(
 			'm' => 'dui_media'), array(
-			'id' ,
-			'type' ,
+			'id',
+			'type',
 			'content'))
 			->joinInner(array(
-			'c' => 'dui_clients'), 'm.clients REGEXP CONCAT(\'(^|[0-9]*,)\', c.id, \'(,|$)\')', '')
+			'c' => 'dui_clients'),
+		'm.clients REGEXP CONCAT(\'(^|[0-9]*,)\', c.id, \'(,|$)\')', '')
 				/* (^|[0-9]*,)###(,|$) searches in comma-delimited clients column
 				INNER JOIN `dui_clients` AS c ON ( m.`clients`
 				REGEXP CONCAT( '(^|[0-9]*,)', c.`id` , '(,|$)' ) ) */
 				->where('c.sys_name = ?', $_sys_name)
-			->where('UTC_TIMESTAMP() > m.activates AND (UTC_TIMESTAMP() < m.expires OR m.expires IS NULL)')
+			->where(
+		'UTC_TIMESTAMP() > m.activates AND (UTC_TIMESTAMP() < m.expires OR m.expires IS NULL)')
 			->where('m.active = 1')
 			->order('m.weight DESC')
 			->limit($_number);
-		$result = $query->query()
-			->fetchAll();
+		$result = $query->query()->fetchAll();
 		return $result;
 	}
 	/**
@@ -149,28 +145,28 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 			 * third element if it exists is duration
 			 */
 			// set a default duration of 20 seconds
-			if (! isset($medium['content'][2]) || ! is_int($medium['content'][2])) $medium['content'][2] = 20;
+			if (! isset($medium['content'][2]) ||
+			 ! is_int($medium['content'][2]))
+				$medium['content'][2] = 20;
 			$playlist[] = array(
-				'type' => $medium['type'] ,
-				'filename' => $medium['content'][0] ,
-				'duration' => ($medium['type'] == 'video') ? 'file' : $medium['content'][2] ,
+				'type' => $medium['type'],
+				'filename' => $medium['content'][0],
+				'duration' => ($medium['type'] == 'video') ? 'file' : $medium['content'][2],
 				'media-id' => (int) $medium['id']);
 		}
-		$client_id = $this->db
-			->fetchOne('SELECT id FROM dui_clients WHERE sys_name = ? LIMIT 1', $_sys_name);
-		$this->db
-			->insert('dui_playlists', array(
-			'generated' => new Zend_Db_Expr('UTC_TIMESTAMP()') ,
-			'client' => $client_id ,
+		$client_id = $this->db->fetchOne(
+		'SELECT id FROM dui_clients WHERE sys_name = ? LIMIT 1', $_sys_name);
+		$this->db->insert('dui_playlists',
+		array(
+			'generated' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
+			'client' => $client_id,
 			'content' => serialize($playlist)));
-		return $this->db
-			->lastInsertId('dui_playlists');
+		return $this->db->lastInsertId('dui_playlists');
 	}
 	public function buildBinary ($_playlist)
 	{
 		$_playlist = unserialize($_playlist);
 		$playlist_objects = array();
-		$binary = pack('v', count($_playlist));
 		foreach ($_playlist as $item) {
 			switch ($item['type']) {
 				case 'image':
@@ -191,14 +187,23 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				default:
 					$item['type'] = (int) 0;
 			}
-			$playlist_objects[] = new Api_Model_PlaylistItem(
-				$item['media-id'], $item['type'],
-				array(
-					'filename' => $item['filename']), $item['duration']);
+			$playlist_objects[] = new Api_Model_PlaylistItem($item['media-id'],
+			$item['type'], array(
+				'filename' => $item['filename']), $item['duration']);
 		}
+		$count = 0;
+		// $binary = pack('v', count($_playlist));
+		$binary = '';
 		foreach ($playlist_objects as $item) {
+			if ($item->getType() == Api_Model_PlaylistItem::IMAGESHOW_TYPE) {
+				// count zip items
+				$tmp = $item->ZipToString();
+				$count += $tmp['count'];
+				$binary .= $tmp['binary'];
+			} else
+				$count ++;
 			$binary .= $item->__toString();
 		}
-		return $binary;
+		return pack('v', $count) . $binary;
 	}
 }

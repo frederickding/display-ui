@@ -97,7 +97,7 @@ class Api_Model_PlaylistItem
 	{
 		return $this->type;
 	}
-	function __toStringZip ()
+	function zipToString ()
 	{
 		if ($this->type != self::IMAGESHOW_TYPE) {
 			return false;
@@ -112,16 +112,21 @@ class Api_Model_PlaylistItem
 				array(
 					'jpeg',
 					'jpg',
-					'png'))) {
+					'png',
+					'JPG',
+					'JPEG',
+					'PNG'))) {
 					$_list[$i] = $item['name'];
 				}
 			}
 			natsort($_list);
-			$_return = null;
+			$_return = array(
+				'count' => count($_list),
+				'binary' => '');
 			foreach ($_list as $i => $filename) {
-				$_return .= pack('cccV', $this->type, $this->duration, $i,
-				$this->media_id);
-				$_return .= pack('Va5', 11 + 5,
+				$_return['binary'] .= pack('cccV', $this->type, $this->duration,
+				$i, $this->media_id);
+				$_return['binary'] .= pack('Va5', 11 + 5,
 				pathinfo($filename, PATHINFO_EXTENSION));
 			}
 			$zip->close();
@@ -135,18 +140,18 @@ class Api_Model_PlaylistItem
 	 */
 	public function __toString ()
 	{
-		if ($this->type == self::IMAGESHOW_TYPE) {
-			return $this->__toStringZip();
+		if ($this->type != self::IMAGESHOW_TYPE) {
+			// TODO: add a byte (or bit) somewhere to force redownload
+			$binary = pack('cccV', $this->type, $this->duration, 0,
+			$this->media_id);
+			if ($this->type == self::IMAGE_TYPE ||
+			 $this->type == self::VIDEO_TYPE ||
+			 $this->type == self::POWERPOINT_TYPE) {
+				// 11 for the item/type headers and 5 for the extension
+				$binary .= pack('Va5', 11 + 5,
+				pathinfo($this->filename, PATHINFO_EXTENSION));
+			}
+			return $binary;
 		}
-		// TODO: add a byte (or bit) somewhere to force redownload
-		$binary = pack('cccV', $this->type, $this->duration, 0,
-		$this->media_id);
-		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE ||
-		 $this->type == self::POWERPOINT_TYPE) {
-			// 11 for the item/type headers and 5 for the extension
-			$binary .= pack('Va5', 11 + 5,
-			pathinfo($this->filename, PATHINFO_EXTENSION));
-		}
-		return $binary;
 	}
 }
