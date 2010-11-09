@@ -83,9 +83,7 @@ class Api_Model_PlaylistItem
 			die('Bad type for Api_Playlist_Item.');
 		$this->duration = $duration;
 		if ($this->type == self::IMAGE_TYPE || $this->type == self::VIDEO_TYPE ||
-		 $this->type == self::POWERPOINT_TYPE) {
-			$this->filename = $content['filename'];
-		} elseif ($this->type == self::TEXT_TYPE ||
+		 $this->type == self::POWERPOINT_TYPE || $this->type == self::TEXT_TYPE ||
 		 $this->type == self::IMAGESHOW_TYPE) {
 			$this->filename = $content['filename'];
 		}
@@ -103,7 +101,7 @@ class Api_Model_PlaylistItem
 			return false;
 		}
 		$zip = new ZipArchive();
-		if ($zip->open($this->filename) === true) {
+		if ($zip->open(MEDIA_DIR . '/' . $this->filename) === true) {
 			$_list = array();
 			for ($i = 0; $i < $zip->numFiles; $i ++) {
 				$item = $zip->statIndex($i);
