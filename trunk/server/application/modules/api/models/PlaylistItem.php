@@ -93,11 +93,11 @@ class Api_Model_PlaylistItem
 	/**
 	 * @return int the item $type
 	 */
-	function getType ()
+	public function getType ()
 	{
 		return $this->type;
 	}
-	function zipToString ()
+	public function zipToString ()
 	{
 		if ($this->type != self::IMAGESHOW_TYPE) {
 			return false;

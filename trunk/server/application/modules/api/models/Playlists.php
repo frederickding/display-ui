@@ -197,7 +197,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 		foreach ($playlist_objects as $item) {
 			if ($item->getType() == Api_Model_PlaylistItem::IMAGESHOW_TYPE) {
 				// count zip items
-				$tmp = $item->ZipToString();
+				$tmp = $item->zipToString();
 				$count += $tmp['count'];
 				$binary .= $tmp['binary'];
 			} else
