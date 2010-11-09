@@ -200,9 +200,10 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				$tmp = $item->zipToString();
 				$count += $tmp['count'];
 				$binary .= $tmp['binary'];
-			} else
+			} else {
 				$count ++;
-			$binary .= $item->__toString();
+				$binary .= $item->__toString();
+			}
 		}
 		return pack('v', $count) . $binary;
 	}
