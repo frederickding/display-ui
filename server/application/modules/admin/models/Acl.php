@@ -178,4 +178,7 @@ class Admin_Model_Acl
 			->isAllowed('it', 'headlines', 'view') ? "allowed\n" : "denied\n");
 		return $dump;
 	}
+	public function getRoles() {
+		return $this->acl->getRoles();
+	}
 }
