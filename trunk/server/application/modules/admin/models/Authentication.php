@@ -47,28 +47,29 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	 */
 	public function checkPassword ($_user, $_password)
 	{
-		$query = $this->db
-			->quoteInto('SELECT password FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$result = $this->db
-			->fetchOne($query);
-		return $this->PasswordHash
-			->CheckPassword($_password, $result);
+		$query = $this->db->quoteInto(
+		'SELECT password FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$result = $this->db->fetchOne($query);
+		return $this->PasswordHash->CheckPassword($_password, $result);
 	}
 	public function checkYubikey ($_user, $_otp)
 	{
 		require_once 'Auth/Yubico.php';
 		$yubi = new Auth_Yubico(4566, 'Z4bAzdALPjtAATSYPvVlBalP+jM=');
 		// check for the public ID in the db
-		$query = $this->db
-			->quoteInto('SELECT yubikey_public FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$yubikeyPublicId = $this->db
-			->fetchOne($query);
+		$query = $this->db->quoteInto(
+		'SELECT yubikey_public FROM dui_users WHERE username = ? LIMIT 1',
+		$_user);
+		$yubikeyPublicId = $this->db->fetchOne($query);
 		$otpParts = $yubi->parsePasswordOTP($_otp);
 		// if it's null, no yubikey needed
-		if (is_null($yubikeyPublicId)) return true;
-		// if it's not null, compare the prefix of the OTP to the public ID
-		else if ($otpParts['prefix'] != $yubikeyPublicId) return false;
-		// all other steps passed, check against Yubico servers
+		if (is_null($yubikeyPublicId))
+			return true;
+				// if it's not null, compare the prefix of the OTP to the public ID
+		else
+			if ($otpParts['prefix'] != $yubikeyPublicId)
+				return false;
+				// all other steps passed, check against Yubico servers
 		$auth = $yubi->verify($_otp);
 		if (PEAR::isError($auth)) {
 			return false;
@@ -82,12 +83,13 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	 */
 	public function userExists ($_user)
 	{
-		$query = $this->db
-			->quoteInto('SELECT id FROM dui_users WHERE username = ? LIMIT 1', $_user);
-		$result = $this->db
-			->fetchOne($query);
-		if (! empty($result)) return (int) $result;
-		else return FALSE;
+		$query = $this->db->quoteInto(
+		'SELECT id FROM dui_users WHERE username = ? LIMIT 1', $_user);
+		$result = $this->db->fetchOne($query);
+		if (! empty($result))
+			return (int) $result;
+		else
+			return FALSE;
 	}
 	/**
 	 * Updates a user's password
@@ -103,11 +105,9 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 		$result1 = $this->checkPassword($_user, $_oldpass);
 		if ($result1) {
 			$query = array(
-				'password' => $this->PasswordHash
-					->HashPassword($_newpass) ,
+				'password' => $this->PasswordHash->HashPassword($_newpass),
 				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'));
-			return $this->db
-				->update('dui_users', $query, 'id = ' . $result1);
+			return $this->db->update('dui_users', $query, 'id = ' . $result1);
 		} else
 			return FALSE;
 	}
@@ -119,15 +119,42 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 	public function userRole ($_user)
 	{
 		if (is_int($_user)) {
-			$query = $this->db
-				->quoteInto('SELECT acl_role FROM dui_users WHERE id = ? LIMIT 1', $_user);
+			$query = $this->db->quoteInto(
+			'SELECT acl_role FROM dui_users WHERE id = ? LIMIT 1', $_user);
 		} else {
-			$query = $this->db
-				->quoteInto('SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
+			$query = $this->db->quoteInto(
+			'SELECT acl_role FROM dui_users WHERE username = ? LIMIT 1', $_user);
 		}
-		$result = $this->db
-			->fetchOne($query);
-		if (! empty($result)) return $result;
-		else return '';
+		$result = $this->db->fetchOne($query);
+		if (! empty($result))
+			return $result;
+		else
+			return '';
+	}
+	public function insertUser ($_user, $_password, $_email, $_role,
+	$_yubikey = null)
+	{
+		if (! in_array($_role, array(
+			'admin',
+			'publisher',
+			'it'))) {
+			return false;
+		}
+		$PasswordHash = new Default_Model_PasswordHash(8, FALSE);
+		try {
+			$insert = array(
+				'username' => $_user,
+				'password' => $PasswordHash->HashPassword($_password),
+				'email' => $_email,
+				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
+				'acl_role' => $_role);
+			if (! empty($_yubikey)) {
+				$insert['yubikey_public'] = $_yubikey;
+			}
+			$this->db->insert('dui_users', $insert);
+		} catch (Zend_Db_Exception $e) {
+			return false;
+		}
+		return $this->db->lastInsertId();
 	}
 }
