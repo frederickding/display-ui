@@ -43,8 +43,9 @@ class Api_Model_Calendar extends Default_Model_DatabaseAbstract
 			$select = $this->table
 				->select(true)
 				->where('client = ?', $client)
-				->where('time < (NOW() + INTERVAL 7 DAY) AND time > DATE(NOW())')
+				->where('time < (NOW() + INTERVAL 7 DAY) AND time > UTC_TIMESTAMP()')
 				->orWhere('type = "weekly"')
+				->orWhere('TIME(time) = "00:00:00" AND DATE(time) = UTC_DATE()')
 				->order('type ASC')
 				->order('time ASC');
 		} else {
