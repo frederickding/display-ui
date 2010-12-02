@@ -11,3 +11,10 @@ This is the first published version of the server; we began tagging alpha releas
   * It is now possible to *view* image items on the list of multimedia through the "View" link.
   * User experience on the multimedia upload form is improved by attaching descriptions/hints to the form fields that need them, instead of a list at the top of the page.
   * There is now *a form to add headlines* in the headlines management section, more flexible than QuickLine — expiry and category can be set.
+== Version 0.4 series ==
+These versions add significant new functionality.
+=== Version 0.4.0-alpha ===
+  * A Calendar has been implemented, and simple events can be added through the control panel.
+  * Yubikey one-time password security has been implemented.
+=== Version 0.4.1-alpha ===
+  * ZIP archive support added to show a set of images together, in alphabetical order of the filenames.
