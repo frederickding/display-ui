@@ -8,6 +8,8 @@ The Display UI server is powered by PHP, and requires the following components, 
   * PHP 5.2.4
    * Hash extension
    * cURL (or sockets)
+   * Zip extension
+   * PEAR
    * PDO (or MySQLi)
    * Safe mode off
    * Output buffering off
