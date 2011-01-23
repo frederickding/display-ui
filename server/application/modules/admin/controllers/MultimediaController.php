@@ -111,6 +111,22 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			return $this->render('upload');
 		}
 	}
+	public function toggleAction ()
+	{
+		$id = $this->_getParam('id');
+		$MediaModel = new Admin_Model_Multimedia();
+		if (! is_null($id) &&
+		 $MediaModel->canModify($this->auth_session->username, $id)) {
+			$MediaModel->toggleActive($id);
+		}
+		// redir back to list
+		return $this->_redirect(
+		$this->view->serverUrl() . $this->view->url(
+		array(
+			'module' => 'admin',
+			'controller' => 'multimedia',
+			'action' => 'index')));
+	}
 	/**
 	 * Shows a confirmation page for deletion of an item
 	 */

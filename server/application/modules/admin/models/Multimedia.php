@@ -99,8 +99,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'pps',
 				'ppsx'))) {
 				$type = self::POWERPOINT_TYPE;
-			} elseif (in_array($extension,
-			array(
+			} elseif (in_array($extension, array(
 				'zip',
 				'duizip'))) {
 				$type = self::ARCHIVE_TYPE;
@@ -248,6 +247,18 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 			return (bool) $result;
 		}
 		return FALSE;
+	}
+	public function toggleActive ($_id)
+	{
+		$_id = (int) $_id;
+		if (! is_null($this->db)) {
+			$query = $this->db->update('dui_media',
+			array(
+				'active' => new Zend_Db_Expr('IF(active = 1, 0, 1)')),
+			$this->db->quoteInto('id = ?', $_id));
+			return (bool) $query;
+		}
+		return false;
 	}
 	public function getMedium ($_id)
 	{
