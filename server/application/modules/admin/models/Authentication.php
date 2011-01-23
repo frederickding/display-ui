@@ -140,11 +140,10 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 			'it'))) {
 			return false;
 		}
-		$PasswordHash = new Default_Model_PasswordHash(8, FALSE);
 		try {
 			$insert = array(
 				'username' => $_user,
-				'password' => $PasswordHash->HashPassword($_password),
+				'password' => $this->PasswordHash->HashPassword($_password),
 				'email' => $_email,
 				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
 				'acl_role' => $_role);

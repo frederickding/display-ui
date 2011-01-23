@@ -44,7 +44,7 @@ tr:hover td.expires, tr:hover td.active, tr:hover td.weight { color: inherit; }
 td.actions a { border-bottom: none; margin: 0 0.25em; }
 td.actions a:hover { border-bottom: inherit; }
 td.actions a.view { color: #507b38; }
-td.actions a.edit { color: #551b7a; }
+td.actions a.toggle { color: #551b7a; }
 td.actions a.delete { color: #bb2200; }
 .video_type { color: #551b7a; }
 .image_type { color: #507b38; }
@@ -82,10 +82,10 @@ foreach ($this->mediaData as $medium) {
 		'controller' => 'multimedia' ,
 		'action' => 'view'
 	)) . '?id='.$medium['id'];
-	$medium['editLink'] = $this->url(array(
+	$medium['toggleLink'] = $this->url(array(
 		'module' => 'admin' ,
 		'controller' => 'multimedia' ,
-		'action' => 'edit'
+		'action' => 'toggle'
 	)) . '?id='.$medium['id'];
 	$medium['delLink'] = $this->url(array(
 		'module' => 'admin' ,
@@ -99,9 +99,13 @@ foreach ($this->mediaData as $medium) {
 		<td class="expires">' . $medium['expires'] . '</td>
 		<td class="type ' . $medium['type'] . '_type">' . $medium['type'] . '</td>
 		<td class="weight">' . $medium['weight'] . '</td>
-		<td class="actions"><a href="'.$medium['viewLink'].'" class="view">View</a>
-		<a href="'.$medium['editLink'].'" class="edit">Edit</a>
-		<a href="'.$medium['delLink'].'" class="delete">Delete</a></td>
+		<td class="actions"><a href="'.$medium['viewLink'].'" class="view">View</a>';
+	if($medium['active'] == 'Yes') {
+		echo '		<a href="'.$medium['toggleLink'].'" class="toggle">Disable</a>';
+	} else {
+		echo '		<a href="'.$medium['toggleLink'].'" class="toggle">Enable</a>';
+	}
+	echo '		<a href="'.$medium['delLink'].'" class="delete">Delete</a></td>
 	</tr>';
 }
 ?>
