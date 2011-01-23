@@ -106,10 +106,10 @@ foreach ($this->mediaData as $medium) {
 	 '</td>';
 	if ($medium['active'] == 'Yes') {
 		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
-		 ' title="Deactivate this item">' . $medium['active'] . '</a></td>';
+		 '" title="Deactivate this item">' . $medium['active'] . '</a></td>';
 	} else {
 		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
-		 ' title="Activate this item">' . $medium['active'] . '</a></td>';
+		 '" title="Activate this item">' . $medium['active'] . '</a></td>';
 	}
 	echo '		<td class="expires">' . $medium['expires'] . '</td>
 		<td class="type ' . $medium['type'] . '_type">' . $medium['type'] . '</td>
