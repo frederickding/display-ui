@@ -102,21 +102,21 @@ foreach ($this->mediaData as $medium) {
 		'action' => 'delete')) . '?id=' . $medium['id'];
 	echo '	<tr class="body">
 		<td class="id">' . $medium['id'] . '</td>
-		<td class="title ' . $medium['type'] . '_type">' . $medium['title'] . '</td>
-		<td class="active">' . $medium['active'] . '</td>
-		<td class="expires">' . $medium['expires'] . '</td>
+		<td class="title ' . $medium['type'] . '_type">' . $medium['title'] .
+	 '</td>';
+	if ($medium['active'] == 'Yes') {
+		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
+		 ' title="Deactivate this item">' . $medium['active'] . '</a></td>';
+	} else {
+		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
+		 ' title="Activate this item">' . $medium['active'] . '</a></td>';
+	}
+	echo '		<td class="expires">' . $medium['expires'] . '</td>
 		<td class="type ' . $medium['type'] . '_type">' . $medium['type'] . '</td>
 		<td class="weight">' . $medium['weight'] . '</td>
 		<td class="actions">';
 	if ($medium['type'] == 'image')
 		echo '<a href="' . $medium['viewLink'] . '" class="view">View</a>';
-	if ($medium['active'] == 'Yes') {
-		echo '		<a href="' . $medium['toggleLink'] .
-		 '" class="toggle">Disable</a>';
-	} else {
-		echo '		<a href="' . $medium['toggleLink'] .
-		 '" class="toggle">Enable</a>';
-	}
 	echo '		<a href="' . $medium['delLink'] . '" class="delete">Delete</a></td>
 	</tr>';
 }
