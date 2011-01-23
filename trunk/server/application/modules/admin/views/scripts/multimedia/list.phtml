@@ -17,8 +17,7 @@ $this->headStyle()->appendStyle(
 	color: #383a3b;
 }
 #media-list th {
-	background: #d1d1d1 url(' .
- $this->baseUrl('images/widget-bg.png') . ') repeat-x;
+	background: #d1d1d1 url(' . $this->baseUrl('images/widget-bg.png') . ') repeat-x;
 	padding: 0.25em 0.5em;
 	margin: 0;
 	height: 1.5em; line-height: 1.25em;
@@ -103,16 +102,14 @@ foreach ($this->mediaData as $medium) {
 		'action' => 'delete')) . '?id=' . $medium['id'];
 	echo '	<tr class="body">
 		<td class="id">' . $medium['id'] . '</td>
-		<td class="title ' .
-	 $medium['type'] . '_type">' . $medium['title'] . '</td>
+		<td class="title ' . $medium['type'] . '_type">' . $medium['title'] . '</td>
 		<td class="active">' . $medium['active'] . '</td>
 		<td class="expires">' . $medium['expires'] . '</td>
-		<td class="type ' .
-	 $medium['type'] . '_type">' . $medium['type'] . '</td>
-		<td class="weight">' . $medium['weight'] .
-	 '</td>
-		<td class="actions"><a href="' .
-	 $medium['viewLink'] . '" class="view">View</a>';
+		<td class="type ' . $medium['type'] . '_type">' . $medium['type'] . '</td>
+		<td class="weight">' . $medium['weight'] . '</td>
+		<td class="actions">';
+	if ($medium['type'] == 'image')
+		echo '<a href="' . $medium['viewLink'] . '" class="view">View</a>';
 	if ($medium['active'] == 'Yes') {
 		echo '		<a href="' . $medium['toggleLink'] .
 		 '" class="toggle">Disable</a>';
@@ -120,9 +117,7 @@ foreach ($this->mediaData as $medium) {
 		echo '		<a href="' . $medium['toggleLink'] .
 		 '" class="toggle">Enable</a>';
 	}
-	if ($medium['type'] == 'image')
-		echo '		<a href="' . $medium['delLink'] . '" class="delete">Delete</a>';
-	echo '</td>
+	echo '		<a href="' . $medium['delLink'] . '" class="delete">Delete</a></td>
 	</tr>';
 }
 ?>
