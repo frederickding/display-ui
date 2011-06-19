@@ -44,25 +44,27 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 	 * @param string $_dbname
 	 * @param string $_driver [optional]
 	 */
-	public function __construct ($_installed, $_host = 'localhost', $_username = '', $_password = '', $_dbname = '', $_driver = 'Pdo_Mysql')
+	public function __construct ($_installed, $_host = 'localhost', $_username = '',
+	$_password = '', $_dbname = '', $_driver = 'Pdo_Mysql')
 	{
 		if (! $_installed) {
 			$this->_host = trim($_host);
 			$this->_username = trim($_username);
 			$this->_password = $_password;
 			$this->_dbname = trim($_dbname);
-			$this->_driver = (in_array($_driver, array(
-				'Pdo_Mysql' ,
+			$this->_driver = (in_array($_driver,
+			array(
+				'Pdo_Mysql',
 				'Mysqli'))) ? $_driver : 'Pdo_Mysql';
 			try {
-				$this->db = Zend_Db::factory($this->_driver, array(
-					'host' => $this->_host ,
-					'username' => $this->_username ,
-					'password' => $this->_password ,
-					'dbname' => $this->_dbname ,
+				$this->db = Zend_Db::factory($this->_driver,
+				array(
+					'host' => $this->_host,
+					'username' => $this->_username,
+					'password' => $this->_password,
+					'dbname' => $this->_dbname,
 					'charset' => 'utf8'));
-				$this->db
-					->getConnection();
+				$this->db->getConnection();
 			} catch (Zend_Db_Adapter_Exception $e) {
 				$this->db = FALSE;
 					// couldn't connect
@@ -80,10 +82,12 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 	 */
 	public function test ()
 	{
-		if ($this->db == FALSE) return FALSE;
-		elseif ($this->db
-			->isConnected()) return TRUE;
-		else return FALSE;
+		if ($this->db == FALSE)
+			return FALSE;
+		elseif ($this->db->isConnected())
+			return TRUE;
+		else
+			return FALSE;
 	}
 	/**
 	 * Executes the database structure SQL commands
@@ -91,20 +95,20 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 	 */
 	public function installStructure ()
 	{
-		$query = file_get_contents(APPLICATION_PATH . '/controllers/structure.mysql.sql') or die('Couldn\'t load SQL query.');
+		$query = file_get_contents(CONFIG_DIR . '/sql/structure.mysql.sql') or
+		 die('Couldn\'t load SQL query.');
 		if ($this->_driver == 'Mysqli') {
 			// operate in MySQLi mode
-			$result = $this->db
-				->getConnection()
-				->multi_query($query);
+			$result = $this->db->getConnection()->multi_query(
+			$query);
 		} elseif ($this->_driver == 'Pdo_Mysql') {
 			// operate in PDO mode
-			$result = $this->db
-				->getConnection()
-				->exec($query);
+			$result = $this->db->getConnection()->exec($query);
 		}
-		if ($result !== FALSE) return TRUE;
-		else return FALSE;
+		if ($result !== FALSE)
+			return TRUE;
+		else
+			return FALSE;
 	}
 	/**
 	 * Writes the database configuration to file
@@ -112,9 +116,9 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 	 */
 	public function writeConfig ()
 	{
-		$config = new Zend_Config_Ini(CONFIG_DIR . '/database.default.ini',
-			NULL, array(
-				'allowModifications' => true));
+		$config = new Zend_Config_Ini(CONFIG_DIR . '/database.default.ini', NULL,
+		array(
+			'allowModifications' => true));
 		// load all the values from the variables in this class
 		$config->production->database->params->host = $this->_host;
 		$config->production->database->params->username = $this->_username;
@@ -122,11 +126,13 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 		$config->production->database->params->dbname = $this->_dbname;
 		$config->production->database->adapter = $this->_driver;
 		$writer = new Zend_Config_Writer_Ini(
-			array(
-				'config' => $config ,
-				'filename' => CONFIG_DIR . '/database.ini'));
-		if ($writer->write()) return TRUE;
-		else return FALSE;
+		array(
+			'config' => $config,
+			'filename' => CONFIG_DIR . '/database.ini'));
+		if ($writer->write())
+			return TRUE;
+		else
+			return FALSE;
 	}
 	/**
 	 * Checks whether the first user is already set up in the user table
@@ -135,10 +141,12 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 	public function hasFirstUser ()
 	{
 		if ($this->db) {
-			$result = $this->db
-				->fetchOne('SELECT username FROM dui_users WHERE id = 1 LIMIT 1');
-			if (empty($result)) return FALSE;
-			else return TRUE;
+			$result = $this->db->fetchOne(
+			'SELECT username FROM dui_users WHERE id = 1 LIMIT 1');
+			if (empty($result))
+				return FALSE;
+			else
+				return TRUE;
 		}
 		;
 		return FALSE;
@@ -154,15 +162,16 @@ class Default_Model_InstallSql extends Default_Model_DatabaseAbstract
 	{
 		// initialize the PHPass class
 		$PasswordHash = new Default_Model_PasswordHash(8, FALSE);
-		$this->db
-			->insert('dui_users', array(
-			'username' => $_username ,
-			'password' => $PasswordHash->HashPassword($_password) ,
-			'email' => $_email ,
-			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()') ,
+		$this->db->insert('dui_users',
+		array(
+			'username' => $_username,
+			'password' => $PasswordHash->HashPassword($_password),
+			'email' => $_email,
+			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
 			'acl_role' => 'admin'));
-		if ($this->db
-			->lastInsertId() == 1) return TRUE;
-		else return FALSE;
+		if ($this->db->lastInsertId() == 1)
+			return TRUE;
+		else
+			return FALSE;
 	}
 }
