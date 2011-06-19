@@ -56,8 +56,8 @@ class InstallController extends Zend_Controller_Action
 			$this->_redirect($this->view->serverUrl()
 							.$this->view->url(array('controller' => 'install', 'action' => 'index')));
 
-		// if PHP version is greater than 5.2.0, TRUE (pass)
-		$this->view->tests[0] = PHP_VERSION >= '5.2.0';
+		// if PHP version is greater than 5.2.4, TRUE (pass)
+		$this->view->tests[0] = PHP_VERSION >= '5.2.4';
 		// hash is necessary
 		$this->view->tests[1] = extension_loaded('hash');
 		// curl?
