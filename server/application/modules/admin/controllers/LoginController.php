@@ -44,7 +44,7 @@ class Admin_LoginController extends Zend_Controller_Action
 			if (! empty($_redir) && $_redir[0] == '/')
 				$this->_redirect($this->view->serverUrl() . $_redir);
 			else
-				$this->_redirect(
+				return $this->_redirect(
 				$this->view->serverUrl() . $this->view->url(
 				array(
 					'module' => 'admin',
