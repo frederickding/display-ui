@@ -131,6 +131,21 @@ class Admin_Model_Authentication extends Default_Model_DatabaseAbstract
 		else
 			return '';
 	}
+	public function updateLastActive ($_user)
+	{
+		if (is_int($_user)) {
+			$query = $this->db->update('dui_users',
+			array(
+				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')),
+			$this->db->quoteInto('id = ?', $_user));
+		} else {
+			$query = $this->db->update('dui_users',
+			array(
+				'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()')),
+			$this->db->quoteInto('username = ?', $_user));
+		}
+		return $query;
+	}
 	public function insertUser ($_user, $_password, $_email, $_role,
 	$_yubikey = null)
 	{

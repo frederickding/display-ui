@@ -47,8 +47,7 @@ class Admin_Model_Acl
 	 */
 	private function addRoles ()
 	{
-		$this->acl
-			->addRole(new Zend_Acl_Role('guest')) // no permissions
+		$this->acl->addRole(new Zend_Acl_Role('guest')) // no permissions
 			->addRole(new Zend_Acl_Role('publisher'), 'guest') // publish content
 			->addRole(new Zend_Acl_Role('it'), 'guest') // manage options, users, clients, backup
 			->addRole(new Zend_Acl_Role('admin')); // everything
@@ -58,8 +57,7 @@ class Admin_Model_Acl
 	 */
 	private function addResources ()
 	{
-		$this->acl
-			->addResource(new Zend_Acl_Resource('backend')) // the backend itself
+		$this->acl->addResource(new Zend_Acl_Resource('backend')) // the backend itself
 			->addResource(new Zend_Acl_Resource('headlines')) // headline functionality
 			->addResource(new Zend_Acl_Resource('multimedia')) // media functionality
 			->addResource(new Zend_Acl_Resource('options')) // system options
@@ -73,39 +71,38 @@ class Admin_Model_Acl
 	private function addAllows ()
 	{
 		// all authenticated users can use the backend
-		$this->acl
-			->allow(array(
-			'publisher' ,
-			'it' ,
+		$this->acl->allow(
+		array(
+			'publisher',
+			'it',
 			'admin'), 'backend');
 		// publisher can view, add, edit and delete; hence no privileges enumerated
-		$this->acl
-			->allow('publisher', array(
-			'headlines' ,
+		$this->acl->allow('publisher',
+		array(
+			'headlines',
 			'multimedia'));
 		// give view-only privilege for clients resource
-		$this->acl
-			->allow('publisher', 'clients', array(
-			'view' ,
+		$this->acl->allow('publisher', 'clients',
+		array(
+			'view',
 			'list'));
 		// IT can view, add, edit, delete options, users and clients
 		// IT can also view, make and restore backups
-		$this->acl
-			->allow('it', array(
-			'options' ,
-			'users' ,
-			'clients' ,
+		$this->acl->allow('it',
+		array(
+			'options',
+			'users',
+			'clients',
 			'backuprestore'));
 		// give view-only privilege for headlines and multimedia
-		$this->acl
-			->allow('it', array(
-			'headlines' ,
+		$this->acl->allow('it',
+		array(
+			'headlines',
 			'multimedia'), array(
-			'view' ,
+			'view',
 			'list'));
 		// admin can do everything
-		$this->acl
-			->allow('admin');
+		$this->acl->allow('admin');
 	}
 	/**
 	 * Adds deny rules for groups
@@ -113,22 +110,22 @@ class Admin_Model_Acl
 	private function addDenys ()
 	{
 		// deny publishers all access to backup/restore functionality
-		$this->acl
-			->deny('publisher', 'backuprestore', NULL)
+		$this->acl->deny('publisher', 'backuprestore', NULL)
 			->// deny publishers write access to client system info
-		deny('publisher', 'clients', array(
-			'add' ,
-			'edit' ,
-			'delete' ,
+		deny('publisher', 'clients',
+		array(
+			'add',
+			'edit',
+			'delete',
 			'link'))
 			->// deny publishers access to users resource
 		deny('publisher', 'users', NULL)
 			->// deny IT write access to content functionality
 		deny('it', array(
-			'headlines' ,
+			'headlines',
 			'multimedia'), array(
-			'add' ,
-			'edit' ,
+			'add',
+			'edit',
 			'delete'));
 	}
 	/**
@@ -140,8 +137,7 @@ class Admin_Model_Acl
 	 */
 	public function isAllowed ($_role, $_resource, $_privilege = NULL)
 	{
-		return $this->acl
-			->isAllowed($_role, $_resource, $_privilege);
+		return $this->acl->isAllowed($_role, $_resource, $_privilege);
 	}
 	/**
 	 * Dumps the ACL, for debugging purposes
@@ -149,36 +145,34 @@ class Admin_Model_Acl
 	public function dump ()
 	{
 		$resources = array(
-			'backend' ,
-			'headlines' ,
-			'multimedia' ,
-			'options' ,
-			'users' ,
-			'clients' ,
+			'backend',
+			'headlines',
+			'multimedia',
+			'options',
+			'users',
+			'clients',
 			'backuprestore');
 		$dump = '';
 		foreach ($resources as $resource) {
 			$dump .= "PUBLISHER GROUP $resource\n";
-			$dump .= $this->acl
-				->isAllowed('publisher', $resource) ? "allowed\n" : "denied\n";
+			$dump .= $this->acl->isAllowed('publisher', $resource) ? "allowed\n" : "denied\n";
 		}
 		foreach ($resources as $resource) {
 			$dump .= "IT GROUP $resource\n";
-			$dump .= $this->acl
-				->isAllowed('it', $resource) ? "allowed\n" : "denied\n";
+			$dump .= $this->acl->isAllowed('it', $resource) ? "allowed\n" : "denied\n";
 		}
 		foreach ($resources as $resource) {
 			$dump .= "ADMIN GROUP $resource\n";
-			$dump .= $this->acl
-				->isAllowed('admin', $resource) ? "allowed\n" : "denied\n";
+			$dump .= $this->acl->isAllowed('admin', $resource) ? "allowed\n" : "denied\n";
 		}
-		$dump .= "PUBLISHER GROUP clients.view\n" . ($this->acl
-			->isAllowed('publisher', 'clients', 'view') ? "allowed\n" : "denied\n");
-		$dump .= "IT GROUP headlines.view\n" . ($this->acl
-			->isAllowed('it', 'headlines', 'view') ? "allowed\n" : "denied\n");
+		$dump .= "PUBLISHER GROUP clients.view\n" . ($this->acl->isAllowed(
+		'publisher', 'clients', 'view') ? "allowed\n" : "denied\n");
+		$dump .= "IT GROUP headlines.view\n" . ($this->acl->isAllowed('it',
+		'headlines', 'view') ? "allowed\n" : "denied\n");
 		return $dump;
 	}
-	public function getRoles() {
+	public function getRoles ()
+	{
 		return $this->acl->getRoles();
 	}
 }
