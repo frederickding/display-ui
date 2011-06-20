@@ -24,7 +24,7 @@
 	</ul>
 	<ul class="sidebar-nav">
 		<li id="sidebar-nav-users"<?php if($this->active == 'users') echo ' class="active"'; ?>>
-			<a href="#" title="Users">Users</a>
+			<a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'users', 'action' => 'index')); ?>" title="Users">Users</a>
 		</li>
 		<li id="sidebar-nav-options"<?php if($this->active == 'options') echo ' class="active"'; ?>>
 			<a href="#" title="Options">Options</a>

@@ -9,15 +9,16 @@ echo $this->doctype('XHTML1_STRICT');
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?php echo $this->headTitle('Display UI Server', 'PREPEND')->setSeparator(' | ') . "\n";
 echo $this->headLink()
-	->prependStylesheet('http://yui.yahooapis.com/combo?3.1.1/build/cssfonts/fonts-min.css&3.1.1/build/cssreset/reset-min.css&3.0.0/build/cssgrids/grids-min.css&3.1.1/build/cssbase/base-min.css')
+	->prependStylesheet($this->baseUrl('styles/yui.css'))
 	->appendStylesheet($this->baseUrl('styles/dashboard.css'))
 	->appendStylesheet($this->baseUrl('styles/ie.css'), NULL, TRUE) . "\n";
 echo $this->headStyle() . "\n";
 echo $this->headScript()
-	->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js')
+	// ->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js')
+	->prependFile($this->baseUrl('scripts/jquery.min.js'))
 	->appendScript('var $j = jQuery.noConflict();')
-	->appendFile($this->baseUrl('scripts/jquery.blockui.js'))
-	->appendFile($this->baseUrl('scripts/jquery.form.js'))
+	->appendFile($this->baseUrl('scripts/jquery.blockui.min.js'))
+	->appendFile($this->baseUrl('scripts/jquery.form.min.js'))
 	->appendFile($this->baseUrl('scripts/dui.core-functionality.js')) . "\n";
 echo $this->headMeta() . "\n"; ?>
 </head>
