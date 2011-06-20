@@ -35,20 +35,22 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 	{
 		if (! is_null($this->db)) {
 			// Fetch headlines for clients to which the active user has access
-			$select = $this->db
-				->select()
+			$select = $this->db->select()
 				->from(array(
-				'h' => 'dui_headlines'), array(
-				'id' ,
-				'title' ,
-				'active' ,
-				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)') ,
+				'h' => 'dui_headlines'),
+			array(
+				'id',
+				'title',
+				'active',
+				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)'),
 				'type'))
 				->join(array(
 				'c' => 'dui_clients'), 'h.client = c.id', array(
 				'sys_name'))
 				->join(array(
-				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array())
+				'u' => 'dui_users'),
+			'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ',
+			array())
 				->order('id ASC');
 			if (is_int($_admin)) {
 				// treat it as the integer user ID
@@ -57,8 +59,7 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 				// treat is as the username
 				$select->where('u.username = ?', $_admin);
 			}
-			$result = $select->query()
-				->fetchAll(Zend_Db::FETCH_ASSOC);
+			$result = $select->query()->fetchAll(Zend_Db::FETCH_ASSOC);
 			// error_log($select->assemble());
 			return $result;
 		}
@@ -82,23 +83,25 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 			 * a client column. We have to use SQL to find admins who have access to clients
 			 * which are listed in the row.
 			 */
-			$query = $this->db
-				->select()
+			$query = $this->db->select()
 				->from(array(
 				'h' => 'dui_headlines'), array(
 				'h.id'))
 				->joinInner(array(
 				'c' => 'dui_clients'), 'h.client = c.id', array())
 				->joinInner(array(
-				'u' => 'dui_users'), 'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ', array())
+				'u' => 'dui_users'),
+			'c.admin = u.id OR c.users REGEXP CONCAT( \'(^|[0-9]*,)\', u.id, \'(,|$)\' ) ',
+			array())
 				->where('h.id = ?', $_id)
 				->limit(1);
 			// Oops, debugging code.
 			// error_log($query->assemble());
-			if (is_int($_admin)) $query->where('u.id = ?', $_admin);
-			else $query->where('u.username = ?', $_admin);
-			$retrievedId = $this->db
-				->fetchOne($query);
+			if (is_int($_admin))
+				$query->where('u.id = ?', $_admin);
+			else
+				$query->where('u.username = ?', $_admin);
+			$retrievedId = $this->db->fetchOne($query);
 			if ($_boolean) {
 				return ($_id == $retrievedId);
 			} else
@@ -115,9 +118,8 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 	{
 		$_id = (int) $_id;
 		if (! is_null($this->db)) {
-			$result = $this->db
-				->delete('dui_headlines', $this->db
-				->quoteInto('id = ?', $_id, 'INTEGER'));
+			$result = $this->db->delete('dui_headlines',
+			$this->db->quoteInto('id = ?', $_id, 'INTEGER'));
 			return (bool) $result;
 		}
 		return FALSE;
@@ -132,17 +134,18 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 	public function insertHeadline ($_title, $_clientId, $_type, $_expires = '')
 	{
 		if (! is_null($this->db)) {
-			$this->db
-				->insert('dui_headlines', array(
-				'title' => trim($_title) ,
-				'active' => 1 ,
+			$this->db->insert('dui_headlines',
+			array(
+				'title' => trim($_title),
+				'active' => 1,
 				// make it expire in 1 month by default
-				'expires' => (! empty($_expires) && is_numeric($_expires)) ? $_expires : new Zend_Db_Expr(
-					'DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)') ,
-				'type' => $_type ,
+				'expires' => (! empty($_expires) &&
+				 is_numeric($_expires)) ? $_expires : new Zend_Db_Expr(
+				'DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)'),
+				'type' => $_type,
 				'client' => $_clientId));
-			if ($this->db
-				->lastInsertId()) return TRUE;
+			if ($this->db->lastInsertId())
+				return TRUE;
 		}
 		return FALSE;
 	}

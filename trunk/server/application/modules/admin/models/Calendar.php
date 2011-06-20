@@ -36,44 +36,43 @@ class Admin_Model_Calendar extends Default_Model_DatabaseAbstract
 	{
 		$this->connectDatabase();
 		$this->table = new Zend_Db_Table(
-			array(
-				'db' => $this->db ,
-				'name' => 'dui_calendar'));
+		array(
+			'db' => $this->db,
+			'name' => 'dui_calendar'));
 	}
 	public function getAllEvents ()
 	{
-		$select = $this->db
-			->select()
+		$select = $this->db->select()
 			->from('dui_calendar', '*')
-			->joinInner('dui_clients', 'dui_calendar.client = dui_clients.id', 'dui_clients.sys_name')
+			->joinInner('dui_clients', 'dui_calendar.client = dui_clients.id',
+		'dui_clients.sys_name')
 			->order('type ASC')
 			->order('time ASC');
-		$events = $select->query()
-			->fetchAll(Zend_Db::FETCH_OBJ);
+		$events = $select->query()->fetchAll(Zend_Db::FETCH_OBJ);
 		return $events;
 	}
-	public function insertEvent ($name, $time, $client, $visible = true, $type = 'once')
+	public function insertEvent ($name, $time, $client, $visible = true,
+	$type = 'once')
 	{
 		$client = (int) $client;
 		$visible = (bool) $visible;
 		if ($type != 'once' && $type != 'weekly') {
 			$type = 'once';
 		}
-		return $this->table
-			->insert(array(
-			'name' => $name ,
-			'time' => $time ,
-			'visible' => $visible ,
-			'type' => $type ,
+		return $this->table->insert(
+		array(
+			'name' => $name,
+			'time' => $time,
+			'visible' => $visible,
+			'type' => $type,
 			'client' => $client));
 	}
 	public function deleteEvent ($id)
 	{
 		$_id = (int) $id;
 		if (! is_null($this->db)) {
-			$result = $this->table
-				->delete($this->db
-				->quoteInto('event_id = ?', $_id, 'INTEGER'));
+			$result = $this->table->delete(
+			$this->db->quoteInto('event_id = ?', $_id, 'INTEGER'));
 			return (bool) $result;
 		}
 		return false;
