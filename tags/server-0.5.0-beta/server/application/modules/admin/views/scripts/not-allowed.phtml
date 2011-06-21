@@ -1,7 +1,0 @@
-<?php
-$this->navActive = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
-$this->title = 'Access Denied';
-$this->headTitle('Oops, Access Denied');
-$this->h1Class = 'denied';
-?>
-<p>Your account with the ACL role <code><?php echo $this->userRole; ?></code> has been denied access to this particular resource (<?php echo $this->resource; ?>).	</p>
