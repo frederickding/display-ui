@@ -37,8 +37,43 @@ td.acl_role, th.acl_role { width: 15%; }
 	padding: none;
 	margin: none;
 }
+form { font-size: 123.1%; }
+dd { margin-bottom: 1em; }
+input { margin-right: 0.25em; }
+label.optional { font-weight: normal; }
+label.optional:after { content: " (optional)"; color: #666666; }
+#adduserlink { color: inherit; }
+#adduserlink.expanded:before { content: "- "; font-weight: normal; color: #666666; }
+#adduserlink:not(.expanded):before { content: "+ "; font-weight: normal; color: #666666; }
+form p.description { font-size: 75%; }
+ul.errors {
+	color: #bb2200;
+}
+#userinsert {
+	margin: 1em auto;
+	border: 1px #aaaaaa solid;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	width: 100%;
+}
+');
+$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#userinsert").hide();
+	if(window.location.pathname.search(/insert-process/) != -1) {
+		$j("#userinsert").show();
+		$j("#adduserlink").addClass("expanded");
+	}
+	$j("#adduserlink").click(function(event) {
+		event.preventDefault();
+		$j("#userinsert").toggle("normal");
+		$j(this).toggleClass("expanded");
+	});
+});
 ');
 ?>
+<h2><a href="#" id="adduserlink">Add a user</a></h2>
+<?php echo $this->insertForm; ?>
 <table cellspacing="0" id="users-list">
 	<tr class="heading">
 		<th class="id">ID</th>

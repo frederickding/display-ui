@@ -51,4 +51,23 @@ class Admin_Model_Users extends Default_Model_DatabaseAbstract
 		}
 		return array();
 	}
+	public function insertUser ($_username, $_password, $_email, $_acl_role,
+	$_yubikey)
+	{
+		if(is_null($this->db))
+			return false;
+		$PasswordHash = new Default_Model_PasswordHash(8, false);
+		$data = array(
+			'username' => $_username,
+			'password' => $PasswordHash->HashPassword($_password),
+			'email' => $_email,
+			'last_active' => new Zend_Db_Expr('UTC_TIMESTAMP()'),
+			'acl_role' => $_acl_role
+		);
+		if(isset($_yubikey) && strlen($_yubikey) >= 12) {
+			$data['yubikey_public'] = substr($_yubikey, 0, 12);
+		}
+		$insert = $this->db->insert('dui_users', $data);
+		return $insert;
+	}
 }
