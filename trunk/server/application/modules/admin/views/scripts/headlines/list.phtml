@@ -30,7 +30,7 @@ $this->headStyle()->appendStyle('#headlines-list {
 #headlines-list tr.body:hover { background-color: #ddeeff; }
 td.id, th.id { width: 7.5%; }
 td.title, th.title { width: 47.5%; }
-td.active, th.active { width: 5%; color: #666666; }
+td.day, th.day { width: 5%; }
 td.expires, th.expires { width: 15%; color: #666666; }
 td.client, th.client { width: 17.5%; }
 td.actions, th.actions { width: 7.5%; }
@@ -66,6 +66,12 @@ ul.errors {
 #headlinemessage {
 	width: 95%;
 }
+td.day.day1 {
+	background: #E7FFD1;
+}
+td.day.day2 {
+	background: #FFD7C1;
+}
 ');
 $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#headlineinsert").hide();
@@ -87,8 +93,8 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 	<tr class="heading">
 		<th class="id">ID</th>
 		<th class="title">Title</th>
-		<th class="active">Active</th>
 		<th class="expires">Expires</th>
+		<th class="day">Day</th>
 		<th class="client">Client</th>
 		<th class="actions"></th>
 	</tr>
@@ -103,8 +109,8 @@ $h['delLink'] = $this->url(array(
 	<tr class="body">
 		<td class="id"><?php echo $h['id']; ?></td>
 		<td class="title"><?php echo $h['title']; ?></td>
-		<td class="active"><?php echo $h['active']; ?></td>
 		<td class="expires"><?php echo $h['expires']; ?></td>
+		<td class="day day<?php echo $h['alternating']; ?>"><?php echo $h['alternating']; ?></td>
 		<td class="client"><?php echo $h['sys_name']; ?></td>
 		<td class="actions"><a href="<?php echo $h['delLink']; ?>" class="delete">Delete</a></td>
 	</tr>

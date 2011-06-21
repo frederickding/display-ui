@@ -26,6 +26,29 @@
  */
 class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 {
+	public function whatDayIsIt ()
+	{
+		// system installation date is always Day 1
+		if (Zend_Registry::isRegistered('configuration_ini')) {
+			$this->config = Zend_Registry::get('configuration_ini');
+		} else {
+			$this->config = new Zend_Config_Ini(
+			CONFIG_DIR . '/configuration.ini', 'production');
+			Zend_Registry::set('configuration_ini', $this->config);
+		}
+		// now find the number of days between now and then, using MySQL
+		$installDate = $this->config->server->install->date;
+		$totalDateDiff = $this->db->select()
+			->from('duix_alternating_exceptions',
+		array(
+			new Zend_Db_Expr('DATEDIFF(UTC_DATE(), ?) - COUNT(*)')))
+			->where('date < UTC_DATE() AND date > ?')
+			->query(null, array(
+			$installDate,
+			$installDate))
+			->fetchColumn();
+		return $totalDateDiff % 2 + 1;
+	}
 	/**
 	 * Retrieves the headlines from the database, returns as an array
 	 * @param int $_number [optional]
@@ -60,7 +83,7 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 	 * @param string $_type [optional]
 	 * @return string
 	 */
-	public function fetchConcatenated ($_number = 25, $_sys_name, $_type = NULL)
+	public function fetchConcatenated ($_number = 25, $_sys_name, $_type = NULL, $_day = null)
 	{
 		$_number = (is_null($_number)) ? 25 : (int) $_number;
 		$query = $this->db
@@ -75,7 +98,10 @@ class Api_Model_Headlines extends Default_Model_DatabaseAbstract
 			->order('RAND()')
 			->limit($_number);
 		if (! is_null($_type)) {
-			$query = $query->where('h.type = ?', $_type);
+			$query->where('h.type = ?', $_type);
+		}
+		if($_day == 1 || $_day == 2) {
+			$query->where('h.alternating = ? OR h.alternating = 0 OR h.alternating IS NULL', $_day);
 		}
 		$headlines = $query->query()
 			->fetchAll(Zend_Db::FETCH_COLUMN);

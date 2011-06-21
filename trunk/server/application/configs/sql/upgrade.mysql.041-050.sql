@@ -11,10 +11,17 @@ ALTER TABLE `dui_media` ADD COLUMN `alternating` TINYINT(3) UNSIGNED NULL DEFAUL
 -- allow null client_id in options for systemwide options
 ALTER TABLE `dui_options` CHANGE COLUMN `client_id` `client_id` INT(10) UNSIGNED NULL DEFAULT NULL  ;
 
--- add exceptions array to options
-START TRANSACTION;
-INSERT INTO `dui_options` (`id`, `option_name`, `option_value`, `client_id`) VALUES (NULL, 'alternating_exceptions', 'a:0:{}', NULL);
-COMMIT;
+-- add exceptions table
+-- -----------------------------------------------------
+-- Table `duix_alternating_exceptions`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `duix_alternating_exceptions` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `date` DATE NOT NULL ,
+  `comment` VARCHAR(45) NULL COMMENT 'PA Day? Holiday?' ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `date_UNIQUE` (`date` ASC) )
+ENGINE = InnoDB;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

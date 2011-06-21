@@ -119,15 +119,21 @@ CREATE  TABLE IF NOT EXISTS `dui_calendar` (
   INDEX `client` (`client` ASC) );
 
 
+-- -----------------------------------------------------
+-- Table `duix_alternating_exceptions`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `duix_alternating_exceptions` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `date` DATE NOT NULL ,
+  `comment` VARCHAR(45) NULL COMMENT 'PA Day? Holiday?' ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `date_UNIQUE` (`date` ASC) )
+ENGINE = InnoDB;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
--- -----------------------------------------------------
--- Data for table `dui_options`
--- -----------------------------------------------------
-START TRANSACTION;
-INSERT INTO `dui_options` (`id`, `option_name`, `option_value`, `client_id`) VALUES (NULL, 'alternating_exceptions', 'a:0:{}', NULL);
 
 COMMIT;

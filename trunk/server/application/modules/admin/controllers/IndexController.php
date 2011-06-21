@@ -83,6 +83,10 @@ class Admin_IndexController extends Zend_Controller_Action
 		$this->listClients = $DashboardModel->fetchClients(
 		$this->auth_session->username);
 		$this->view->quicklineForm = $this->quicklineForm();
+
+		// Playlists
+		$Pl = new Api_Model_Playlists();
+		$this->view->day = $Pl->whatDayIsIt();
 	}
 	public function quicklineAction ()
 	{

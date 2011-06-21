@@ -49,7 +49,7 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'active' => 'UTC_TIMESTAMP() > activates AND (UTC_TIMESTAMP() < expires OR expires IS NULL) AND active = 1',
 				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)'),
 				'type',
-				'weight'))
+				'alternating'))
 				->order('id DESC')
 				->limitPage($_page, $_limit)
 				->query()
@@ -121,6 +121,9 @@ class Admin_Model_Multimedia extends Default_Model_DatabaseAbstract
 				'content' => $_data['mediumfile'] . ';' . $mime);
 			if (! empty($_data['mediumexpiration'])) {
 				$insertData['expires'] = $_data['mediumexpiration'];
+			}
+			if (! empty($_data['mediumalternating'])) {
+				$insertData['alternating'] = $_data['mediumalternating'];
 			}
 			if ($type == 'image') {
 				if (! empty($_data['mediumduration']) &&

@@ -34,8 +34,8 @@ td.title, th.title { width: 38.5%; font-weight: bold; }
 td.active, th.active { width: 4%; color: #666666; }
 td.expires, th.expires { width: 17.5%; color: #666666; }
 td.type, th.type { width: 10%; }
+td.day, th.day { width: 5%; }
 td.actions, th.actions { width: 20%; }
-td.weight, th.weight { width: 5%; color: #666666; }
 td.actions { font-size: 77%; }
 tr:hover td.expires, tr:hover td.active, tr:hover td.weight { color: inherit; }
 #clients-list td {
@@ -49,6 +49,12 @@ td.actions a.toggle { color: #551b7a; }
 td.actions a.delete { color: #bb2200; }
 .video_type { color: #551b7a; }
 .image_type { color: #507b38; }
+tr.day1 td.day {
+	background: #E7FFD1;
+}
+tr.day2 td.day {
+	background: #FFD7C1;
+}
 .highlight {
 	background: #D7FFC1;
 	text-align: center;
@@ -78,8 +84,8 @@ echo $this->mediaTotal;
 		<th class="title">Title</th>
 		<th class="active">Active</th>
 		<th class="expires">Expires</th>
+		<th class="day">Day</th>
 		<th class="type">Type</th>
-		<th class="weight"><abbr title="Weight">Wt.</abbr></th>
 		<th class="actions">Actions</th>
 	</tr>
 <?php
@@ -100,8 +106,12 @@ foreach ($this->mediaData as $medium) {
 		'module' => 'admin',
 		'controller' => 'multimedia',
 		'action' => 'delete')) . '?id=' . $medium['id'];
-	echo '	<tr class="body">
-		<td class="id">' . $medium['id'] . '</td>
+	if($medium['alternating'] == "1")
+		echo '	<tr class="body day1">';
+	elseif($medium['alternating'] == "2")
+		echo '	<tr class="body day2">';
+	else echo '	<tr class="body">';
+	echo '	<td class="id">' . $medium['id'] . '</td>
 		<td class="title ' . $medium['type'] . '_type">' . $medium['title'] .
 	 '</td>';
 	if ($medium['active'] == 'Yes') {
@@ -111,10 +121,10 @@ foreach ($this->mediaData as $medium) {
 		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
 		 '" title="Activate this item">' . $medium['active'] . '</a></td>';
 	}
-	echo '		<td class="expires">' . $medium['expires'] . '</td>
-		<td class="type ' . $medium['type'] . '_type">' . $medium['type'] . '</td>
-		<td class="weight">' . $medium['weight'] . '</td>
-		<td class="actions">';
+	echo "		<td class='expires'>{$medium['expires']}</td>
+		<td class='day'>{$medium['alternating']}</td>
+		<td class='type {$medium['type']}_type'>{$medium['type']}</td>
+		<td class='actions'>";
 	if ($medium['type'] == 'image')
 		echo '<a href="' . $medium['viewLink'] . '" class="view">View</a>';
 	echo '		<a href="' . $medium['delLink'] . '" class="delete">Delete</a></td>

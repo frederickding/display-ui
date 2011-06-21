@@ -26,6 +26,29 @@
  */
 class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 {
+	public function whatDayIsIt ()
+	{
+		// system installation date is always Day 1
+		if (Zend_Registry::isRegistered('configuration_ini')) {
+			$this->config = Zend_Registry::get('configuration_ini');
+		} else {
+			$this->config = new Zend_Config_Ini(
+			CONFIG_DIR . '/configuration.ini', 'production');
+			Zend_Registry::set('configuration_ini', $this->config);
+		}
+		// now find the number of days between now and then, using MySQL
+		$installDate = $this->config->server->install->date;
+		$totalDateDiff = $this->db->select()
+			->from('duix_alternating_exceptions',
+		array(
+			new Zend_Db_Expr('DATEDIFF(UTC_DATE(), ?) - COUNT(*)')))
+			->where('date < UTC_DATE() AND date > ?')
+			->query(null, array(
+			$installDate,
+			$installDate))
+			->fetchColumn();
+		return $totalDateDiff % 2 + 1;
+	}
 	/**
 	 * Retrieves one playlist at random from the known, stored playlists
 	 * @param string $_sys_name
@@ -96,7 +119,7 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	 * @param int $_number
 	 * @return array The results of the query
 	 */
-	private function getMedia ($_sys_name, $_number = 20)
+	private function getMedia ($_sys_name, $_number = 20, $_alternating = null)
 	{
 		$this->db->setFetchMode(Zend_Db::FETCH_ASSOC);
 		$query = $this->db->select()
@@ -111,13 +134,17 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 				/* (^|[0-9]*,)###(,|$) searches in comma-delimited clients column
 				INNER JOIN `dui_clients` AS c ON ( m.`clients`
 				REGEXP CONCAT( '(^|[0-9]*,)', c.`id` , '(,|$)' ) ) */
-				->where('c.sys_name = ?', $_sys_name)
+				->
+		where('c.sys_name = ?', $_sys_name)
 			->where(
 		'UTC_TIMESTAMP() > m.activates AND (UTC_TIMESTAMP() < m.expires OR m.expires IS NULL)')
-			->where('m.active = 1')
-			->order('m.weight DESC')
-			->limit($_number);
-		$result = $query->query()->fetchAll();
+			->where('m.active = 1');
+		if($_alternating >= 1 && $_alternating <= 2)
+			$query->where('m.alternating = ? OR m.alternating IS NULL OR m.alternating = 0', $_alternating);
+		$result = $query->order('m.weight DESC')
+			->limit($_number)
+			->query()
+			->fetchAll();
 		return $result;
 	}
 	/**
@@ -130,7 +157,8 @@ class Api_Model_Playlists extends Default_Model_DatabaseAbstract
 	{
 		$_number = (int) $_number;
 		$playlist = array();
-		$media = $this->getMedia($_sys_name, $_number);
+		$day = $this->whatDayIsIt();
+		$media = $this->getMedia($_sys_name, $_number, $day);
 		// randomize the media a little bit
 		shuffle($media);
 		/* array is now something like

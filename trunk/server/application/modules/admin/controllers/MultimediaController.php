@@ -105,7 +105,7 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 	{
 		$this->view->id = (int) $this->_getParam('id');
 		$MediaModel = new Admin_Model_Multimedia();
-		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
+		$this->auth_session->deleteCrsf = sha1(microtime(true));
 		$this->view->csrf = $this->auth_session->deleteCrsf;
 		$this->view->canDelete = $MediaModel->canModify(
 		$this->auth_session->username, $this->view->id);
@@ -135,11 +135,11 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$this->view->id = (int) $this->_getParam('id', 0);
 		$query = $MediaModel->getMedium($this->view->id);
 		if ($query->type == Admin_Model_Multimedia::IMAGE_TYPE) {
-			$this->view->canShow = TRUE;
+			$this->view->canShow = true;
 			$this->view->fileBinary = $query->fileBinary;
 			$this->view->mimeType = $query->mime;
 		} else {
-			$this->view->canShow = FALSE;
+			$this->view->canShow = false;
 			$this->view->type = $query->type;
 		}
 	}
@@ -156,24 +156,35 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$title = new Zend_Form_Element_Text('mediumtitle',
 		array(
 			'label' => 'Title',
-			'required' => TRUE));
-		$title->addValidator('StringLength', FALSE, array(
+			'required' => true));
+		$title->addValidator('StringLength', false, array(
 			1,
 			63));
 		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow',
 		array(
 			'label' => 'Immediately activate?',
-			'required' => TRUE,
+			'required' => true,
+			'value' => '1',
 			'description' => 'Will this item begin showing immediately or at a later date?'));
 		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No');
+		$alternating = new Zend_Form_Element_Select('mediumalternating',
+		array(
+			'label' => 'On which days should this play?',
+			'required' => true,
+			'description' => 'Will this item show only on Day 1, Day 2 or all days?'));
+		$alternating->addMultiOptions(array(
+			'0' => 'All Days',
+			'1' => 'Day 1',
+			'2' => 'Day 2'
+		));
 		$activates = new Zend_Form_Element_Text('mediumactivation',
 		array(
 			'label' => 'Start showing on (YYYY-MM-DD)',
-			'required' => FALSE));
+			'required' => false));
 		$expires = new Zend_Form_Element_Text('mediumexpiration',
 		array(
 			'label' => 'Stop showing on (YYYY-MM-DD)',
-			'required' => FALSE));
+			'required' => false));
 		$activates->addFilter('Digits');
 		$expires->addFilter('Digits');
 		$duration = new Zend_Form_Element_Text('mediumduration',
@@ -185,8 +196,8 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		array(
 			'label' => 'Weight',
 			'description' => 'A higher weight usually results in the file showing more frequently.'));
-		$weight->addValidator('int', FALSE)
-			->addValidator('between', FALSE, array(
+		$weight->addValidator('int', false)
+			->addValidator('between', false, array(
 			1,
 			10))
 			->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
@@ -203,10 +214,10 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$file = new Zend_Form_Element_File('mediumfile',
 		array(
 			'label' => 'Media file',
-			'required' => TRUE,
+			'required' => true,
 			'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, MPG, MPEG.'));
-		$file->addValidator('count', FALSE, 1)
-			->addValidator('Extension', FALSE,
+		$file->addValidator('count', false, 1)
+			->addValidator('Extension', false,
 		array(
 			'jpg',
 			'jpeg',
@@ -224,7 +235,7 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$clients = new Zend_Form_Element_Multiselect('mediumclients',
 		array(
 			'label' => 'Show on these clients',
-			'required' => TRUE,
+			'required' => true,
 			'description' => 'You can hold down Shift or Ctrl to select multiple clients.'));
 		foreach ($listClients as $c) {
 			$clients->addMultiOption($c['id'], $c['sys_name']);
@@ -246,6 +257,7 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 			'mediumclients' => $clients,
 			'mediumfile' => $file,
 			'mediumactivatenow' => $immediateActive,
+			'mediumalternating' => $alternating,
 			'mediumactivation' => $activates,
 			'mediumexpiration' => $expires,
 			'mediumweight' => $weight,

@@ -43,6 +43,7 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 				'title',
 				'active',
 				'expires' => new Zend_Db_Expr('CAST(expires AS DATE)'),
+				'alternating',
 				'type'))
 				->join(array(
 				'c' => 'dui_clients'), 'h.client = c.id', array(
@@ -131,7 +132,8 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 	 * @param string $_type
 	 * @return bool
 	 */
-	public function insertHeadline ($_title, $_clientId, $_type, $_expires = '')
+	public function insertHeadline ($_title, $_clientId, $_type, $_expires = '',
+	$_alternating = null)
 	{
 		if (! is_null($this->db)) {
 			$this->db->insert('dui_headlines',
@@ -143,6 +145,7 @@ class Admin_Model_Headlines extends Default_Model_DatabaseAbstract
 				 is_numeric($_expires)) ? $_expires : new Zend_Db_Expr(
 				'DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 MONTH)'),
 				'type' => $_type,
+				'alternating' => ($_alternating != 0) ? $_alternating : null,
 				'client' => $_clientId));
 			if ($this->db->lastInsertId())
 				return TRUE;
