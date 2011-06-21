@@ -1,0 +1,79 @@
+<?php
+$layout = $this->layout();
+$this->declareVars(array(
+	'systemName',
+	'username',
+	'h1Class'));
+$this->logoutLink = $this->url(
+array(
+	'module' => 'admin',
+	'controller' => 'login',
+	'action' => 'logout'), 'login');
+$this->headLink(
+array(
+	'rel' => 'icon',
+	'href' => $this->baseUrl('favicon.ico'),
+	'type' => 'image/x-icon',
+	'APPEND'));
+echo $this->doctype('XHTML1_STRICT');
+?>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<?php echo $this->headTitle('Display UI Server', 'PREPEND')->setSeparator(' | ') . "\n";
+echo $this->headLink()
+	->prependStylesheet($this->baseUrl('styles/yui.css'))
+	->appendStylesheet($this->baseUrl('styles/dashboard.css'))
+	->appendStylesheet($this->baseUrl('styles/ie.css'), NULL, TRUE) . "\n";
+echo $this->headStyle() . "\n";
+echo $this->headScript()
+	->// ->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js')
+prependFile($this->baseUrl('scripts/jquery.min.js'))
+	->appendScript('var $j = jQuery.noConflict();')
+	->appendFile($this->baseUrl('scripts/jquery.blockui.min.js'))
+	->appendFile($this->baseUrl('scripts/jquery.form.min.js'))
+	->appendFile($this->baseUrl('scripts/dui.core-functionality.js')) . "\n";
+echo $this->headMeta() . "\n"; ?>
+</head>
+<body>
+<div id="doc2">
+<div id="hd"><span id="system-name"><?php echo $this->systemName; ?></span>
+		<?php if(!empty($this->username)) { ?>
+		<span id="top-howdy">Howdy, <a href="#" title="User profile"><?php echo $this->username; ?></a>&nbsp;&nbsp;|
+		<?php } ?>
+		&nbsp;&nbsp;<a href="<?php echo $this->logoutLink; ?>" title="Logout"
+	class="logout">Logout</a></span></div>
+<div id="bd" class="yui-t2">
+<div id="yui-main">
+<div class="yui-b">
+				<?php if(!isset($this->h1Class)) : ?>
+				<h1
+	class="<?php echo Zend_Controller_Front::getInstance()->getRequest()->getControllerName(); ?>"><span><?php echo $this->title; ?></span></h1>
+				<?php elseif(!empty($this->h1Class)) : ?>
+				<h1 class="<?php echo $this->h1Class; ?>"><span><?php echo $this->title; ?></span></h1>
+				<?php else : ?>
+				<h1><span><?php echo $this->title; ?></span></h1>
+				<?php endif; echo $layout->content; ?>
+				<div class="clear"></div>
+</div>
+</div>
+<?php echo $this->partial('admin-panel-navigation.phtml',
+	array('active' => $this->navActive, 'systemName' => $this->systemName)); ?>
+	</div>
+</div>
+<?php echo $this->inlineScript()
+	// our functionality-enabling code, will be externalized
+	->appendScript('$j(document).ready(function () {
+	DisplayUI.showSidebar();
+	$j(\'li#sidebar-nav-logout, #hd a.logout\').click(function (event) {
+		event.preventDefault();
+		DisplayUI.logout();
+	});
+	$j(\'div.widgets-widget h2\').click(function (event) {
+		DisplayUI.toggleWidget($j(this));
+	});
+});'); ?>
+<!-- Processing took <?php echo number_format(microtime(TRUE) - PERFORMANCE_TIMER, 5); ?> seconds -->
+</body>
+</html>

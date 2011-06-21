@@ -1,0 +1,20 @@
+<?php
+$this->navActive = 'clients';
+$this->title = 'Clients';
+$this->headTitle('Clients');
+// var_dump($this->client);
+$this->headStyle()->appendStyle('form { font-size: 123.1%; }
+dd { margin-bottom: 1em; }
+input { margin-right: 0.25em; }
+label.optional { font-weight: normal; }
+label.optional:after { content: " (optional)"; color: #666666; }
+form p.description { font-size: 75%; }
+ul.errors {
+	color: #bb2200;
+}
+');
+?>
+<h2>Client <?php echo $this->client['id']; ?>: <?php echo $this->client['sys_name']; ?></h2>
+<p>Main administrator: <?php echo $this->client['admin']; ?></p>
+<hr />
+<?php echo $this->form; ?>
