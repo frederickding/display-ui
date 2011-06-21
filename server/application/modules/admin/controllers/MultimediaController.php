@@ -21,41 +21,12 @@
  * @license http://code.google.com/p/display-ui/wiki/License Apache License 2.0
  * @version $Id$
  */
+require 'ControllerAbstract.php';
 /**
  * Functionality for multimedia
  */
-class Admin_MultimediaController extends Zend_Controller_Action
+class Admin_MultimediaController extends Admin_ControllerAbstract
 {
-	public function init ()
-	{
-		// initiate a session for the installer
-		$this->auth_session = new Zend_Session_Namespace('auth');
-		// ALWAYS check if authenticated
-		if (! $this->auth_session->authenticated) {
-			return $this->_redirect(
-			$this->view->serverUrl() . $this->view->url(
-			array(
-				'module' => 'admin',
-				'controller' => 'login',
-				'action' => 'index')) . '?redirect=' . $this->view->url(
-			array(
-				'module' => 'admin',
-				'controller' => $this->_request->getControllerName(),
-				'action' => $this->_request->getActionName())));
-		}
-		// configuration object
-		if (Zend_Registry::isRegistered('configuration_ini')) {
-			$config = Zend_Registry::get('configuration_ini');
-		} else {
-			$config = new Zend_Config_ini(CONFIG_DIR . '/configuration.ini',
-			'production');
-			Zend_Registry::set('configuration_ini', $config);
-		}
-		$this->view->systemName = $config->server->install->name;
-		$this->view->username = $this->auth_session->username;
-		$this->_helper->layout()->setLayout('AdminPanelWidgets');
-		return TRUE;
-	}
 	/**
 	 * The default action for this module, internally forwards to listAction
 	 */
@@ -233,7 +204,7 @@ class Admin_MultimediaController extends Zend_Controller_Action
 		array(
 			'label' => 'Media file',
 			'required' => TRUE,
-			'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, PPT(X), PPS(X)).'));
+			'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, MPG, MPEG.'));
 		$file->addValidator('count', FALSE, 1)
 			->addValidator('Extension', FALSE,
 		array(
@@ -245,11 +216,9 @@ class Admin_MultimediaController extends Zend_Controller_Action
 			'avi',
 			'wmv',
 			'mkv',
-			'ppt',
-			'pptx',
-			'pps',
-			'ppsx',
 			'zip',
+			'mpg',
+			'mpeg',
 			'duizip'))
 			->setDestination(MEDIA_DIR);
 		$clients = new Zend_Form_Element_Multiselect('mediumclients',

@@ -50,7 +50,8 @@ class Admin_Model_Acl
 		$this->acl->addRole(new Zend_Acl_Role('guest')) // no permissions
 			->addRole(new Zend_Acl_Role('publisher'), 'guest') // publish content
 			->addRole(new Zend_Acl_Role('it'), 'guest') // manage options, users, clients, backup
-			->addRole(new Zend_Acl_Role('admin')); // everything
+			->addRole(new Zend_Acl_Role('admin')) // everything
+			->addRole(new Zend_Acl_Role('banned')); // nothing
 	}
 	/**
 	 * Sets up all known resources in the admin module
@@ -59,7 +60,9 @@ class Admin_Model_Acl
 	{
 		$this->acl->addResource(new Zend_Acl_Resource('backend')) // the backend itself
 			->addResource(new Zend_Acl_Resource('headlines')) // headline functionality
+			->addResource(new Zend_Acl_Resource('calendar')) // calendar functionality
 			->addResource(new Zend_Acl_Resource('multimedia')) // media functionality
+			->addResource(new Zend_Acl_Resource('weather')) // weather functionality
 			->addResource(new Zend_Acl_Resource('options')) // system options
 			->addResource(new Zend_Acl_Resource('users')) // user access
 			->addResource(new Zend_Acl_Resource('clients')) // client systems
@@ -80,16 +83,21 @@ class Admin_Model_Acl
 		$this->acl->allow('publisher',
 		array(
 			'headlines',
+			'calendar',
 			'multimedia'));
-		// give view-only privilege for clients resource
-		$this->acl->allow('publisher', 'clients',
+		// give view-only privilege for clients resource and weather
+		$this->acl->allow('publisher',
 		array(
+			'weather',
+			'clients'), array(
 			'view',
+			'index',
 			'list'));
 		// IT can view, add, edit, delete options, users and clients
 		// IT can also view, make and restore backups
 		$this->acl->allow('it',
 		array(
+			'weather',
 			'options',
 			'users',
 			'clients',
@@ -98,7 +106,9 @@ class Admin_Model_Acl
 		$this->acl->allow('it',
 		array(
 			'headlines',
+			'calendar',
 			'multimedia'), array(
+			'index',
 			'view',
 			'list'));
 		// admin can do everything
@@ -111,22 +121,28 @@ class Admin_Model_Acl
 	{
 		// deny publishers all access to backup/restore functionality
 		$this->acl->deny('publisher', 'backuprestore', NULL)
-			->// deny publishers write access to client system info
-		deny('publisher', 'clients',
+			->deny('publisher', 'clients',
 		array(
 			'add',
 			'edit',
 			'delete',
-			'link'))
-			->// deny publishers access to users resource
-		deny('publisher', 'users', NULL)
-			->// deny IT write access to content functionality
-		deny('it', array(
+			'link')) // deny publishers write access to client system info
+			->deny('publisher', 'users', NULL) // deny publishers access to users resource
+			->deny('it',
+		array(
 			'headlines',
-			'multimedia'), array(
+			'calendar',
+			'multimedia'),
+		array(
 			'add',
 			'edit',
-			'delete'));
+			'toggle',
+			'upload',
+			'delete',
+			'delete-process',
+			'insert-process',
+			'upload-process')) // deny IT write access to content functionality
+			->deny('banned'); // banned can do nothing
 	}
 	/**
 	 * Returns true if given role has access to the specified resource/privilege
@@ -147,9 +163,11 @@ class Admin_Model_Acl
 		$resources = array(
 			'backend',
 			'headlines',
+			'calendar',
 			'multimedia',
 			'options',
 			'users',
+			'weather',
 			'clients',
 			'backuprestore');
 		$dump = '';
