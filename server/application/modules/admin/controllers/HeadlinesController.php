@@ -85,7 +85,7 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 			$values = $form->getValues();
 			$this->view->success = ($HeadlinesModel->insertHeadline(
 			$values['headlinemessage'], $values['headlineclient'],
-			$values['headlinetype'], $values['headlineexpires']));
+			$values['headlinetype'], $values['headlineexpires'], $values['headlinealternating']));
 			return $this->render('insert-process');
 		} else {
 			$this->view->insertForm = $form;
@@ -124,6 +124,16 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 		array(
 			'news' => 'News',
 			'psa' => 'Public Service Announcement'));
+		$alternating = new Zend_Form_Element_Select('headlinealternating',
+		array(
+			'label' => 'On which days should this play?',
+			'required' => true,
+			'description' => 'Will this item show only on Day 1, Day 2 or all days?'));
+		$alternating->addMultiOptions(array(
+			'0' => 'All Days',
+			'1' => 'Day 1',
+			'2' => 'Day 2'
+		));
 		$expires = new Zend_Form_Element_Text('headlineexpires',
 		array(
 			'label' => 'Stop showing on',
@@ -158,6 +168,7 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 			'headlinemessage' => $message,
 			'headlineclient' => $show,
 			'headlinetype' => $type,
+			'headlinealternating' => $alternating,
 			'headlineexpires' => $expires,
 			'headlinecsrf' => $csrf,
 			'headlinesubmit' => $submit,
