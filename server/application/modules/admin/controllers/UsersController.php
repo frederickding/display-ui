@@ -35,6 +35,103 @@ class Admin_UsersController extends Admin_ControllerAbstract
 	{
 		$UsersModel = new Admin_Model_Users();
 		$this->view->usersList = $UsersModel->fetchUsers();
-		// $OptionsModel = new Admin_Model_Options();
+		$this->view->insertForm = $this->insertForm();
+	}
+	public function insertForm ()
+	{
+		$this->view->doctype('XHTML1_STRICT');
+		$username = new Zend_Form_Element_Text('username',
+		array(
+			'label' => 'Pick a username',
+			'required' => true));
+		$password = new Zend_Form_Element_Password('password',
+		array(
+			'label' => 'Enter a password',
+			'required' => true,
+			'description' => 'Passwords are stored in irreversible hashed form.'));
+		$email = new Zend_Form_Element_Text('email',
+		array(
+			'label' => 'Enter an e-mail address',
+			'required' => true));
+		$email->addValidator(new Zend_Validate_EmailAddress());
+		$aclrole = new Zend_Form_Element_Select('aclrole',
+		array(
+			'label' => 'User ACL role',
+			'required' => true,
+			'description' => 'Admins have access to every part of the system. Publishers can only manage content, and IT manages the technical parts of the system.'));
+		$aclrole->addMultiOptions(
+		array(
+			'publisher' => 'Publisher',
+			'it' => 'IT',
+			'admin' => 'Admin'));
+		$aclrole->addValidator(
+		new Zend_Validate_InArray(array(
+			'publisher',
+			'it',
+			'admin')));
+		$yubikey = new Zend_Form_Element_Text('yubikey',
+		array(
+			'label' => 'Yubikey public ID',
+			'required' => false,
+			'description' => 'To require this user to authenticate with a hardware token, type in the first 12 characters of the Yubikey output or press it in this box.'));
+		$submit = new Zend_Form_Element_Submit('usersubmit',
+		array(
+			'label' => 'Save'));
+		$submit->setDecorators(array(
+			'ViewHelper'));
+		$reset = new Zend_Form_Element_Reset('userreset',
+		array(
+			'label' => 'Reset'));
+		$reset->setDecorators(array(
+			'ViewHelper'));
+		$csrf = new Zend_Form_Element_Hash('usercsrf',
+		array(
+			'salt' => 'unique'));
+		$csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
+		$form = new Zend_Form();
+		$form->setAction(
+		$this->view->url(
+		array(
+			'module' => 'admin',
+			'controller' => 'users',
+			'action' => 'insert-process')))
+			->setMethod('post')
+			->setAttrib('id', 'userinsert')
+			->addElements(
+		array(
+			'username' => $username,
+			'password' => $password,
+			'email' => $email,
+			'aclrole' => $aclrole,
+			'yubikey' => $yubikey,
+			'usercsrf' => $csrf,
+			'usersubmit' => $submit,
+			'userreset' => $reset));
+		// $form->removeDecorator('HtmlTag');
+		return $form;
+	}
+	public function insertProcessAction ()
+	{
+		if (! $this->getRequest()->isPost()) {
+			return $this->_redirect(
+			$this->view->serverUrl() . $this->view->url(
+			array(
+				'module' => 'admin',
+				'controller' => 'users',
+				'action' => 'list')));
+		}
+		$form = $this->insertForm();
+		$UsersModel = new Admin_Model_Users();
+		if ($form->isValid($_POST)) {
+			$values = $form->getValues();
+			$this->view->success = $UsersModel->insertUser($values['username'],
+			$values['password'], $values['email'], $values['aclrole'],
+			$values['yubikey']);
+			return $this->render('insert-process');
+		} else {
+			$this->view->usersList = $UsersModel->fetchUsers();
+			$this->view->insertForm = $form;
+			return $this->render('list');
+		}
 	}
 }

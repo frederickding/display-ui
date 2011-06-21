@@ -45,12 +45,14 @@ td.admin, th.admin { width: 20%; }
 		<th class="last_active">Last Active</th>
 		<th class="admin">Administrator</th>
 	</tr>
-<?php foreach($this->clientsList as $c) { ?>
+<?php foreach($this->clientsList as $c) {
+	$c['edit_users'] = $this->url(array('action' => 'edit-users', 'id' => $c['id']));
+?>
 	<tr class="body">
 		<td class="id"><?php echo $c['id']; ?></td>
 		<td class="sys_name"><?php echo $c['sys_name']; ?></td>
 		<td class="last_active"><?php echo $c['last_active']; ?></td>
-		<td class="admin"><?php echo $c['admin']; ?></td>
+		<td class="admin"><a href="<?php echo $c['edit_users']; ?>"><?php echo $c['admin']; ?></a></td>
 	</tr>
 <?php } ?>
 </table>

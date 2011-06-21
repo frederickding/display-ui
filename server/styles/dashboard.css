@@ -110,6 +110,9 @@ div.widgets-widget li {
 #yui-main h1.clients {
 	background-image: url(../images/icons/tv.png);
 }
+#yui-main h1.users {
+	background-image: url(../images/icons/users.png);
+}
 #yui-main h1 span { line-height: 264%; }
 #hd span#system-name {
 	font-weight: bold;

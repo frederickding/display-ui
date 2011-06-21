@@ -37,4 +37,72 @@ class Admin_ClientsController extends Admin_ControllerAbstract
 		$this->view->clientsList = $ClientsModel->fetchClients(
 		$this->auth_session->username);
 	}
+	public function editUsersAction ()
+	{
+		$ClientsModel = new Admin_Model_Clients();
+		$_id = $this->_getParam('id');
+		if ($this->getRequest()->isPost()) {
+			$form = $this->usersForm();
+			if ($form->isValid($_POST)) {
+				$values = $form->getValues();
+				$this->view->success = $ClientsModel->updateUsers($values['id'],
+				$values['users']);
+				return $this->_helper->redirector->goToSimpleAndExit('index',
+				'clients', 'admin', array(
+					'id' => null));
+			} else {
+				$this->view->client = $ClientsModel->fetchClient($_id,
+				$this->auth_session->username);
+				$this->view->form = $form;
+			}
+		} else {
+			$this->view->client = $ClientsModel->fetchClient($_id,
+			$this->auth_session->username);
+			$this->view->form = $this->usersForm($this->view->client['users']);
+		}
+	}
+	public function usersForm ($list = '')
+	{
+		$this->view->doctype('XHTML1_STRICT');
+		$users = new Zend_Form_Element_Text('users',
+		array(
+			'label' => 'Accounts that should have access',
+			'required' => false,
+			'description' => 'Enter a comma-delimited list of all user IDs that should have access to this client.'));
+		if (! empty($list)) {
+			$users->setValue($list);
+		}
+		$id = new Zend_Form_Element_Hidden('id',
+		array(
+			'required' => true,
+			'value' => $this->_getParam('id')));
+		$id->removeDecorator('HtmlTag')->removeDecorator('Label');
+		$submit = new Zend_Form_Element_Submit('usersubmit',
+		array(
+			'label' => 'Save'));
+		$submit->setDecorators(array(
+			'ViewHelper'));
+		$csrf = new Zend_Form_Element_Hash('usercsrf',
+		array(
+			'salt' => 'unique'));
+		$csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
+		$form = new Zend_Form();
+		$form->setAction(
+		$this->view->url(
+		array(
+			'module' => 'admin',
+			'controller' => 'clients',
+			'action' => 'edit-users',
+			'id' => null)))
+			->setMethod('post')
+			->setAttrib('id', 'editusers')
+			->addElements(
+		array(
+			'users' => $users,
+			'id' => $id,
+			'usercsrf' => $csrf,
+			'usersubmit' => $submit));
+		$form->removeDecorator('HtmlTag');
+		return $form;
+	}
 }
