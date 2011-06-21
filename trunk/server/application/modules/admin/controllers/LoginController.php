@@ -81,13 +81,15 @@ class Admin_LoginController extends Zend_Controller_Action
 		if ($passwordValid && $yubikeyValid) {
 			$this->session->authenticated = true;
 			$this->session->username = $_user;
+			$this->session->userRole = $Auth->userRole($_user);
 			unset($this->session->loginDebug);
 			if (! empty($_redir) && $_redir[0] == '/') {
 				$Auth->updateLastActive($this->session->username);
 				$this->_redirect($this->view->serverUrl() . $_redir);
 			} else {
 				// update last active
-				$Auth->updateLastActive($this->session->username);
+				$Auth->updateLastActive(
+				$this->session->username);
 				// send them to the dashboard
 				$this->_redirect(
 				$this->view->serverUrl() . $this->view->url(
@@ -95,15 +97,13 @@ class Admin_LoginController extends Zend_Controller_Action
 					'module' => 'admin',
 					'controller' => 'index',
 					'action' => 'dashboard')));
-
 			}
 		} else {
 			$this->session->loginErrorDetails = (! $passwordValid) ? 'userpass' : ((! $yubikeyValid) ? 'yubikey' : 'unknown');
 			$this->session->authenticated = false;
 			if (! empty($_redir) && $_redir[0] == '/') {
 				$this->_redirect(
-				$this->view->serverUrl() .
-				 $this->view->url(
+				$this->view->serverUrl() . $this->view->url(
 				array(
 					'module' => 'admin',
 					'controller' => 'login',

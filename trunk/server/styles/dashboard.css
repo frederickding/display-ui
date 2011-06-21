@@ -92,6 +92,24 @@ div.widgets-widget li {
 	height: 2em;
 	background: #ffffff url(../images/icons/folder_home.png) top right no-repeat;
 }
+#yui-main h1.denied {
+	background-image: url(../images/icons/error.png);
+}
+#yui-main h1.calendar {
+	background-image: url(../images/icons/vcalendar.png);
+}
+#yui-main h1.multimedia {
+	background-image: url(../images/icons/video.png);
+}
+#yui-main h1.headlines {
+	background-image: url(../images/icons/announcements.png);
+}
+#yui-main h1.weather {
+	background-image: url(../images/icons/weather.png);
+}
+#yui-main h1.clients {
+	background-image: url(../images/icons/tv.png);
+}
 #yui-main h1 span { line-height: 264%; }
 #hd span#system-name {
 	font-weight: bold;
