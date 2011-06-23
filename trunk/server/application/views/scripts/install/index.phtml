@@ -1,108 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Display UI Server | Installer</title>
-<style type="text/css">
-<!--
-body {
-	margin: 0; padding: 0;
-	background-color: #206080;
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 100%;
-}
-div {
-	padding: 0; margin: 0;
-}
-p {
-	line-height: 1.75;
-	font-size: 0.875em;
-	width: 40em;
-	margin-top: 1.75em; margin-bottom: 1.75em;
-}
-li {
-	font-size: 0.875em;
-	line-height: 1.75;
-}
-div.wrapper {
-	background: #FEFEFE url(<?php echo $this->baseUrl('images/installer/background.jpg'); ?>) bottom right no-repeat;
-	width: 920px;
-	margin: 1em auto;
-	padding: 10px;
-	border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
-}
-div.wrapper#step1 {
-	background-image: url(<?php echo $this->baseUrl('images/installer/background-switch.jpg'); ?>);
-}
-div#header {
-	width: 880px;
-	margin: 0 auto 2em auto;
-}
-div#body {
-	width: 880px;
-	margin: 1em auto;
-}
-div#header {
-	border-bottom: 1px #444 solid;
-}
-div#footer {
-	position: relative;
-	top: 3em;
-	width: 880px;
-	color: #FEFEFE;
-	margin-left: 1em;
-}
-h1 {
-	font-family: Helvetica, Arial, sans-serif;
-	font-weight: bold;
-	text-transform: uppercase;
-	font-size: 2.25em;
-	margin: 1em 0;
-}
-h2, h3, h4, h5 {
-	font-weight: bold;
-}
-h2 {
-	font-size: 1.5em;
-}
-ul.requirements {
-	list-style-type: circle;
-}
-span.mouseover {
-	border-bottom: 1px #666 dashed;
-}
-small {
-	font-size: 0.75em;
-}
-a.home, a.back, a.next {
-	display: block;
-	width: 88px; height: 89px;
-	text-indent: -1000em;
-}
-a.home {
-	background: none;
-}
-a.back {
-	background-image: url(<?php echo $this->baseUrl('images/installer/back.png') ?>);
-}
-a.next {
-	margin-top: -89px;
-	margin-left: 30em;
-	background-image: url(<?php echo $this->baseUrl('images/installer/next.png'); ?>);
-}
--->
-</style></head>
-
-<body>
-
-<div class="wrapper" id="step1">
-	<div id="header">
-		<h1><img src="<?php echo $this->baseUrl('images/installer/title.png'); ?>"
-		width="670" height="35" alt="Display UI Server &raquo; Installer" /></h1>
-	</div>
+<?php
+$this->headTitle('Step 1');
+$this->wrapperId = 'step1';
+?>
 	<div id="body">
 		<h2>Step 1 &raquo; Welcome</h2>
 		<p>Welcome to your soon-to-be installation of Display UI Server.
@@ -116,7 +15,7 @@ a.next {
 			<li>Apache <span class="mouseover"
 title="May work on older versions, but only tested with 2.2.11">2.2</span></li>
 			<li>Write access to files</li>
-			<li>SQLite or MySQL</li>
+			<li>PDO &amp; pdo_mysql, or MySQLi</li>
 		</ul>
 		<p>Click the next arrow to move on to Step 2, where the installer will
 		check that your system meets the requirements.</p>
@@ -124,19 +23,14 @@ title="May work on older versions, but only tested with 2.2.11">2.2</span></li>
 		<a class="next" href="<?php echo $this->url(array('controller' => 'install', 'action' => 'test')); ?>"
 		title="Click here to go to Step 2">Next</a>
 	</div>
-	<div id="footer">
-		<small>Display UI Server/<?php echo APPLICATION_VER; ?></small>
-	</div>
-</div>
-<?php echo $this->inlineScript()
-	->appendScript('
-$(document).ready(function(){
-    $(\'tr[title]\').qtip({
-        style: {
-            name: \'dark\',
-            tip: true
-        }
-    });
+<?php $this->inlineScript()
+	->appendScript('$(document).ready(function(){
+	$(\'tr[title]\').qtip({
+		style: {
+			name: \'dark\',
+			tip: true
+		}
+	});
 	$(\'a.next[title]\').qtip({
 		style: {
 			name: \'light\',
@@ -145,5 +39,3 @@ $(document).ready(function(){
 	});
 	$(\'a.next\').effect(\'pulsate\', { times: 3 }, 2000);
 });'); ?>
-</body>
-</html>
