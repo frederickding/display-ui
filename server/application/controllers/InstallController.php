@@ -173,7 +173,7 @@ class InstallController extends Zend_Controller_Action
 				$this->view->dbname = $req->getParam('dbname');
 				$this->view->driver = $req->getParam('driver');
 				// instantiate the database install model
-				$db = new Default_Model_Installsql(
+				$db = new Default_Model_InstallSql(
 					false,
 					$this->view->hostname,
 					$this->view->username,
