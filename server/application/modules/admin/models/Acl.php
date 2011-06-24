@@ -120,7 +120,7 @@ class Admin_Model_Acl
 	private function addDenys ()
 	{
 		// deny publishers all access to backup/restore functionality
-		$this->acl->deny('publisher', 'backuprestore', NULL)
+		$this->acl->deny('publisher', array('backuprestore', 'options'))
 			->deny('publisher', 'clients',
 		array(
 			'add',
