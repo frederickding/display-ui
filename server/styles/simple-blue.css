@@ -1,18 +1,21 @@
 @charset "utf-8";
 body {
-	margin: 0; padding: 0;
+	margin: 0;
+	padding: 0;
 	background-color: #206080;
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 100%;
 }
 div {
-	padding: 0; margin: 0;
+	padding: 0;
+	margin: 0;
 }
 p {
 	line-height: 1.75;
 	font-size: 0.875em;
 	width: 40em;
-	margin-top: 1.75em; margin-bottom: 1.75em;
+	margin-top: 1.75em;
+	margin-bottom: 1.75em;
 }
 li {
 	font-size: 0.875em;
@@ -44,9 +47,7 @@ h1 {
 	font-size: 2.25em;
 	margin: 1em 0;
 }
-h2, h3, h4, h5 {
-	font-weight: bold;
-}
+h2, h3, h4, h5 { font-weight: bold; }
 h2 {
 	font-size: 1.5em;
 	text-align: center;
