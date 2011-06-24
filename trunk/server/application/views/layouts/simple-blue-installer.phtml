@@ -1,30 +1,23 @@
 <?php
 $layout = $this->layout();
-echo $this->doctype('XHTML1_STRICT');
-$this->headLink(
-array(
-	'rel' => 'icon',
-	'href' => $this->baseUrl('favicon.ico'),
-	'type' => 'image/x-icon',
-	'PREPEND'))
-	->prependStylesheet($this->baseUrl('styles/installer.css'));
 $this->inlineScript()
-	->appendFile('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js')
-	->appendFile('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js')
-	->appendFile($this->view->baseUrl('scripts/jquery.qtip-1.0.0-rc3.min.js'));
+    ->prependFile($this->baseUrl('scripts/jquery.qtip-1.0.0-rc3.min.js'))
+    ->prependFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js')
+    ->prependFile('//ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js');
+echo $this->doctype('XHTML1_STRICT');
+$this->headLink(array('rel' => 'icon', 'href' => $this->baseUrl('favicon.ico'),
+'type' => 'image/x-icon', 'PREPEND'))
+    ->prependStylesheet($this->baseUrl('styles/installer.css'));
 ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<?php
-	echo $this->headTitle('Installer', 'PREPEND')->setSeparator(' » ');
-	echo "\n";
-	echo $this->headLink();
-	echo "\n";
-	echo $this->headStyle();
-	echo "\n";
-	echo $this->headScript(); ?>
+	echo $this->headTitle('Installer', 'PREPEND')->setSeparator(' » ') . "\n";
+	echo $this->headMeta()->prependHttpEquiv('Content-Type', 'text/html; charset=utf-8')->setIndent('	') . "\n";
+	echo $this->headLink()->setIndent('	') . "\n";
+	echo $this->headStyle()->setIndent('	') . "\n";
+	echo $this->headScript()->setIndent('	'); ?>
 </head>
 <body>
 <div class="wrapper" id="<?php echo $this->wrapperId; ?>">

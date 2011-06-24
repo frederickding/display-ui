@@ -21,7 +21,7 @@ var DisplayUI = {
 	 * Fades in the sidebar only if this is the first time the dashboard is loaded.
 	 * PHP must add the 'first-load' class to the body tag if the user just logged in.
 	 */
-	showSidebar : function() {
+	showSidebar : function () {
 		if ($j('body').hasClass('first-load')) {
 			$j('div#sidebar').hide().animate( {
 				opacity : 1.0
@@ -44,7 +44,7 @@ var DisplayUI = {
 	 * Toggles the main widget body when the title of the widget is clicked.
 	 * Expects a jQuery object as the parameter
 	 */
-	toggleWidget : function(widget) {
+	toggleWidget : function (widget) {
 		if (widget.hasClass('collapsed')) {
 			widget.removeClass('no-after').removeClass('collapsed').next(
 					'.widgets-widget-content').slideDown('fast');
@@ -53,5 +53,16 @@ var DisplayUI = {
 				widget.addClass('no-after').addClass('collapsed')
 			});
 		}
+	},
+	enableDatePicker : function (selector) {
+		$j(selector).datepicker({
+			dateFormat: 'yy-mm-dd'
+		});
+	},
+	enableDateTimePicker : function (selector) {
+		$j(selector).datetimepicker({
+			dateFormat: 'yy-mm-dd',
+			timeFormat: 'hh:mm:ss'
+		});
 	}
 }

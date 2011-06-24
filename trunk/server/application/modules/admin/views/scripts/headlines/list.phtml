@@ -72,7 +72,14 @@ td.day.day1 {
 td.day.day2 {
 	background: #FFD7C1;
 }
+div.ui-datepicker a {
+	border-bottom: none;
+}
 ');
+$this->headLink()->appendStylesheet(
+	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
+$this->headScript()->appendFile(
+	$this->baseUrl('/scripts/jquery-ui-1.8.13.custom.min.js'));
 $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#headlineinsert").hide();
 	if(window.location.pathname.search(/insert-process/) != -1) {
@@ -84,6 +91,7 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 		$j("#headlineinsert").toggle("normal");
 		$j(this).toggleClass("expanded");
 	});
+	DisplayUI.enableDatePicker("#headlineexpires");
 });
 ');
 ?>
