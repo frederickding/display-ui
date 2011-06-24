@@ -37,6 +37,8 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 		$this->view->headlinesList = $HeadlinesModel->fetchHeadlines(
 		$this->auth_session->username);
 		$this->view->insertForm = $this->insertForm();
+		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->deleteCsrf;
 	}
 	/**
 	 * Shows a confirmation page for deletion of an item

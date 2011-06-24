@@ -71,6 +71,8 @@ div.ui-datepicker a {
 .ui-timepicker-div dl dt{ height: 25px; }
 .ui-timepicker-div dl dd{ margin: -25px 10px 10px 65px; }
 .ui-timepicker-div td { font-size: 90%; }
+#dialog-confirm { display: none; text-align: left; font-size: 90%; }
+.ui-widget-header a { border-bottom: none; }
 ');
 $this->headLink()->appendStylesheet(
 	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
@@ -89,6 +91,14 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 		$j(this).toggleClass("expanded");
 	});
 	DisplayUI.enableDateTimePicker("#eventtime");
+	$j("a.delete").click(function(event) {
+		event.preventDefault();
+		var _id = $j(this).attr("id").replace("delete-href-","");
+		$j("#dialog-confirm-id").text(_id);
+		DisplayUI.ajaxDeleteObject(_id, "#dialog-confirm", "'
+	. $this->url(array('module' => 'admin' , 'controller' => 'calendar' , 'action' => 'delete-process'))
+	. '", "' . $this->csrf . '");
+	});
 });
 ');
 ?>
@@ -115,8 +125,14 @@ $del = $this->url(array(
 		<td class="name"><?php echo $e->name; ?></td>
 		<td class="time"><?php echo $e->time; ?></td>
 		<td class="type"><?php echo $e->type; ?></td>
-		<td class="client"><?php echo $e->client; ?></td>
-		<td class="actions"><a href="<?php echo $del; ?>" class="delete">Delete</a></td>
+		<td class="client"><?php echo $e->sys_name; ?></td>
+		<td class="actions"><a href="<?php echo $del; ?>" class="delete"
+			id="delete-href-<?php echo $e->event_id; ?>">Delete</a></td>
 	</tr>
 <?php } ?>
 </table>
+<div id="dialog-confirm" title="Delete this event?">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+	<strong>Are you sure you want to delete the event with the ID of <span id="dialog-confirm-id"></span>?</strong></p>
+	<p>Deletion is irreversible.</p>
+</div>
