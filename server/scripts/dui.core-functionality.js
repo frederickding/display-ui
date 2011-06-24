@@ -54,15 +54,57 @@ var DisplayUI = {
 			});
 		}
 	},
+	/**
+	 * Enables a jQuery UI datepicker on the object specified by the selector. 
+	 * Expects a selector string, not a jQuery object
+	 */
 	enableDatePicker : function (selector) {
 		$j(selector).datepicker({
 			dateFormat: 'yy-mm-dd'
 		});
 	},
+	/**
+	 * Enables a jQuery UI date & time picker on the object specified by the 
+	 * selector. Expects a selector string, not a jQuery object
+	 */
 	enableDateTimePicker : function (selector) {
 		$j(selector).datetimepicker({
 			dateFormat: 'yy-mm-dd',
 			timeFormat: 'hh:mm:ss'
+		});
+	},
+	/**
+	 * Submits an AJAX GET request to delete an object.
+	 * 
+	 * id:		numerical ID of object to be deleted
+	 * dialog:	selector of confirmation dialog <div>
+	 * url:		location to query (by POST)
+	 * csrf:	secure hash
+	 */
+	ajaxDeleteObject : function (id, dialog, url, csrf) {
+		var dialogObject = $j(dialog);
+		dialogObject.dialog({
+			modal: true,
+			resizable: false,
+			buttons: {
+				"Delete" : function() {
+					$j.post(url,	{
+						id : id,
+						deletecsrf : csrf,
+						deleteconf: "Yes!"
+					}, function(data) {
+						if(data == "Successfully deleted.") {
+							dialogObject.dialog("close");
+							window.location.reload();
+						} else {
+							alert("Error upon request. The deletion may have failed.");
+						}
+					});
+				},
+				"Cancel" : function() {
+					dialogObject.dialog("close");
+				}
+			}
 		});
 	}
 }

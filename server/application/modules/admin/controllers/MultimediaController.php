@@ -47,6 +47,8 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$this->view->mediaRange = array(
 			$mediaData[2],
 			$mediaData[3]);
+		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->deleteCsrf;
 	}
 	/**
 	 * Shows a form for uploading media into the system
@@ -257,8 +259,8 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 			'mediumclients' => $clients,
 			'mediumfile' => $file,
 			'mediumactivatenow' => $immediateActive,
-			'mediumalternating' => $alternating,
 			'mediumactivation' => $activates,
+			'mediumalternating' => $alternating,
 			'mediumexpiration' => $expires,
 			'mediumweight' => $weight,
 			'mediumduration' => $duration,

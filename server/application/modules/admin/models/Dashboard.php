@@ -50,15 +50,17 @@ class Admin_Model_Dashboard extends Default_Model_DatabaseAbstract
 				->where('type = ?', Admin_Model_Multimedia::VIDEO_TYPE));
 			$result4 = $this->db->fetchOne(
 			$this->db->select()
-				->from('dui_media', 'COUNT(*)')
-				->where('type = ?', Admin_Model_Multimedia::POWERPOINT_TYPE));
+				->from('dui_calendar', 'COUNT(*)')
+				->where('time > UTC_TIMESTAMP()')
+				->orWhere('type = "weekly"')
+				->orWhere('TIME(time) = "00:00:00" AND DATE(time) = UTC_DATE()'));
 			return array(
 				'clients' => $result['dui_clients'],
 				'headlines' => $result['dui_headlines'],
 				'users' => $result['dui_users'],
 				'images' => $result2,
 				'videos' => $result3,
-				'powerpoints' => $result4);
+				'events' => $result4);
 		}
 		return array();
 	}

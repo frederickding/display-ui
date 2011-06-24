@@ -36,6 +36,8 @@ class Admin_CalendarController extends Admin_ControllerAbstract
 		$CalendarModel = new Admin_Model_Calendar();
 		$this->view->eventsList = $CalendarModel->getAllEvents();
 		$this->view->insertForm = $this->insertForm();
+		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->deleteCsrf;
 	}
 	/**
 	 * Shows a confirmation page for deletion of an item
@@ -88,7 +90,7 @@ class Admin_CalendarController extends Admin_ControllerAbstract
 			return $this->render('insert-process');
 		} else {
 			$this->view->insertForm = $form;
-			$this->view->headlinesList = $CalendarModel->getAllEvents();
+			$this->view->eventsList = $CalendarModel->getAllEvents();
 			return $this->render('list');
 		}
 	}

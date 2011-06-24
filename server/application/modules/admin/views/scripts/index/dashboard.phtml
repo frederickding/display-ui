@@ -2,21 +2,7 @@
 $this->navActive = 'dashboard';
 $this->title = 'Dashboard';
 $this->headTitle('Dashboard');
-if(APPLICATION_ENV == 'development')
-	$this->inlineScript()->appendScript('$j(document).ready(function() {
-	$j("#quickline-form").ajaxForm({
-		target: "#quickline-response",
-		resetForm: true,
-		beforeSubmit : function() {
-			$j("#quickline-form").block({
-				message: "<img src=\''.$this->baseUrl('images/ajax-loader.gif').'\' />"
-			});
-		},
-		success : function() { $j("#quickline-form").unblock().reset(); }
-	});
-	$j("body").addClass("first-load");
-});');
-else $this->inlineScript()->appendScript('$j(document).ready(function() {
+$this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#quickline-form").ajaxForm({
 		resetForm: true,
 		beforeSubmit : function() {
@@ -82,6 +68,13 @@ ul.quick-actions li { list-style-type: square; }
 	font-style: italic;
 }
 #quickline-message { width: 100%; }');
+$this->statusLinks = array(
+	'clients' => $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')),
+	'headlines' => $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')),
+	'users' => $this->url(array('module' => 'admin', 'controller' => 'users', 'action' => 'list')),
+	'multimedia' => $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')),
+	'calendar' => $this->url(array('module' => 'admin', 'controller' => 'calendar', 'action' => 'list'))
+);
 ?>
 
 				<div class="yui-gc">
@@ -91,30 +84,31 @@ ul.quick-actions li { list-style-type: square; }
 							<div class="widgets-widget-content">
 								<table cellspacing="0" class="status-report">
 									<tr id="status-report-clients">
-										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>"><?php echo $this->statusReport['clients']; ?></a></td>
-										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'clients', 'action' => 'list')); ?>">TV clients</a></td>
+										<td class="number"><a href="<?php echo $this->statusLinks['clients']; ?>"><?php echo $this->statusReport['clients']; ?></a></td>
+										<td><a href="<?php echo $this->statusLinks['clients']; ?>">TV clients</a></td>
 									</tr>
 									<tr id="status-report-headlines">
-										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')); ?>"><?php echo $this->statusReport['headlines']; ?></a></td>
-										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'headlines', 'action' => 'list')); ?>">headlines</a></td>
+										<td class="number"><a href="<?php echo $this->statusLinks['headlines']; ?>"><?php echo $this->statusReport['headlines']; ?></a></td>
+										<td><a href="<?php echo $this->statusLinks['headlines']; ?>">headlines</a></td>
 									</tr>
 									<tr id="status-report-users">
-										<td class="number"><a href="#users"><?php echo $this->statusReport['users']; ?></a></td>
-										<td><a href="#users">users</a></td>
+										<td class="number"><a href="<?php echo $this->statusLinks['users']; ?>"><?php echo $this->statusReport['users']; ?></a></td>
+										<td><a href="<?php echo $this->statusLinks['users']; ?>">users</a></td>
 									</tr>
 								</table>
 								<table cellspacing="0" class="status-report">
 									<tr id="status-report-videos">
-										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['videos']; ?></a></td>
-										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">videos</a></td>
+										<td class="number"><a href="<?php echo $this->statusLinks['multimedia']; ?>"><?php echo $this->statusReport['videos']; ?></a></td>
+										<td><a href="<?php echo $this->statusLinks['multimedia']; ?>">videos</a></td>
 									</tr>
 									<tr id="status-report-pictures">
-										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['images']; ?></a></td>
-										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">pictures</a></td>
+										<td class="number"><a href="<?php echo $this->statusLinks['multimedia']; ?>"><?php echo $this->statusReport['images']; ?></a></td>
+										<td><a href="<?php echo $this->statusLinks['multimedia']; ?>">pictures</a></td>
 									</tr>
-									<tr id="status-report-ppts">
-										<td class="number"><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>"><?php echo $this->statusReport['powerpoints']; ?></a></td>
-										<td><a href="<?php echo $this->url(array('module' => 'admin', 'controller' => 'multimedia', 'action' => 'list')); ?>">PowerPoints</a></td>
+									<tr id="status-report-events">
+										<td class="number"><a href="<?php echo $this->statusLinks['calendar']; ?>">
+										<abbr title="Only future and repeating events counted"><?php echo $this->statusReport['events']; ?></abbr></a></td>
+										<td><a href="<?php echo $this->statusLinks['calendar']; ?>">calendar events</a></td>
 									</tr>
 								</table>
 								<div class="clear"></div>

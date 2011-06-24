@@ -65,6 +65,23 @@ tr.day2 td.day {
 	-moz-border-radius: 5px;
 }
 #clicktoupload a, #clicktoupload em { font-weight: bold; color: #003c00 !important; }
+#dialog-confirm { display: none; text-align: left; font-size: 90%; }
+.ui-widget-header a { border-bottom: none; }
+');
+$this->headLink()->appendStylesheet(
+	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
+$this->headScript()->appendFile(
+	$this->baseUrl('/scripts/jquery-ui-1.8.13.custom.min.js'));
+$this->inlineScript('script', '$j(document).ready(function() {
+	$j("a.delete").click(function(event) {
+		event.preventDefault();
+		var _id = $j(this).attr("id").replace("delete-href-","");
+		$j("#dialog-confirm-id").text(_id);
+		DisplayUI.ajaxDeleteObject(_id, "#dialog-confirm", "'
+	. $this->url(array('module' => 'admin' , 'controller' => 'multimedia' , 'action' => 'delete-process'))
+	. '", "' . $this->csrf . '");
+	});
+});
 ');
 ?>
 <p class="highlight" id="clicktoupload"><a
@@ -93,21 +110,9 @@ echo $this->mediaTotal;
 <?php
 foreach ($this->mediaData as $medium) {
 	$medium['active'] = ($medium['active'] == 1) ? 'Yes' : 'No';
-	$medium['viewLink'] = $this->url(
-	array(
-		'module' => 'admin',
-		'controller' => 'multimedia',
-		'action' => 'view')) . '?id=' . $medium['id'];
-	$medium['toggleLink'] = $this->url(
-	array(
-		'module' => 'admin',
-		'controller' => 'multimedia',
-		'action' => 'toggle')) . '?id=' . $medium['id'];
-	$medium['delLink'] = $this->url(
-	array(
-		'module' => 'admin',
-		'controller' => 'multimedia',
-		'action' => 'delete')) . '?id=' . $medium['id'];
+	$medium['viewLink'] = $this->url(array('action' => 'view', 'id' => $medium['id']));
+	$medium['toggleLink'] = $this->url(array('action' => 'toggle', 'id' => $medium['id']));
+	$medium['delLink'] = $this->url(array('action' => 'delete', 'id' => $medium['id']));
 	if($medium['alternating'] == "1")
 		echo '	<tr class="body day1">';
 	elseif($medium['alternating'] == "2")
@@ -129,7 +134,8 @@ foreach ($this->mediaData as $medium) {
 		<td class='actions'>";
 	if ($medium['type'] == 'image')
 		echo '<a href="' . $medium['viewLink'] . '" class="view">View</a>';
-	echo '		<a href="' . $medium['delLink'] . '" class="delete">Delete</a></td>
+	echo '		<a href="' . $medium['delLink'] . '" class="delete"
+		id="delete-href-' . $medium['id'] . '">Delete</a></td>
 	</tr>';
 }
 ?>
@@ -144,3 +150,8 @@ for ($p = $this->page; $p <= $numPages; $p ++) {
 		'action' => 'list')) . "?page={$p}\">{$p}</a>&nbsp;&nbsp;";
 }
 ?>
+<div id="dialog-confirm" title="Delete this event?">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+	<strong>Are you sure you want to delete the media item with the ID of <span id="dialog-confirm-id"></span>?</strong></p>
+	<p>Deletion is irreversible.</p>
+</div>
