@@ -2,6 +2,8 @@
 /* Only IE uses this */
 
 #hd { left: 17.1em; }
+#bd { left: 0; }
 #bd #yui-main .yui-b { margin-left: 17.1em; }
+#sidebar { left: 0; }
 table.status-report tr + tr { background-color: #efefef; }
 table.status-report tr + tr + tr { background-color: #ffffff; }
