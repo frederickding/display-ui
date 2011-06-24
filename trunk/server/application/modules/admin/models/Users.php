@@ -70,4 +70,14 @@ class Admin_Model_Users extends Default_Model_DatabaseAbstract
 		$insert = $this->db->insert('dui_users', $data);
 		return $insert;
 	}
+	public function deleteUser ($_id)
+	{
+		$_id = (int) $_id;
+		if (! is_null($this->db)) {
+			$result = $this->db->delete('dui_users',
+			$this->db->quoteInto('id = ?', $_id, 'INTEGER'));
+			return (bool) $result;
+		}
+		return FALSE;
+	}
 }

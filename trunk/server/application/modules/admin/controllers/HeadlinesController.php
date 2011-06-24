@@ -37,7 +37,7 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 		$this->view->headlinesList = $HeadlinesModel->fetchHeadlines(
 		$this->auth_session->username);
 		$this->view->insertForm = $this->insertForm();
-		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
+		$this->auth_session->deleteCsrf = sha1(microtime(TRUE));
 		$this->view->csrf = $this->auth_session->deleteCsrf;
 	}
 	/**
@@ -56,7 +56,7 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$this->_helper->removeHelper('layout');
-		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecrsf') == $this->auth_session->deleteCsrf) {
+		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecsrf') == $this->auth_session->deleteCsrf) {
 			$HeadlinesModel = new Admin_Model_Headlines();
 			$id = (int) $this->_getParam('id', 0);
 			if ($this->_getParam('deleteconf', 'No!') == 'Yes!') {

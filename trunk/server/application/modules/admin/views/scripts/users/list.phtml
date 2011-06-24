@@ -33,6 +33,7 @@ td.username, th.username { width: 27.5%; }
 td.email, th.email { width: 30%; }
 td.last_active, th.last_active { width: 20%; }
 td.acl_role, th.acl_role { width: 15%; }
+td.delete, th.delete { width: 10%; }
 #users-list td {
 	padding: none;
 	margin: none;
@@ -57,7 +58,13 @@ ul.errors {
 	-webkit-border-radius: 5px;
 	width: 100%;
 }
+#dialog-confirm { display: none; text-align: left; font-size: 90%; }
+.ui-widget-header a { border-bottom: none; }
 ');
+$this->headLink()->appendStylesheet(
+	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
+$this->headScript()->appendFile(
+	$this->baseUrl('/scripts/jquery-ui-1.8.13.custom.min.js'));
 $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#userinsert").hide();
 	if(window.location.pathname.search(/insert-process/) != -1) {
@@ -68,6 +75,14 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 		event.preventDefault();
 		$j("#userinsert").toggle("normal");
 		$j(this).toggleClass("expanded");
+	});
+	$j("a.delete").click(function(event) {
+		event.preventDefault();
+		var _id = $j(this).attr("id").replace("delete-href-","");
+		$j("#dialog-confirm-id").text(_id);
+		DisplayUI.ajaxDeleteObject(_id, "#dialog-confirm", "'
+	. $this->url(array('module' => 'admin' , 'controller' => 'users' , 'action' => 'delete-process'), null, true)
+	. '", "' . $this->csrf . '");
 	});
 });
 ');
@@ -80,15 +95,25 @@ $this->inlineScript()->appendScript('$j(document).ready(function() {
 		<th class="username">Username</th>
 		<th class="email">Email</th>
 		<th class="last_active">Last Active</th>
-		<th class="acl_role">ACL Role</th>
+		<th class="acl_role">Role</th>
+		<th class="delete">Actions</th>
 	</tr>
-<?php foreach($this->usersList as $u) { ?>
+<?php foreach($this->usersList as &$u) {
+$u['delete_link'] = $this->url(array('action' => 'delete', 'id' => $u['id']));
+	?>
 	<tr class="body">
 		<td class="id"><?php echo $u['id']; ?></td>
 		<td class="username"><?php echo $u['username']; ?></td>
 		<td class="email"><?php echo $u['email']; ?></td>
 		<td class="last_active"><?php echo $u['last_active']; ?></td>
 		<td class="acl_role"><?php echo $u['acl_role']; ?></td>
+		<td class="delete"><a href="<?php echo $u['delete_link']; ?>"
+			class="delete" id="delete-href-<?php echo $u['id']; ?>">Delete</a></td>
 	</tr>
 <?php } ?>
 </table>
+<div id="dialog-confirm" title="Delete this user?">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+	<strong>Are you sure you want to delete the user with the ID of <span id="dialog-confirm-id"></span>?</strong></p>
+	<p>Deletion is irreversible.</p>
+</div>

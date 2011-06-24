@@ -36,6 +36,8 @@ class Admin_UsersController extends Admin_ControllerAbstract
 		$UsersModel = new Admin_Model_Users();
 		$this->view->usersList = $UsersModel->fetchUsers();
 		$this->view->insertForm = $this->insertForm();
+		$this->auth_session->deleteCsrf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->deleteCsrf;
 	}
 	public function insertForm ()
 	{
@@ -133,5 +135,34 @@ class Admin_UsersController extends Admin_ControllerAbstract
 			$this->view->insertForm = $form;
 			return $this->render('list');
 		}
+	}
+	/**
+	 * Shows a confirmation page for deletion of an item
+	 */
+	public function deleteAction ()
+	{
+		$this->view->id = (int) $this->_getParam('id');
+		$UsersModel = new Admin_Model_Users();
+		$this->auth_session->deleteCsrf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->deleteCsrf;
+	}
+	public function deleteProcessAction ()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->removeHelper('layout');
+		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecsrf') == $this->auth_session->deleteCsrf) {
+			$UsersModel = new Admin_Model_Users();
+			$id = (int) $this->_getParam('id', 0);
+			if ($this->_getParam('deleteconf', 'No!') == 'Yes!') {
+				if ($UsersModel->deleteUser($id)) {
+					return $this->getResponse()->setBody(
+					'Successfully deleted.');
+				} else {
+					return $this->getResponse()->setBody('Deletion failed.');
+				}
+			}
+		}
+		return $this->getResponse()->setBody(
+		'Nothing was deleted. <a href="javascript:history.back(1);">Go back.</a>');
 	}
 }
