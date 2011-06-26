@@ -29,9 +29,10 @@ $this->headStyle()->appendStyle('#clients-list {
 #clients-list tr.body:nth-child(odd) { background-color: #fafafa; }
 #clients-list tr.body:hover { background-color: #ddeeff; }
 td.id, th.id { width: 10%; }
-td.sys_name, th.sys_name { width: 50%; }
+td.sys_name, th.sys_name { width: 60%; }
 td.location, th.location { width: 20%; }
-td.actions, th.actions { width: 20%; display: none; }
+td.actions, th.actions { width: 10%; display: none; text-align: center; }
+td.actions a, td.actions a:hover { border-bottom: none; }
 #clients-list td {
 	padding: none;
 	margin: none;
@@ -42,6 +43,12 @@ p.notice.bad {
 	background-color:#f5afb0;
 	color:#500000;
 	padding:0.5em;
+}
+a.edit {
+	text-indent: -10000em;
+	display: inline-block;
+	height: 32px; width: 32px;
+	background: url(' . $this->baseUrl('/images/icons/actions/screwdriver_32.png') . ') no-repeat;
 }
 ');
 $this->headLink()->appendStylesheet(
@@ -95,7 +102,7 @@ $this->inlineScript('script', '$j(document).ready(function() {
 		<th class="id">ID</th>
 		<th class="sys_name">Client System Name</th>
 		<th class="location">Location</th>
-		<th class="actions">Actions</th>
+		<th class="actions"></th>
 	</tr>
 <?php foreach($this->clientsList as $c) { ?>
 	<tr class="body">
@@ -104,7 +111,8 @@ $this->inlineScript('script', '$j(document).ready(function() {
 		<td class="location" title="<?php echo $c['city']; ?>">
 			<a href="<?php echo $c['link']; ?>"><?php echo $c['location']; ?></a>
 		</td>
-		<td class="actions"><a href="#" class="edit" id="edit-href-<?php echo $c['id']; ?>">Edit Location</a></td>
+		<td class="actions"><a href="#" class="edit" id="edit-href-<?php echo $c['id']; ?>"
+			title="Change this client's location">Edit Location</a></td>
 	</tr>
 <?php } ?>
 </table>
