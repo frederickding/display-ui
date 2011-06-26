@@ -36,5 +36,28 @@ class Admin_WeatherController extends Admin_ControllerAbstract
 		$WeatherModel = new Admin_Model_Weather();
 		$list = $WeatherModel->fetchClients($this->auth_session->username);
 		$this->view->clientsList = $list;
+		$this->auth_session->weatherCsrf = sha1(microtime(TRUE));
+		$this->view->csrf = $this->auth_session->weatherCsrf;
+	}
+	public function editProcessAction ()
+	{
+		$this->_helper->layout()->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		$this->_response->setHeader('Content-Type', 'text/plain; charset=utf-8');
+		$_id = $this->_getParam('id');
+		$_csrf = $this->_getParam('csrf');
+		$_location = $this->_getParam('location');
+		if ($_SERVER['REQUEST_METHOD'] != 'POST')
+			return $this->_response->setBody('Invalid request');
+		if (empty($_csrf) || $_csrf != $this->auth_session->weatherCsrf)
+			return $this->_response->setBody('Bad CSRF token.');
+		if (empty($_id) || empty($_location))
+			return $this->_response->setBody('Invalid form submission.');
+		$WeatherModel = new Admin_Model_Weather();
+		if ($WeatherModel->getLocation($_id) == $_location)
+			return $this->_response->setBody('Not updated.');
+		if (! $WeatherModel->updateLocation($_id, $_location))
+			return $this->_response->setBody('Database operation failed.');
+		return $this->_response->setBody('Successfully saved.');
 	}
 }
