@@ -30,22 +30,21 @@ $this->headStyle()->appendStyle(
 #media-list tr.body:nth-child(odd) { background-color: #fafafa; }
 #media-list tr.body:hover { background-color: #ddeeff; }
 td.id, th.id { width: 5%; }
-td.title, th.title { width: 38.5%; font-weight: bold; }
+td.title, th.title { width: 43.5%; font-weight: bold; }
 td.active, th.active { width: 4%; color: #666666; }
 td.expires, th.expires { width: 17.5%; color: #666666; }
 td.type, th.type { width: 10%; }
 td.day, th.day { width: 5%; }
-td.actions, th.actions { width: 20%; }
-td.actions { font-size: 77%; }
+td.actions, th.actions { width: 15%; }
+td.actions { font-size: 77%; text-align: center; }
 tr:hover td.expires, tr:hover td.active, tr:hover td.weight { color: inherit; }
 #clients-list td {
 	padding: none;
 	margin: none;
 }
 td.actions a { border-bottom: none; margin: 0 0.25em; }
-td.actions a:hover { border-bottom: inherit; }
+td.actions a:hover { border-bottom: none; }
 td.actions a.view { color: #507b38; }
-td.actions a.toggle { color: #551b7a; }
 td.actions a.delete { color: #bb2200; }
 .video_type { color: #551b7a; }
 .image_type { color: #507b38; }
@@ -63,6 +62,18 @@ tr.day2 td.day {
 	padding: 0.5em;
 	border-radius: 5px; border: 1px #ffffff solid;
 	-moz-border-radius: 5px;
+}
+a.delete, a.view {
+	text-indent: -10000em;
+	display: inline-block;
+	height: 32px; width: 32px;
+	margin: auto;
+}
+a.delete {
+	background: url(' . $this->baseUrl('/images/icons/actions/close_32.png') . ') no-repeat;
+}
+a.view {
+	background: url(' . $this->baseUrl('/images/icons/actions/search_button_green_32.png') . ') no-repeat;
 }
 #clicktoupload a, #clicktoupload em { font-weight: bold; color: #003c00 !important; }
 #dialog-confirm { display: none; text-align: left; font-size: 90%; }
@@ -133,9 +144,9 @@ foreach ($this->mediaData as $medium) {
 		<td class='type {$medium['type']}_type'>{$medium['type']}</td>
 		<td class='actions'>";
 	if ($medium['type'] == 'image')
-		echo '<a href="' . $medium['viewLink'] . '" class="view">View</a>';
+		echo '<a href="' . $medium['viewLink'] . '" class="view" title="View this item">View</a>';
 	echo '		<a href="' . $medium['delLink'] . '" class="delete"
-		id="delete-href-' . $medium['id'] . '">Delete</a></td>
+		id="delete-href-' . $medium['id'] . '" title="Delete this item">Delete</a></td>
 	</tr>';
 }
 ?>

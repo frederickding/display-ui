@@ -36,7 +36,7 @@ td.client, th.client { width: 17.5%; }
 td.actions, th.actions { width: 7.5%; }
 td.actions { font-size: 77%; }
 td.actions a { border-bottom: none; margin: 0 0.25em; }
-td.actions a:hover { border-bottom: inherit; }
+td.actions a:hover { border-bottom: none; }
 td.actions a.delete { color: #bb2200; }
 tr:hover td.expires, tr:hover td.active { color: inherit; }
 #calendar-list td {
@@ -73,6 +73,13 @@ div.ui-datepicker a {
 .ui-timepicker-div td { font-size: 90%; }
 #dialog-confirm { display: none; text-align: left; font-size: 90%; }
 .ui-widget-header a { border-bottom: none; }
+a.delete {
+	background: url(' . $this->baseUrl('/images/icons/actions/close_32.png') . ') no-repeat;
+	text-indent: -10000em;
+	display: block;
+	height: 32px; width: 32px;
+	margin: auto;
+}
 ');
 $this->headLink()->appendStylesheet(
 	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
@@ -127,7 +134,7 @@ $del = $this->url(array(
 		<td class="type"><?php echo $e->type; ?></td>
 		<td class="client"><?php echo $e->sys_name; ?></td>
 		<td class="actions"><a href="<?php echo $del; ?>" class="delete"
-			id="delete-href-<?php echo $e->event_id; ?>">Delete</a></td>
+			id="delete-href-<?php echo $e->event_id; ?>" title="Delete this item">Delete</a></td>
 	</tr>
 <?php } ?>
 </table>

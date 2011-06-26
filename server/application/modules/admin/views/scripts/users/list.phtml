@@ -34,6 +34,7 @@ td.email, th.email { width: 30%; }
 td.last_active, th.last_active { width: 20%; }
 td.acl_role, th.acl_role { width: 15%; }
 td.delete, th.delete { width: 10%; }
+td.delete a, td.delete a:hover { border-bottom: none; }
 #users-list td {
 	padding: none;
 	margin: none;
@@ -57,6 +58,13 @@ ul.errors {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	width: 100%;
+}
+a.delete {
+	background: url(' . $this->baseUrl('/images/icons/actions/user_close_32.png') . ') no-repeat;
+	text-indent: -10000em;
+	display: block;
+	height: 32px; width: 32px;
+	margin: auto;
 }
 #dialog-confirm { display: none; text-align: left; font-size: 90%; }
 .ui-widget-header a { border-bottom: none; }
@@ -108,7 +116,7 @@ $u['delete_link'] = $this->url(array('action' => 'delete', 'id' => $u['id']));
 		<td class="last_active"><?php echo $u['last_active']; ?></td>
 		<td class="acl_role"><?php echo $u['acl_role']; ?></td>
 		<td class="delete"><a href="<?php echo $u['delete_link']; ?>"
-			class="delete" id="delete-href-<?php echo $u['id']; ?>">Delete</a></td>
+			class="delete" id="delete-href-<?php echo $u['id']; ?>" title="Delete this user">Delete</a></td>
 	</tr>
 <?php } ?>
 </table>

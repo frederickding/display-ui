@@ -36,7 +36,7 @@ td.client, th.client { width: 17.5%; }
 td.actions, th.actions { width: 7.5%; }
 td.actions { font-size: 77%; }
 td.actions a { border-bottom: none; margin: 0 0.25em; }
-td.actions a:hover { border-bottom: inherit; }
+td.actions a:hover { border-bottom: none; }
 td.actions a.delete { color: #bb2200; }
 tr:hover td.expires, tr:hover td.active { color: inherit; }
 #headlines-list td {
@@ -75,6 +75,13 @@ td.day.day2 {
 div.ui-datepicker a { border-bottom: none; }
 #dialog-confirm { display: none; text-align: left; font-size: 90%; }
 .ui-widget-header a { border-bottom: none; }
+a.delete {
+	background: url(' . $this->baseUrl('/images/icons/actions/comment_user_close_32.png') . ') no-repeat;
+	text-indent: -10000em;
+	display: block;
+	height: 32px; width: 32px;
+	margin: auto;
+}
 ');
 $this->headLink()->appendStylesheet(
 	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
@@ -129,7 +136,7 @@ $h['delLink'] = $this->url(array(
 		<td class="day day<?php echo $h['alternating']; ?>"><?php echo $h['alternating']; ?></td>
 		<td class="client"><?php echo $h['sys_name']; ?></td>
 		<td class="actions"><a href="<?php echo $h['delLink']; ?>"
-			id="delete-href-<?php echo $h['id']; ?>" class="delete">Delete</a></td>
+			id="delete-href-<?php echo $h['id']; ?>" class="delete" title="Delete this item">Delete</a></td>
 	</tr>
 <?php } ?>
 </table>
