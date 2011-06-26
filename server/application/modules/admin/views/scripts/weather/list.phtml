@@ -30,20 +30,72 @@ $this->headStyle()->appendStyle('#clients-list {
 #clients-list tr.body:hover { background-color: #ddeeff; }
 td.id, th.id { width: 10%; }
 td.sys_name, th.sys_name { width: 50%; }
-td.location, th.location { width: 30%; }
-td.admin, th.admin { width: 20%; }
+td.location, th.location { width: 20%; }
+td.actions, th.actions { width: 20%; display: none; }
 #clients-list td {
 	padding: none;
 	margin: none;
 }
+#dialog-form { display: none; text-align: left; font-size: 90%; }
+.ui-widget-header a { border-bottom: none; }
+p.notice.bad {
+	background-color:#f5afb0;
+	color:#500000;
+	padding:0.5em;
+}
 ');
+$this->headLink()->appendStylesheet(
+	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
+$this->headScript('file', $this->baseUrl('/scripts/jquery-ui-1.8.13.custom.min.js'));
+$editProcessUrl = $this->url(array(
+	'module' => 'admin',
+	'controller' => 'weather',
+	'action' => 'edit-process'
+), null, true);
+$this->inlineScript('script', '$j(document).ready(function() {
+	$j("th.actions, td.actions").show();
+	$j("a.edit").click(function(event) {
+		event.preventDefault();
+		var _id = $j(this).attr("id").replace("edit-href-","");
+		var _currentLocation = $j(this).parent().prev("td.location").text().trim();
+		$j("#dialog-form-id").text(_id);
+		$j("#dialog-form-location").val(_currentLocation);
+		$j("#dialog-form").dialog({
+			modal: true,
+			resizable: true,
+			minWidth: 500,
+			buttons: {
+				"Save" : function() {
+					$j.post("' . $editProcessUrl . '",	{
+						id : _id,
+						location : $j("#dialog-form-location").val(),
+						"csrf" : "' . $this->csrf . '"
+					}, function(data) {
+						if(data == "Successfully saved.") {
+							$j("#dialog-form").dialog("close");
+							window.location.reload();
+						} else if(data == "Not updated.") {
+							$j("#dialog-form").dialog("close");
+						} else {
+							alert("Error upon request: " + data);
+							window.location.reload();
+						}
+					});
+				},
+				"Cancel" : function() {
+					$j("#dialog-form").dialog("close");
+				}
+			}
+		});
+	});
+});');
 ?>
 <table cellspacing="0" id="clients-list">
 	<tr class="heading">
 		<th class="id">ID</th>
 		<th class="sys_name">Client System Name</th>
-		<th class="last_active">Location</th>
-		<th class="admin">Administrator</th>
+		<th class="location">Location</th>
+		<th class="actions">Actions</th>
 	</tr>
 <?php foreach($this->clientsList as $c) { ?>
 	<tr class="body">
@@ -52,7 +104,15 @@ td.admin, th.admin { width: 20%; }
 		<td class="location" title="<?php echo $c['city']; ?>">
 			<a href="<?php echo $c['link']; ?>"><?php echo $c['location']; ?></a>
 		</td>
-		<td class="admin"><?php echo $c['admin']; ?></td>
+		<td class="actions"><a href="#" class="edit" id="edit-href-<?php echo $c['id']; ?>">Edit Location</a></td>
 	</tr>
 <?php } ?>
 </table>
+<noscript>
+<p class="notice bad">JavaScript is disabled in your browser. You must have
+JavaScript enabled to edit weather locations.</p>
+</noscript>
+<div id="dialog-form" title="Change location">
+	<p><strong>This form lets you change the location for the client with the ID <span id="dialog-form-id"></span>.</strong></p>
+	<p><label for="dialog-form-location">Location Code:</label>&nbsp;<input type="text" id="dialog-form-location" /></p>
+</div>

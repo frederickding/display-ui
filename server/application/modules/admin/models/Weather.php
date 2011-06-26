@@ -83,4 +83,28 @@ class Admin_Model_Weather extends Default_Model_DatabaseAbstract
 		}
 		return $this->_cities[$_location];
 	}
+	public function updateLocation ($_id, $_location)
+	{
+		if (! is_null($this->db)) {
+			$value = $this->db->update('dui_clients',
+			array(
+				'location' => $_location), $this->db->quoteInto('id = ?', $_id));
+			return $value == 1;
+		}
+		return false;
+	}
+	public function getLocation ($_id)
+	{
+		if (! is_null($this->db)) {
+			$value = $this->db->select()
+				->from('dui_clients', array(
+				'location'))
+				->where('id = ?', $_id)
+				->limit(1)
+				->query()
+				->fetchColumn();
+			return $value;
+		}
+		return null;
+	}
 }
