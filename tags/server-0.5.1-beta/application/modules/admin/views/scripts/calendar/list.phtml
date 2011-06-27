@@ -1,0 +1,145 @@
+<?php
+$this->navActive = 'calendar';
+$this->title = 'Manage Calendar';
+$this->headTitle('Calendar');
+$this->headStyle()->appendStyle('#calendar-list {
+	width: 100%;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#calendar-list td, #calendar-list th, #calendar-list {
+	border-color: #aaaaaa;
+}
+#calendar-list tr.body {
+	font-size: 123.1%;
+	color: #383a3b;
+}
+#calendar-list th {
+	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
+	padding: 0.25em 0.5em;
+	margin: 0;
+	height: 1.5em; line-height: 1.25em;
+	font-size: 123.1%;
+	font-weight: bold;
+	color: #333333;
+	text-shadow: #ffffff 1px 1px 3px;
+	cursor: pointer;
+}
+#calendar-list tr.body:nth-child(odd) { background-color: #fafafa; }
+#calendar-list tr.body:hover { background-color: #ddeeff; }
+td.id, th.id { width: 7.5%; }
+td.name, th.name { width: 27.5%; }
+td.time, th.time { width: 25%; }
+td.type, th.type { width: 15%; color: #666666; }
+td.client, th.client { width: 17.5%; }
+td.actions, th.actions { width: 7.5%; }
+td.actions { font-size: 77%; }
+td.actions a { border-bottom: none; margin: 0 0.25em; }
+td.actions a:hover { border-bottom: none; }
+td.actions a.delete { color: #bb2200; }
+tr:hover td.expires, tr:hover td.active { color: inherit; }
+#calendar-list td {
+	padding: none;
+	margin: none;
+}
+form { font-size: 123.1%; }
+dd { margin-bottom: 1em; }
+input { margin-right: 0.25em; }
+label.optional { font-weight: normal; }
+label.optional:after { content: " (optional)"; color: #666666; }
+#addeventlink { color: inherit; }
+#addeventlink.expanded:before { content: "- "; font-weight: normal; color: #666666; }
+#addeventlink:not(.expanded):before { content: "+ "; font-weight: normal; color: #666666; }
+form p.description { font-size: 75%; }
+ul.errors {
+	color: #bb2200;
+}
+#eventinsert {
+	margin: 1em auto;
+	border: 1px #aaaaaa solid;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	width: 100%;
+}
+div.ui-datepicker a {
+	border-bottom: none;
+}
+.ui-timepicker-div .ui-widget-header{ margin-bottom: 8px; }
+.ui-timepicker-div dl{ text-align: left; }
+.ui-timepicker-div dl dt{ height: 25px; }
+.ui-timepicker-div dl dd{ margin: -25px 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+#dialog-confirm { display: none; text-align: left; font-size: 90%; }
+.ui-widget-header a { border-bottom: none; }
+a.delete {
+	background: url(' . $this->baseUrl('/images/icons/actions/close_32.png') . ') no-repeat;
+	text-indent: -10000em;
+	display: block;
+	height: 32px; width: 32px;
+	margin: auto;
+}
+');
+$this->headLink()->appendStylesheet(
+	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
+$this->headScript()
+	->appendFile($this->baseUrl('/scripts/jquery-ui-1.8.13.custom.min.js'))
+	->appendFile($this->baseUrl('/scripts/jquery-ui.timepicker.min.js'));
+$this->inlineScript()->appendScript('$j(document).ready(function() {
+	$j("#eventinsert").hide();
+	if(window.location.pathname.search(/insert-process/) != -1) {
+		$j("#eventinsert").show();
+		$j("#addeventlink").addClass("expanded");
+	}
+	$j("#addeventlink").click(function(event) {
+		event.preventDefault();
+		$j("#eventinsert").toggle("normal");
+		$j(this).toggleClass("expanded");
+	});
+	DisplayUI.enableDateTimePicker("#eventtime");
+	$j("a.delete").click(function(event) {
+		event.preventDefault();
+		var _id = $j(this).attr("id").replace("delete-href-","");
+		$j("#dialog-confirm-id").text(_id);
+		DisplayUI.ajaxDeleteObject(_id, "#dialog-confirm", "'
+	. $this->url(array('module' => 'admin' , 'controller' => 'calendar' , 'action' => 'delete-process'))
+	. '", "' . $this->csrf . '");
+	});
+});
+');
+?>
+<h2><a href="#" id="addeventlink">Add an event</a></h2>
+<?php echo $this->insertForm; ?>
+<table cellspacing="0" id="calendar-list">
+	<tr class="heading">
+		<th class="id">ID</th>
+		<th class="name">Name</th>
+		<th class="time">Time</th>
+		<th class="type">Type</th>
+		<th class="client">Client</th>
+		<th class="actions"></th>
+	</tr>
+<?php foreach($this->eventsList as $e) {
+$del = $this->url(array(
+		'module' => 'admin' ,
+		'controller' => 'calendar' ,
+		'action' => 'delete'
+	)) . '?id='.$e->event_id;
+	?>
+	<tr class="body">
+		<td class="id"><?php echo $e->event_id; ?></td>
+		<td class="name"><?php echo $e->name; ?></td>
+		<td class="time"><?php echo $e->time; ?></td>
+		<td class="type"><?php echo $e->type; ?></td>
+		<td class="client"><?php echo $e->sys_name; ?></td>
+		<td class="actions"><a href="<?php echo $del; ?>" class="delete"
+			id="delete-href-<?php echo $e->event_id; ?>" title="Delete this item">Delete</a></td>
+	</tr>
+<?php } ?>
+</table>
+<div id="dialog-confirm" title="Delete this event?">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+	<strong>Are you sure you want to delete the event with the ID of <span id="dialog-confirm-id"></span>?</strong></p>
+	<p>Deletion is irreversible.</p>
+</div>

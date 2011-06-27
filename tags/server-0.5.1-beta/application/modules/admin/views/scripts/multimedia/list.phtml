@@ -1,0 +1,168 @@
+<?php
+$this->navActive = 'multimedia';
+$this->title = 'Manage Multimedia';
+$this->headTitle('Multimedia');
+$this->headStyle()->appendStyle(
+'#media-list {
+	width: 100%;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#media-list, #media-list td, #media-list th {
+	border-color: #aaaaaa;
+}
+#media-list tr.body {
+	font-size: 123.1%;
+	color: #383a3b;
+}
+#media-list th {
+	background: #d1d1d1 url(' . $this->baseUrl('images/widget-bg.png') . ') repeat-x;
+	padding: 0.25em 0.5em;
+	margin: 0;
+	height: 1.5em; line-height: 1.25em;
+	font-size: 123.1%;
+	font-weight: bold;
+	color: #333333;
+	text-shadow: #ffffff 1px 1px 3px;
+	cursor: pointer;
+}
+#media-list tr.body:nth-child(odd) { background-color: #fafafa; }
+#media-list tr.body:hover { background-color: #ddeeff; }
+td.id, th.id { width: 5%; }
+td.title, th.title { width: 43.5%; font-weight: bold; }
+td.active, th.active { width: 4%; color: #666666; }
+td.expires, th.expires { width: 17.5%; color: #666666; }
+td.type, th.type { width: 10%; }
+td.day, th.day { width: 5%; }
+td.actions, th.actions { width: 15%; }
+td.actions { font-size: 77%; text-align: center; }
+tr:hover td.expires, tr:hover td.active, tr:hover td.weight { color: inherit; }
+#clients-list td {
+	padding: none;
+	margin: none;
+}
+td.actions a { border-bottom: none; margin: 0 0.25em; }
+td.actions a:hover { border-bottom: none; }
+td.actions a.view { color: #507b38; }
+td.actions a.delete { color: #bb2200; }
+.video_type { color: #551b7a; }
+.image_type { color: #507b38; }
+tr.day1 td.day {
+	background: #E7FFD1;
+}
+tr.day2 td.day {
+	background: #FFD7C1;
+}
+.highlight {
+	/* background: #D7FFC1; */
+	background-color:#c1f7a8;
+	color:#003c00 !important;
+	text-align: center;
+	padding: 0.5em;
+	border-radius: 5px; border: 1px #ffffff solid;
+	-moz-border-radius: 5px;
+}
+a.delete, a.view {
+	text-indent: -10000em;
+	display: inline-block;
+	height: 32px; width: 32px;
+	margin: auto;
+}
+a.delete {
+	background: url(' . $this->baseUrl('/images/icons/actions/close_32.png') . ') no-repeat;
+}
+a.view {
+	background: url(' . $this->baseUrl('/images/icons/actions/search_button_green_32.png') . ') no-repeat;
+}
+#clicktoupload a, #clicktoupload em { font-weight: bold; color: #003c00 !important; }
+#dialog-confirm { display: none; text-align: left; font-size: 90%; }
+.ui-widget-header a { border-bottom: none; }
+');
+$this->headLink()->appendStylesheet(
+	$this->baseUrl('/styles/jquery-ui/jquery-ui-1.8.13.custom.css'));
+$this->headScript()->appendFile(
+	$this->baseUrl('/scripts/jquery-ui-1.8.13.custom.min.js'));
+$this->inlineScript('script', '$j(document).ready(function() {
+	$j("a.delete").click(function(event) {
+		event.preventDefault();
+		var _id = $j(this).attr("id").replace("delete-href-","");
+		$j("#dialog-confirm-id").text(_id);
+		DisplayUI.ajaxDeleteObject(_id, "#dialog-confirm", "'
+	. $this->url(array('module' => 'admin' , 'controller' => 'multimedia' , 'action' => 'delete-process'))
+	. '", "' . $this->csrf . '");
+	});
+});
+');
+?>
+<p class="highlight" id="clicktoupload"><a
+	href="<?php
+	echo $this->url(
+	array(
+		'module' => 'admin',
+		'controller' => 'multimedia',
+		'action' => 'upload'));
+	?>">Click here to <em>upload</em> media.</a></p>
+<p>Showing media objects <?php
+echo $this->mediaRange[0] . ' to ' . $this->mediaRange[1];
+?> of <?php
+echo $this->mediaTotal;
+?>.</p>
+<table cellspacing="0" id="media-list">
+	<tr>
+		<th class="id">ID</th>
+		<th class="title">Title</th>
+		<th class="active">Active</th>
+		<th class="expires">Expires</th>
+		<th class="day">Day</th>
+		<th class="type">Type</th>
+		<th class="actions">Actions</th>
+	</tr>
+<?php
+foreach ($this->mediaData as $medium) {
+	$medium['active'] = ($medium['active'] == 1) ? 'Yes' : 'No';
+	$medium['viewLink'] = $this->url(array('action' => 'view', 'id' => $medium['id']));
+	$medium['toggleLink'] = $this->url(array('action' => 'toggle', 'id' => $medium['id']));
+	$medium['delLink'] = $this->url(array('action' => 'delete', 'id' => $medium['id']));
+	if($medium['alternating'] == "1")
+		echo '	<tr class="body day1">';
+	elseif($medium['alternating'] == "2")
+		echo '	<tr class="body day2">';
+	else echo '	<tr class="body">';
+	echo '	<td class="id">' . $medium['id'] . '</td>
+		<td class="title ' . $medium['type'] . '_type">' . $medium['title'] .
+	 '</td>';
+	if ($medium['active'] == 'Yes') {
+		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
+		 '" title="Deactivate this item">' . $medium['active'] . '</a></td>';
+	} else {
+		echo '		<td class="active"><a href="' . $medium['toggleLink'] .
+		 '" title="Activate this item">' . $medium['active'] . '</a></td>';
+	}
+	echo "		<td class='expires'>{$medium['expires']}</td>
+		<td class='day'>{$medium['alternating']}</td>
+		<td class='type {$medium['type']}_type'>{$medium['type']}</td>
+		<td class='actions'>";
+	if ($medium['type'] == 'image')
+		echo '<a href="' . $medium['viewLink'] . '" class="view" title="View this item">View</a>';
+	echo '		<a href="' . $medium['delLink'] . '" class="delete"
+		id="delete-href-' . $medium['id'] . '" title="Delete this item">Delete</a></td>
+	</tr>';
+}
+?>
+</table>
+<?php
+$numPages = ceil($this->mediaTotal / 25);
+for ($p = $this->page; $p <= $numPages; $p ++) {
+	echo '<a href="' . $this->url(
+	array(
+		'module' => 'admin',
+		'controller' => 'multimedia',
+		'action' => 'list')) . "?page={$p}\">{$p}</a>&nbsp;&nbsp;";
+}
+?>
+<div id="dialog-confirm" title="Delete this event?">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+	<strong>Are you sure you want to delete the media item with the ID of <span id="dialog-confirm-id"></span>?</strong></p>
+	<p>Deletion is irreversible.</p>
+</div>

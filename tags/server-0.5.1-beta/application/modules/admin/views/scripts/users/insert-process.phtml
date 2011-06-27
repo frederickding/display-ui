@@ -1,0 +1,20 @@
+<?php
+$this->navActive = 'users';
+$this->title = 'Add A User';
+$this->headTitle('Add A User');
+?>
+<?php if($this->success) { ?>
+<p><strong>Great! You successfully added a user.</strong>
+<a href="<?php echo $this->url(array(
+			'module' => 'admin' ,
+			'controller' => 'users' ,
+			'action' => 'list'
+		));	?>">Manage users or add another one?</a></p>
+<?php } else { ?>
+<p><strong>Whoops, there was a problem inserting the user into the database.</strong>
+<a href="<?php echo $this->url(array(
+			'module' => 'admin' ,
+			'controller' => 'users' ,
+			'action' => 'list'
+		));	?>">Go back to managing users.</a></p>
+<?php } ?>
