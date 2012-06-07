@@ -58,6 +58,11 @@ class Admin_CalendarController extends Admin_ControllerAbstract
 		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecrsf') == $this->auth_session->deleteCsrf) {
 			$CalendarModel = new Admin_Model_Calendar();
 			$id = (int) $this->_getParam('id', 0);
+			if (! $this->Acl->isAllowed($this->auth_session->userRole, 
+			$this->reqController, $this->reqAction)) {
+				return $this->getResponse()->setBody(
+				'Access denied for role ' . $this->auth_session->userRole);
+			}
 			if ($this->_getParam('deleteconf', 'No!') == 'Yes!') {
 				if ($CalendarModel->deleteEvent($id)) {
 					return $this->getResponse()->setBody(
@@ -76,22 +81,25 @@ class Admin_CalendarController extends Admin_ControllerAbstract
 			return $this->_redirect(
 			$this->view->serverUrl() . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => 'calendar',
+				'module' => 'admin', 
+				'controller' => 'calendar', 
 				'action' => 'list')));
 		}
-		$form = $this->insertForm();
-		$CalendarModel = new Admin_Model_Calendar();
-		if ($form->isValid($_POST)) {
-			$values = $form->getValues();
-			$this->view->success = $CalendarModel->insertEvent(
-			$values['eventname'], $values['eventtime'], $values['eventclient'],
-			true, $values['eventtype']);
-			return $this->render('insert-process');
-		} else {
-			$this->view->insertForm = $form;
-			$this->view->eventsList = $CalendarModel->getAllEvents();
-			return $this->render('list');
+		if ($this->Acl->isAllowed($this->auth_session->userRole, 
+		$this->reqController, $this->reqAction)) {
+			$form = $this->insertForm();
+			$CalendarModel = new Admin_Model_Calendar();
+			if ($form->isValid($_POST)) {
+				$values = $form->getValues();
+				$this->view->success = $CalendarModel->insertEvent(
+				$values['eventname'], $values['eventtime'], 
+				$values['eventclient'], true, $values['eventtype']);
+				return $this->render('insert-process');
+			} else {
+				$this->view->insertForm = $form;
+				$this->view->eventsList = $CalendarModel->getAllEvents();
+				return $this->render('list');
+			}
 		}
 	}
 	public function insertForm ()
@@ -100,46 +108,46 @@ class Admin_CalendarController extends Admin_ControllerAbstract
 		$listClients = $ClientModel->fetchClients($this->auth_session->username);
 		unset($ClientModel);
 		$this->view->doctype('XHTML1_STRICT');
-		$name = new Zend_Form_Element_Text('eventname',
+		$name = new Zend_Form_Element_Text('eventname', 
 		array(
-			'label' => 'Event Name',
+			'label' => 'Event Name', 
 			'required' => TRUE));
 		$name->setAttribs(array(
-			'cols' => 50,
+			'cols' => 50, 
 			'rows' => 3));
-		$show = new Zend_Form_Element_Select('eventclient',
+		$show = new Zend_Form_Element_Select('eventclient', 
 		array(
-			'label' => 'Show on',
+			'label' => 'Show on', 
 			'required' => TRUE));
 		foreach ($listClients as $c) {
 			$show->addMultiOption($c['id'], $c['sys_name']);
 		}
-		$type = new Zend_Form_Element_Select('eventtype',
+		$type = new Zend_Form_Element_Select('eventtype', 
 		array(
-			'label' => 'Event type',
-			'required' => TRUE,
+			'label' => 'Event type', 
+			'required' => TRUE, 
 			'description' => 'Is this a one-time event or does it repeat weekly?"'));
 		$type->addMultiOptions(
 		array(
-			'once' => 'One time',
+			'once' => 'One time', 
 			'weekly' => 'Weekly'));
-		$time = new Zend_Form_Element_Text('eventtime',
+		$time = new Zend_Form_Element_Text('eventtime', 
 		array(
-			'label' => 'Event date/time',
+			'label' => 'Event date/time', 
 			'required' => TRUE,  // TODO: better local timezone support using CONVERT_TZ() in SQL
 			'description' => 'Enter in YYYY-MM-DD HH:MM:SS format. If this is a weekly event, this is the start date.'));
 		$time->addFilter('Digits');
-		$submit = new Zend_Form_Element_Submit('eventsubmit',
+		$submit = new Zend_Form_Element_Submit('eventsubmit', 
 		array(
 			'label' => 'Save'));
 		$submit->setDecorators(array(
 			'ViewHelper'));
-		$reset = new Zend_Form_Element_Reset('eventreset',
+		$reset = new Zend_Form_Element_Reset('eventreset', 
 		array(
 			'label' => 'Reset'));
 		$reset->setDecorators(array(
 			'ViewHelper'));
-		$csrf = new Zend_Form_Element_Hash('eventcsrf',
+		$csrf = new Zend_Form_Element_Hash('eventcsrf', 
 		array(
 			'salt' => 'unique'));
 		$csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
@@ -147,19 +155,19 @@ class Admin_CalendarController extends Admin_ControllerAbstract
 		$form->setAction(
 		$this->view->url(
 		array(
-			'module' => 'admin',
-			'controller' => 'calendar',
+			'module' => 'admin', 
+			'controller' => 'calendar', 
 			'action' => 'insert-process')))
 			->setMethod('post')
 			->setAttrib('id', 'eventinsert')
 			->addElements(
 		array(
-			'eventname' => $name,
-			'eventclient' => $show,
-			'eventtype' => $type,
-			'eventtime' => $time,
-			'eventcsrf' => $csrf,
-			'eventsubmit' => $submit,
+			'eventname' => $name, 
+			'eventclient' => $show, 
+			'eventtype' => $type, 
+			'eventtime' => $time, 
+			'eventcsrf' => $csrf, 
+			'eventsubmit' => $submit, 
 			'eventreset' => $reset));
 		// $form->removeDecorator('HtmlTag');
 		return $form;
