@@ -35,19 +35,19 @@ class Admin_IndexController extends Zend_Controller_Action
 			return $this->_redirect(
 			$this->view->serverUrl() . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => 'login',
+				'module' => 'admin', 
+				'controller' => 'login', 
 				'action' => 'index')) . '?redirect=' . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => $this->_request->getControllerName(),
+				'module' => 'admin', 
+				'controller' => $this->_request->getControllerName(), 
 				'action' => $this->_request->getActionName())));
 		}
 		// configuration object
 		if (Zend_Registry::isRegistered('configuration_ini')) {
 			$config = Zend_Registry::get('configuration_ini');
 		} else {
-			$config = new Zend_Config_ini(CONFIG_DIR . '/configuration.ini',
+			$config = new Zend_Config_ini(CONFIG_DIR . '/configuration.ini', 
 			'production');
 			Zend_Registry::set('configuration_ini', $config);
 		}
@@ -62,8 +62,8 @@ class Admin_IndexController extends Zend_Controller_Action
 			return $this->_redirect(
 			$this->view->serverUrl() . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => 'index',
+				'module' => 'admin', 
+				'controller' => 'index', 
 				'action' => 'dashboard')));
 		}
 	}
@@ -83,7 +83,6 @@ class Admin_IndexController extends Zend_Controller_Action
 		$this->listClients = $DashboardModel->fetchClients(
 		$this->auth_session->username);
 		$this->view->quicklineForm = $this->quicklineForm();
-
 		// Playlists
 		$Pl = new Api_Model_Playlists();
 		$this->view->day = $Pl->whatDayIsIt();
@@ -94,8 +93,8 @@ class Admin_IndexController extends Zend_Controller_Action
 			return $this->_redirect(
 			$this->view->serverUrl() . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => 'index',
+				'module' => 'admin', 
+				'controller' => 'index', 
 				'action' => 'dashboard')));
 		}
 		$DashboardModel = new Admin_Model_Dashboard();
@@ -109,7 +108,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		// success!
 		// process the data by inserting it into the DB
 		$values = $form->getValues();
-		$DashboardModel->insertQuickline($values['quicklinemessage'],
+		$DashboardModel->insertQuickline($values['quicklinemessage'], 
 		$values['quicklineclients']);
 		return $this->getResponse()
 			->setHttpResponseCode(200)
@@ -120,41 +119,41 @@ class Admin_IndexController extends Zend_Controller_Action
 	public function quicklineForm ()
 	{
 		$this->view->doctype('XHTML1_STRICT');
-		$message = new Zend_Form_Element_Textarea('quicklinemessage',
+		$message = new Zend_Form_Element_Textarea('quicklinemessage', 
 		array(
-			'label' => 'Headline Message',
+			'label' => 'Headline Message', 
 			'required' => TRUE));
 		$message->setAttribs(
 		array(
-			'id' => 'quickline-message',
-			'cols' => 20,
+			'id' => 'quickline-message', 
+			'cols' => 20, 
 			'rows' => 5))->setDecorators(
 		array(
-			'ViewHelper',
-			'Label',
+			'ViewHelper', 
+			'Label', 
 			array(
-				'HtmlTag',
+				'HtmlTag', 
 				array(
 					'tag' => 'p'))));
-		$show = new Zend_Form_Element_Select('quicklineclients',
+		$show = new Zend_Form_Element_Select('quicklineclients', 
 		array(
 			'label' => 'Show on'));
 		$show->setAttribs(
 		array(
-			'id' => 'quickline-clients',
+			'id' => 'quickline-clients', 
 			'size' => 1))->setDecorators(
 		array(
-			'ViewHelper',
-			'Errors',
-			'Label',
+			'ViewHelper', 
+			'Errors', 
+			'Label', 
 			array(
-				'HtmlTag',
+				'HtmlTag', 
 				array(
 					'tag' => 'p'))));
 		foreach ($this->listClients as $c) {
 			$show->addMultiOption($c['id'], $c['sys_name']);
 		}
-		$submit = new Zend_Form_Element_Submit('quicklinesubmit',
+		$submit = new Zend_Form_Element_Submit('quicklinesubmit', 
 		array(
 			'label' => 'Save & Activate'));
 		$submit->setAttrib('id', 'quickline-submit')
@@ -165,18 +164,22 @@ class Admin_IndexController extends Zend_Controller_Action
 		$form->setAction(
 		$this->view->url(
 		array(
-			'module' => 'admin',
-			'controller' => 'index',
+			'module' => 'admin', 
+			'controller' => 'index', 
 			'action' => 'quickline')))
 			->setMethod('post')
 			->setAttrib('id', 'quickline-form')
 			->addElements(
 		array(
-			'quicklinemessage' => $message,
-			'quicklineclients' => $show,
+			'quicklinemessage' => $message, 
+			'quicklineclients' => $show, 
 			'quicklinesubmit' => $submit))
 			->removeDecorator('DtDdWrapper');
 		$form->removeDecorator('HtmlTag');
+		if (! $this->Acl->isAllowed($this->auth_session->userRole, 
+		$this->reqController, $this->reqAction)) {
+			$form->clearElements();
+		}
 		return $form;
 	}
 }

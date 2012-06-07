@@ -2,7 +2,7 @@
 define('PERFORMANCE_TIMER', microtime(TRUE));
 
 defined('APPLICATION_VER')
-	|| define('APPLICATION_VER', '0.5.1-beta');
+	|| define('APPLICATION_VER', '0.5.2-beta');
 
 // Define path to application directory
 defined('APPLICATION_PATH')
