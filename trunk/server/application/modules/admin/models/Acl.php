@@ -66,7 +66,7 @@ class Admin_Model_Acl
 			->addResource(new Zend_Acl_Resource('options')) // system options
 			->addResource(new Zend_Acl_Resource('users')) // user access
 			->addResource(new Zend_Acl_Resource('clients')) // client systems
-			->addResource(new Zend_Acl_Resource('backuprestore')) // data management
+			->addResource(new Zend_Acl_Resource('backuprestore')); // data management
 	}
 	/**
 	 * Adds allow rules for groups
