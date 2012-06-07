@@ -2,7 +2,7 @@
 /**
  * CalendarController for Admin module
  *
- * Copyright 2010 Frederick Ding<br />
+ * Copyright 2010-2012 Frederick Ding<br />
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  *
