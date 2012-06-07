@@ -181,7 +181,7 @@ class Admin_IndexController extends Zend_Controller_Action
 			->removeDecorator('DtDdWrapper');
 		$form->removeDecorator('HtmlTag');
 		if (! $this->Acl->isAllowed($this->auth_session->userRole, 
-		$this->reqController, $this->reqAction)) {
+		'headlines', 'add')) {
 			$form->clearElements();
 		}
 		return $form;
