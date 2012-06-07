@@ -26,6 +26,7 @@
  */
 class Admin_IndexController extends Zend_Controller_Action
 {
+	protected $Acl;
 	public function init ()
 	{
 		// initiate a session for the installer
@@ -51,6 +52,9 @@ class Admin_IndexController extends Zend_Controller_Action
 			'production');
 			Zend_Registry::set('configuration_ini', $config);
 		}
+		$this->reqController = $this->_request->getControllerName();
+		$this->reqAction = $this->_request->getActionName();
+		$this->Acl = new Admin_Model_Acl();
 		$this->view->systemName = $config->server->install->name;
 		$this->view->username = $this->auth_session->username;
 		return TRUE;
