@@ -58,7 +58,7 @@ class Admin_Model_Acl
 	 */
 	private function addResources ()
 	{
-		$this->acl->addResource(new Zend_Acl_Resource('backend')) // the backend itself
+		$this->acl->addResource(new Zend_Acl_Resource('index')) // the backend itself
 			->addResource(new Zend_Acl_Resource('headlines')) // headline functionality
 			->addResource(new Zend_Acl_Resource('calendar')) // calendar functionality
 			->addResource(new Zend_Acl_Resource('multimedia')) // media functionality
@@ -66,7 +66,7 @@ class Admin_Model_Acl
 			->addResource(new Zend_Acl_Resource('options')) // system options
 			->addResource(new Zend_Acl_Resource('users')) // user access
 			->addResource(new Zend_Acl_Resource('clients')) // client systems
-			->addResource(new Zend_Acl_Resource('backuprestore')); // data management
+			->addResource(new Zend_Acl_Resource('backuprestore')) // data management
 	}
 	/**
 	 * Adds allow rules for groups
@@ -78,7 +78,7 @@ class Admin_Model_Acl
 		array(
 			'publisher',
 			'it',
-			'admin'), 'backend');
+			'admin'), 'index');
 		// publisher can view, add, edit and delete; hence no privileges enumerated
 		$this->acl->allow('publisher',
 		array(
@@ -161,7 +161,7 @@ class Admin_Model_Acl
 	public function dump ()
 	{
 		$resources = array(
-			'backend',
+			'index',
 			'headlines',
 			'calendar',
 			'multimedia',
