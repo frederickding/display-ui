@@ -45,7 +45,7 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$this->view->mediaTotal = $mediaData[0];
 		$this->view->mediaData = $mediaData[1];
 		$this->view->mediaRange = array(
-			$mediaData[2],
+			$mediaData[2], 
 			$mediaData[3]);
 		$this->auth_session->deleteCrsf = sha1(microtime(TRUE));
 		$this->view->csrf = $this->auth_session->deleteCsrf;
@@ -67,21 +67,24 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 			return $this->_redirect(
 			$this->view->serverUrl() . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => 'multimedia',
+				'module' => 'admin', 
+				'controller' => 'multimedia', 
 				'action' => 'upload')));
 		}
-		$form = $this->uploadForm();
-		if ($form->isValid($_POST)) {
-			// assign the values and receive the file
-			// FIXME: MASSIVELY BROKEN OVERWRITING!
-			$values = $form->getValues();
-			$MediaModel = new Admin_Model_Multimedia();
-			$this->view->id = $MediaModel->insertMultimedia($values);
-			return $this->render('upload-process');
-		} else {
-			$this->view->form = $form;
-			return $this->render('upload');
+		if ($this->Acl->isAllowed($this->auth_session->userRole, 
+		$this->reqController, $this->reqAction)) {
+			$form = $this->uploadForm();
+			if ($form->isValid($_POST)) {
+				// assign the values and receive the file
+				// FIXME: MASSIVELY BROKEN OVERWRITING!
+				$values = $form->getValues();
+				$MediaModel = new Admin_Model_Multimedia();
+				$this->view->id = $MediaModel->insertMultimedia($values);
+				return $this->render('upload-process');
+			} else {
+				$this->view->form = $form;
+				return $this->render('upload');
+			}
 		}
 	}
 	public function toggleAction ()
@@ -96,8 +99,8 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		return $this->_redirect(
 		$this->view->serverUrl() . $this->view->url(
 		array(
-			'module' => 'admin',
-			'controller' => 'multimedia',
+			'module' => 'admin', 
+			'controller' => 'multimedia', 
 			'action' => 'index')));
 	}
 	/**
@@ -119,6 +122,11 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		if (/*$this->getRequest()->isPost() &&*/ $this->_getParam('deletecrsf') == $this->auth_session->deleteCsrf) {
 			$MediaModel = new Admin_Model_Multimedia();
 			$id = (int) $this->_getParam('id', 0);
+			if (! $this->Acl->isAllowed($this->auth_session->userRole, 
+			$this->reqController, $this->reqAction)) {
+				return $this->getResponse()->setBody(
+				'Access denied for role ' . $this->auth_session->userRole);
+			}
 			if ($this->_getParam('deleteconf', 'No!') == 'Yes!') {
 				if ($MediaModel->deleteMultimedia($id)) {
 					return $this->getResponse()->setBody(
@@ -155,89 +163,89 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$listClients = $MediaModel->fetchClients($this->auth_session->username);
 		unset($MediaModel);
 		$this->view->doctype('XHTML1_STRICT');
-		$title = new Zend_Form_Element_Text('mediumtitle',
+		$title = new Zend_Form_Element_Text('mediumtitle', 
 		array(
-			'label' => 'Title',
+			'label' => 'Title', 
 			'required' => true));
 		$title->addValidator('StringLength', false, array(
-			1,
+			1, 
 			63));
-		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow',
+		$immediateActive = new Zend_Form_Element_Radio('mediumactivatenow', 
 		array(
-			'label' => 'Immediately activate?',
-			'required' => true,
-			'value' => '1',
+			'label' => 'Immediately activate?', 
+			'required' => true, 
+			'value' => '1', 
 			'description' => 'Will this item begin showing immediately or at a later date?'));
 		$immediateActive->addMultiOption('1', 'Yes')->addMultiOption('0', 'No');
-		$alternating = new Zend_Form_Element_Select('mediumalternating',
+		$alternating = new Zend_Form_Element_Select('mediumalternating', 
 		array(
-			'label' => 'On which days should this play?',
-			'required' => true,
+			'label' => 'On which days should this play?', 
+			'required' => true, 
 			'description' => 'Will this item show only on Day 1, Day 2 or all days?'));
-		$alternating->addMultiOptions(array(
-			'0' => 'All Days',
-			'1' => 'Day 1',
-			'2' => 'Day 2'
-		));
-		$activates = new Zend_Form_Element_Text('mediumactivation',
+		$alternating->addMultiOptions(
 		array(
-			'label' => 'Start showing on (YYYY-MM-DD)',
+			'0' => 'All Days', 
+			'1' => 'Day 1', 
+			'2' => 'Day 2'));
+		$activates = new Zend_Form_Element_Text('mediumactivation', 
+		array(
+			'label' => 'Start showing on (YYYY-MM-DD)', 
 			'required' => false));
-		$expires = new Zend_Form_Element_Text('mediumexpiration',
+		$expires = new Zend_Form_Element_Text('mediumexpiration', 
 		array(
-			'label' => 'Stop showing on (YYYY-MM-DD)',
+			'label' => 'Stop showing on (YYYY-MM-DD)', 
 			'required' => false));
 		$activates->addFilter('Digits');
 		$expires->addFilter('Digits');
-		$duration = new Zend_Form_Element_Text('mediumduration',
+		$duration = new Zend_Form_Element_Text('mediumduration', 
 		array(
-			'label' => 'Length to show image',
+			'label' => 'Length to show image', 
 			'description' => 'This value is ignored for videos.'));
 		$duration->setValue('15');
-		$weight = new Zend_Form_Element_Select('mediumweight',
+		$weight = new Zend_Form_Element_Select('mediumweight', 
 		array(
-			'label' => 'Weight',
+			'label' => 'Weight', 
 			'description' => 'A higher weight usually results in the file showing more frequently.'));
 		$weight->addValidator('int', false)
 			->addValidator('between', false, array(
-			1,
+			1, 
 			10))
 			->addMultiOptions(array_combine(range(1, 10), range(1, 10)));
-		$submit = new Zend_Form_Element_Submit('mediasubmit',
+		$submit = new Zend_Form_Element_Submit('mediasubmit', 
 		array(
 			'label' => 'Upload!'));
 		$submit->setDecorators(array(
 			'ViewHelper'));
-		$reset = new Zend_Form_Element_Reset('mediareset',
+		$reset = new Zend_Form_Element_Reset('mediareset', 
 		array(
 			'label' => 'Reset'));
 		$reset->setDecorators(array(
 			'ViewHelper'));
-		$file = new Zend_Form_Element_File('mediumfile',
+		$file = new Zend_Form_Element_File('mediumfile', 
 		array(
-			'label' => 'Media file',
-			'required' => true,
+			'label' => 'Media file', 
+			'required' => true, 
 			'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, MPG, MPEG.'));
 		$file->addValidator('count', false, 1)
-			->addValidator('Extension', false,
+			->addValidator('Extension', false, 
 		array(
-			'jpg',
-			'jpeg',
-			'png',
-			'mov',
-			'mp4',
-			'avi',
-			'wmv',
-			'mkv',
-			'zip',
-			'mpg',
-			'mpeg',
+			'jpg', 
+			'jpeg', 
+			'png', 
+			'mov', 
+			'mp4', 
+			'avi', 
+			'wmv', 
+			'mkv', 
+			'zip', 
+			'mpg', 
+			'mpeg', 
 			'duizip'))
 			->setDestination(MEDIA_DIR);
-		$clients = new Zend_Form_Element_Multiselect('mediumclients',
+		$clients = new Zend_Form_Element_Multiselect('mediumclients', 
 		array(
-			'label' => 'Show on these clients',
-			'required' => true,
+			'label' => 'Show on these clients', 
+			'required' => true, 
 			'description' => 'You can hold down Shift or Ctrl to select multiple clients.'));
 		foreach ($listClients as $c) {
 			$clients->addMultiOption($c['id'], $c['sys_name']);
@@ -248,23 +256,23 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
 		$form->setAction(
 		$this->view->url(
 		array(
-			'module' => 'admin',
-			'controller' => 'multimedia',
+			'module' => 'admin', 
+			'controller' => 'multimedia', 
 			'action' => 'upload-process')))
 			->setMethod('post')
 			->setAttrib('id', 'mediaupload')
 			->addElements(
 		array(
-			'mediumtitle' => $title,
-			'mediumclients' => $clients,
-			'mediumfile' => $file,
-			'mediumactivatenow' => $immediateActive,
-			'mediumactivation' => $activates,
-			'mediumalternating' => $alternating,
-			'mediumexpiration' => $expires,
-			'mediumweight' => $weight,
-			'mediumduration' => $duration,
-			'mediasubmit' => $submit,
+			'mediumtitle' => $title, 
+			'mediumclients' => $clients, 
+			'mediumfile' => $file, 
+			'mediumactivatenow' => $immediateActive, 
+			'mediumactivation' => $activates, 
+			'mediumalternating' => $alternating, 
+			'mediumexpiration' => $expires, 
+			'mediumweight' => $weight, 
+			'mediumduration' => $duration, 
+			'mediasubmit' => $submit, 
 			'mediareset' => $reset));
 		return $form;
 	}

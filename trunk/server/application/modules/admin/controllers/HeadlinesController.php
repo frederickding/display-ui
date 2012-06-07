@@ -77,23 +77,27 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 			return $this->_redirect(
 			$this->view->serverUrl() . $this->view->url(
 			array(
-				'module' => 'admin',
-				'controller' => 'headlines',
+				'module' => 'admin', 
+				'controller' => 'headlines', 
 				'action' => 'list')));
 		}
-		$form = $this->insertForm();
-		$HeadlinesModel = new Admin_Model_Headlines();
-		if ($form->isValid($_POST)) {
-			$values = $form->getValues();
-			$this->view->success = ($HeadlinesModel->insertHeadline(
-			$values['headlinemessage'], $values['headlineclient'],
-			$values['headlinetype'], $values['headlineexpires'], $values['headlinealternating']));
-			return $this->render('insert-process');
-		} else {
-			$this->view->insertForm = $form;
-			$this->view->headlinesList = $HeadlinesModel->fetchHeadlines(
-			$this->auth_session->username);
-			return $this->render('list');
+		if ($this->Acl->isAllowed($this->auth_session->userRole, 
+		$this->reqController, $this->reqAction)) {
+			$form = $this->insertForm();
+			$HeadlinesModel = new Admin_Model_Headlines();
+			if ($form->isValid($_POST)) {
+				$values = $form->getValues();
+				$this->view->success = ($HeadlinesModel->insertHeadline(
+				$values['headlinemessage'], $values['headlineclient'], 
+				$values['headlinetype'], $values['headlineexpires'], 
+				$values['headlinealternating']));
+				return $this->render('insert-process');
+			} else {
+				$this->view->insertForm = $form;
+				$this->view->headlinesList = $HeadlinesModel->fetchHeadlines(
+				$this->auth_session->username);
+				return $this->render('list');
+			}
 		}
 	}
 	public function insertForm ()
@@ -103,56 +107,56 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 		$this->auth_session->username);
 		unset($DashboardModel);
 		$this->view->doctype('XHTML1_STRICT');
-		$message = new Zend_Form_Element_Textarea('headlinemessage',
+		$message = new Zend_Form_Element_Textarea('headlinemessage', 
 		array(
-			'label' => 'Add a headline message',
+			'label' => 'Add a headline message', 
 			'required' => TRUE));
 		$message->setAttribs(array(
-			'cols' => 50,
+			'cols' => 50, 
 			'rows' => 3));
-		$show = new Zend_Form_Element_Select('headlineclient',
+		$show = new Zend_Form_Element_Select('headlineclient', 
 		array(
-			'label' => 'Show on',
+			'label' => 'Show on', 
 			'required' => TRUE));
 		foreach ($listClients as $c) {
 			$show->addMultiOption($c['id'], $c['sys_name']);
 		}
-		$type = new Zend_Form_Element_Select('headlinetype',
+		$type = new Zend_Form_Element_Select('headlinetype', 
 		array(
-			'label' => 'Message type',
-			'required' => TRUE,
+			'label' => 'Message type', 
+			'required' => TRUE, 
 			'description' => 'Most headlines are news. PSAs are low-priority messages such as "Weather data provided by Yahoo! Weather."'));
 		$type->addMultiOptions(
 		array(
-			'news' => 'News',
+			'news' => 'News', 
 			'psa' => 'Public Service Announcement'));
-		$alternating = new Zend_Form_Element_Select('headlinealternating',
+		$alternating = new Zend_Form_Element_Select('headlinealternating', 
 		array(
-			'label' => 'On which days should this play?',
-			'required' => true,
+			'label' => 'On which days should this play?', 
+			'required' => true, 
 			'description' => 'Will this item show only on Day 1, Day 2 or all days?'));
-		$alternating->addMultiOptions(array(
-			'0' => 'All Days',
-			'1' => 'Day 1',
-			'2' => 'Day 2'
-		));
-		$expires = new Zend_Form_Element_Text('headlineexpires',
+		$alternating->addMultiOptions(
 		array(
-			'label' => 'Stop showing on',
+			'0' => 'All Days', 
+			'1' => 'Day 1', 
+			'2' => 'Day 2'));
+		$expires = new Zend_Form_Element_Text('headlineexpires', 
+		array(
+			'label' => 'Stop showing on', 
 			'required' => FALSE,  // TODO: better local timezone support using CONVERT_TZ() in SQL
 			'description' => 'Enter in YYYY-MM-DD format. If you use the more specific YYYY-MM-DD HH:MM:SS format, it must be in UTC. If this is blank, the headline will, by default, expire in 1 month.'));
 		$expires->addFilter('Digits');
-		$submit = new Zend_Form_Element_Submit('headlinesubmit',
+		$submit = new Zend_Form_Element_Submit('headlinesubmit', 
 		array(
 			'label' => 'Save'));
 		$submit->setDecorators(array(
 			'ViewHelper'));
-		$reset = new Zend_Form_Element_Reset('headlinereset',
+		$reset = new Zend_Form_Element_Reset('headlinereset', 
 		array(
 			'label' => 'Reset'));
 		$reset->setDecorators(array(
 			'ViewHelper'));
-		$csrf = new Zend_Form_Element_Hash('headlinecsrf',
+		$csrf = new Zend_Form_Element_Hash('headlinecsrf', 
 		array(
 			'salt' => 'unique'));
 		$csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
@@ -160,20 +164,20 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
 		$form->setAction(
 		$this->view->url(
 		array(
-			'module' => 'admin',
-			'controller' => 'headlines',
+			'module' => 'admin', 
+			'controller' => 'headlines', 
 			'action' => 'insert-process')))
 			->setMethod('post')
 			->setAttrib('id', 'headlineinsert')
 			->addElements(
 		array(
-			'headlinemessage' => $message,
-			'headlineclient' => $show,
-			'headlinetype' => $type,
-			'headlinealternating' => $alternating,
-			'headlineexpires' => $expires,
-			'headlinecsrf' => $csrf,
-			'headlinesubmit' => $submit,
+			'headlinemessage' => $message, 
+			'headlineclient' => $show, 
+			'headlinetype' => $type, 
+			'headlinealternating' => $alternating, 
+			'headlineexpires' => $expires, 
+			'headlinecsrf' => $csrf, 
+			'headlinesubmit' => $submit, 
 			'headlinereset' => $reset));
 		// $form->removeDecorator('HtmlTag');
 		return $form;
