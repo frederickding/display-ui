@@ -2,6 +2,7 @@
 $this->navActive = 'dashboard';
 $this->title = 'Dashboard';
 $this->headTitle('Dashboard');
+$this->declareVars(array('quicklineForm', 'quicklineNotice', 'statusLinks', 'activeClients'));
 $this->inlineScript()->appendScript('$j(document).ready(function() {
 	$j("#quickline-form").ajaxForm({
 		resetForm: true,
@@ -149,6 +150,7 @@ echo $this->url(array('module' => 'link', 'controller' => 'index' , 'action' => 
 								</ul>
 							</div>
 						</div>
+<?php if(!is_null($this->quicklineForm)) : ?>
 						<div class="widgets-widget">
 							<h2>QuickLine</h2>
 							<div class="widgets-widget-content">
@@ -158,5 +160,6 @@ echo $this->quicklineForm; ?>
 								<div id="quickline-response"></div>
 							</div>
 						</div>
+<?php endif; ?>
 					</div>
 				</div>
