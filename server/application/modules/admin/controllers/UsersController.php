@@ -56,8 +56,7 @@ class Admin_UsersController extends Admin_ControllerAbstract
         $aclrole->addMultiOptions(
         array('publisher' => 'Publisher', 'it' => 'IT', 'admin' => 'Admin'));
         $aclrole->addValidator(
-        new Zend_Validate_InArray(
-        array('publisher', 'it', 'admin')));
+        new Zend_Validate_InArray(array('publisher', 'it', 'admin')));
         $yubikey = new Zend_Form_Element_Text('yubikey', 
         array('label' => 'Yubikey public ID', 'required' => false, 
         'description' => 'To require this user to authenticate with a hardware token, type in the first 12 characters of the Yubikey output or press it in this box.'));
@@ -67,8 +66,7 @@ class Admin_UsersController extends Admin_ControllerAbstract
         $reset = new Zend_Form_Element_Reset('userreset', 
         array('label' => 'Reset'));
         $reset->setDecorators(array('ViewHelper'));
-        $csrf = new Zend_Form_Element_Hash('usercsrf', 
-        array('salt' => 'unique'));
+        $csrf = new Zend_Form_Element_Hash('usercsrf', array('salt' => 'unique'));
         $csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
         $form = new Zend_Form();
         $form->setAction(
@@ -84,11 +82,11 @@ class Admin_UsersController extends Admin_ControllerAbstract
         // $form->removeDecorator('HtmlTag');
         if (! $this->Acl->isAllowed($this->auth_session->userRole, 
         $this->reqController, 'insert-process')) {
-            $form->clearElements();
-            $form->addError(
+            $form->clearElements()
+                ->addError(
             'Your role, <code>' . $this->auth_session->userRole .
-             '</code>, is not authorized to add users.');
-            $form->addDecorator('HtmlTag');
+             '</code>, is not authorized to add users.')
+                ->addDecorator('HtmlTag');
         }
         return $form;
     }
