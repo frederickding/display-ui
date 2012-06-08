@@ -1,0 +1,65 @@
+<?php
+$this->wrapperClass = 'step4';
+$this->headTitle('Step 4');
+?>
+	<div id="body">
+		<h2>Step 4 &raquo; Database</h2>
+		<p>To hold data, authenticate users and client software, and prepare playlists,<br />
+		the Display UI Server needs to connect to a database.</p>
+		<p>Please supply the details of your database server.</p>
+<?php if($this->uhoh) { ?>
+		<p class="notice bad">Uh oh! The installer encountered problems connecting
+		to your database server.<br />Please check that everything is right.</p>
+<?php } ?>
+		<form id="databasedetails" action="<?php echo $this->url(array('controller' => 'install', 'action' => 'database')); ?>"
+		method="post" accept-charset="utf-8">
+			<div>
+			<p><label for="hostname">Hostname</label></p>
+				<input type="text" id="hostname" name="hostname"
+				value="<?php if($this->hostname) echo $this->hostname; else echo 'localhost'; ?>" />
+			<p><label for="username">Username</label></p>
+				<input type="text" id="username" name="username"
+				value="<?php if($this->username) echo $this->username; ?>" />
+			<p><label for="password">Password</label></p>
+				<input type="password" id="password" name="password"
+				value="<?php if($this->password) echo $this->password; ?>" />
+			<p><label for="dbname">Database Name</label></p>
+				<input type="text" id="dbname" name="dbname"
+				value="<?php if($this->dbname) echo $this->dbname; ?>" />
+			<p><label for="driver">Database Adapter</label></p>
+			<select name="driver" id="driver">
+<?php if(extension_loaded('mysqli')) { ?>
+				<option value="Mysqli">MySQLi</option>
+<?php } if(extension_loaded('pdo_mysql')) { ?>
+				<option value="Pdo_Mysql" selected="selected">PDO MySQL</option>
+<?php } ?>
+			</select>
+			</div>
+		</form>
+		<p>This database should not be shared with other applications.</p>
+		<a class="back" href="<?php echo $this->url(array('controller' => 'install', 'action' => 'config')); ?>"
+		title="Return to Step 3">Back</a>
+		<a class="next" href="#" title="Click here to submit the form">Next</a>
+	</div>
+<?php $this->inlineScript()
+	->appendScript('$(document).ready(function(){
+	$(\'p.notice\').hide();
+	setTimeout("$(\'p.notice\').show(\'fold\', {}, \'500\');", 500);
+	$(\'a.next[title]\').qtip({
+		style: {
+			name: \'light\',
+			tip: true
+		}
+	});
+	$(\'a.back[title]\').qtip({
+		style: {
+			name: \'light\',
+			tip: true
+		}
+	});
+	$(\'a.next\').effect(\'pulsate\', {	times: 3 }, 2000);
+});
+$(\'a.next\').click(function(e) {
+	$(\'form#databasedetails\').submit();
+	e.preventDefault();
+});'); ?>

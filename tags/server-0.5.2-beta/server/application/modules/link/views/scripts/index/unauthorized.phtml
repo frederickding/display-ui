@@ -1,0 +1,11 @@
+<?php
+$this->headTitle('Unauthorized');
+?>
+	<div id="header">
+		<h1>Link a Display UI Client</h1>
+	</div>
+	<div id="body">
+		<h2>Unauthorized</h2>
+		<p>Your user role, <?php echo $this->user_role; ?>, is not authorized to operate this module.</p>
+		<p><a href="<?php echo $this->baseUrl(''); ?>">Return to the front page</a></p>
+	</div>

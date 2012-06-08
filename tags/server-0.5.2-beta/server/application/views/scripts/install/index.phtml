@@ -1,0 +1,41 @@
+<?php
+$this->headTitle('Step 1');
+$this->wrapperId = 'step1';
+?>
+	<div id="body">
+		<h2>Step 1 &raquo; Welcome</h2>
+		<p>Welcome to your soon-to-be installation of Display UI Server.
+		The Server integrates with&nbsp;the Display UI Client
+		to make the most out of your high definition TV displays.</p>
+		<p>Before we begin, make sure that your server meets
+		these minimum requirements:</p>
+		<ul class="requirements">
+			<li>PHP <span title="Tested on 5.2.9" class="mouseover">5.2</span><br />
+			with Hash, sockets/cURL, and PDO</li>
+			<li>Apache <span class="mouseover"
+title="May work on older versions, but only tested with 2.2.11">2.2</span></li>
+			<li>Write access to files</li>
+			<li>PDO &amp; pdo_mysql, or MySQLi</li>
+		</ul>
+		<p>Click the next arrow to move on to Step 2, where the installer will
+		check that your system meets the requirements.</p>
+		<a class="home" href="#">Home</a>
+		<a class="next" href="<?php echo $this->url(array('controller' => 'install', 'action' => 'test')); ?>"
+		title="Click here to go to Step 2">Next</a>
+	</div>
+<?php $this->inlineScript()
+	->appendScript('$(document).ready(function(){
+	$(\'tr[title]\').qtip({
+		style: {
+			name: \'dark\',
+			tip: true
+		}
+	});
+	$(\'a.next[title]\').qtip({
+		style: {
+			name: \'light\',
+			tip: true
+		}
+	});
+	$(\'a.next\').effect(\'pulsate\', { times: 3 }, 2000);
+});'); ?>

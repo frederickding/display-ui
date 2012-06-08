@@ -1,0 +1,63 @@
+<?php
+$this->navActive = 'clients';
+$this->title = 'Clients';
+$this->headTitle('Clients');
+$this->headStyle()->appendStyle('#clients-list {
+	width: 100%;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#clients-list td, #clients-list th, #clients-list {
+	border-color: #aaaaaa;
+}
+#clients-list tr.body {
+	font-size: 123.1%;
+	color: #383a3b;
+}
+#clients-list th {
+	background: #d1d1d1 url('.$this->baseUrl('images/widget-bg.png').') repeat-x;
+	padding: 0.25em 0.5em;
+	margin: 0;
+	height: 1.5em; line-height: 1.25em;
+	font-size: 123.1%;
+	font-weight: bold;
+	color: #333333;
+	text-shadow: #ffffff 1px 1px 3px;
+	cursor: pointer;
+}
+#clients-list tr.body:nth-child(odd) { background-color: #fafafa; }
+#clients-list tr.body:hover { background-color: #ddeeff; }
+td.id, th.id { width: 10%; }
+td.sys_name, th.sys_name { width: 50%; }
+td.last_active, th.last_active { width: 30%; }
+td.admin, th.admin { width: 20%; }
+#clients-list td {
+	padding: none;
+	margin: none;
+}
+');
+?>
+<table cellspacing="0" id="clients-list">
+	<tr class="heading">
+		<th class="id">ID</th>
+		<th class="sys_name">Client System Name</th>
+		<th class="last_active">Last Active</th>
+		<th class="admin">Administrator</th>
+	</tr>
+<?php foreach($this->clientsList as $c) {
+	$c['edit_users'] = $this->url(array('action' => 'edit-users', 'id' => $c['id']));
+?>
+	<tr class="body">
+		<td class="id"><?php echo $c['id']; ?></td>
+		<td class="sys_name"><?php echo $c['sys_name']; ?></td>
+		<td class="last_active"><?php echo $c['last_active']; ?></td>
+		<td class="admin"><a href="<?php echo $c['edit_users']; ?>"><?php echo $c['adminname']; ?></a></td>
+	</tr>
+<?php } ?>
+</table>
+<p><small>Display UI Server does <em>not</em> provide a control panel method to
+delete clients, as doing so can be very damaging. Instead, the system administrator
+must manually remove the appropriate entry from the <code>dui_clients</code> table.
+For administrators: it is a good practice to remove the ID of a deleted client
+from the <code>clients</code> column of any media items.</small></p>
