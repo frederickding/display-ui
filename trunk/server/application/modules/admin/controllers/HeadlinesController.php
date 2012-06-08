@@ -110,49 +110,58 @@ class Admin_HeadlinesController extends Admin_ControllerAbstract
         $this->auth_session->username);
         unset($DashboardModel);
         $this->view->doctype('XHTML1_STRICT');
-        $message = new Zend_Form_Element_Textarea('headlinemessage', 
-        array('label' => 'Add a headline message', 'required' => TRUE));
-        $message->setAttribs(array('cols' => 50, 'rows' => 3));
-        $show = new Zend_Form_Element_Select('headlineclient', 
-        array('label' => 'Show on', 'required' => TRUE));
-        foreach ($listClients as $c) {
-            $show->addMultiOption($c['id'], $c['sys_name']);
-        }
-        $type = new Zend_Form_Element_Select('headlinetype', 
-        array('label' => 'Message type', 'required' => TRUE, 
-        'description' => 'Most headlines are news. PSAs are low-priority messages such as "Weather data provided by Yahoo! Weather."'));
-        $type->addMultiOptions(
-        array('news' => 'News', 'psa' => 'Public Service Announcement'));
-        $alternating = new Zend_Form_Element_Select('headlinealternating', 
-        array('label' => 'On which days should this play?', 'required' => true, 
-        'description' => 'Will this item show only on Day 1, Day 2 or all days?'));
-        $alternating->addMultiOptions(
-        array('0' => 'All Days', '1' => 'Day 1', '2' => 'Day 2'));
-        $expires = new Zend_Form_Element_Text('headlineexpires', 
-        array('label' => 'Stop showing on', 'required' => FALSE,  // TODO: better local timezone support using CONVERT_TZ() in SQL
-        'description' => 'Enter in YYYY-MM-DD format. If you use the more specific YYYY-MM-DD HH:MM:SS format, it must be in UTC. If this is blank, the headline will, by default, expire in 1 month.'));
-        $expires->addFilter('Digits');
-        $submit = new Zend_Form_Element_Submit('headlinesubmit', 
-        array('label' => 'Save'));
-        $submit->setDecorators(array('ViewHelper'));
-        $reset = new Zend_Form_Element_Reset('headlinereset', 
-        array('label' => 'Reset'));
-        $reset->setDecorators(array('ViewHelper'));
-        $csrf = new Zend_Form_Element_Hash('headlinecsrf', 
-        array('salt' => 'unique'));
-        $csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
         $form = new Zend_Form();
-        $form->setAction(
-        $this->view->url(
-        array('module' => 'admin', 'controller' => 'headlines', 
-        'action' => 'insert-process')))
-            ->setMethod('post')
-            ->setAttrib('id', 'headlineinsert')
-            ->addElements(
-        array('headlinemessage' => $message, 'headlineclient' => $show, 
-        'headlinetype' => $type, 'headlinealternating' => $alternating, 
-        'headlineexpires' => $expires, 'headlinecsrf' => $csrf, 
-        'headlinesubmit' => $submit, 'headlinereset' => $reset));
+        $form->setAttrib('id', 'headlineinsert');
+        if (! $this->Acl->isAllowed($this->auth_session->userRole, 
+        $this->reqController, 'insert-process')) {
+            $form->addError(
+            'Your role, <code>' . $this->auth_session->userRole .
+             '</code>, is not authorized to add headlines.')->addDecorator(
+            'HtmlTag');
+        } else {
+            $message = new Zend_Form_Element_Textarea('headlinemessage', 
+            array('label' => 'Add a headline message', 'required' => TRUE));
+            $message->setAttribs(array('cols' => 50, 'rows' => 3));
+            $show = new Zend_Form_Element_Select('headlineclient', 
+            array('label' => 'Show on', 'required' => TRUE));
+            foreach ($listClients as $c) {
+                $show->addMultiOption($c['id'], $c['sys_name']);
+            }
+            $type = new Zend_Form_Element_Select('headlinetype', 
+            array('label' => 'Message type', 'required' => TRUE, 
+            'description' => 'Most headlines are news. PSAs are low-priority messages such as "Weather data provided by Yahoo! Weather."'));
+            $type->addMultiOptions(
+            array('news' => 'News', 'psa' => 'Public Service Announcement'));
+            $alternating = new Zend_Form_Element_Select('headlinealternating', 
+            array('label' => 'On which days should this play?', 
+            'required' => true, 
+            'description' => 'Will this item show only on Day 1, Day 2 or all days?'));
+            $alternating->addMultiOptions(
+            array('0' => 'All Days', '1' => 'Day 1', '2' => 'Day 2'));
+            $expires = new Zend_Form_Element_Text('headlineexpires', 
+            array('label' => 'Stop showing on', 'required' => FALSE,  // TODO: better local timezone support using CONVERT_TZ() in SQL
+            'description' => 'Enter in YYYY-MM-DD format. If you use the more specific YYYY-MM-DD HH:MM:SS format, it must be in UTC. If this is blank, the headline will, by default, expire in 1 month.'));
+            $expires->addFilter('Digits');
+            $submit = new Zend_Form_Element_Submit('headlinesubmit', 
+            array('label' => 'Save'));
+            $submit->setDecorators(array('ViewHelper'));
+            $reset = new Zend_Form_Element_Reset('headlinereset', 
+            array('label' => 'Reset'));
+            $reset->setDecorators(array('ViewHelper'));
+            $csrf = new Zend_Form_Element_Hash('headlinecsrf', 
+            array('salt' => 'unique'));
+            $csrf->removeDecorator('HtmlTag')->removeDecorator('Label');
+            $form->setAction(
+            $this->view->url(
+            array('module' => 'admin', 'controller' => 'headlines', 
+            'action' => 'insert-process')))
+                ->setMethod('post')
+                ->addElements(
+            array('headlinemessage' => $message, 'headlineclient' => $show, 
+            'headlinetype' => $type, 'headlinealternating' => $alternating, 
+            'headlineexpires' => $expires, 'headlinecsrf' => $csrf, 
+            'headlinesubmit' => $submit, 'headlinereset' => $reset));
+        }
         // $form->removeDecorator('HtmlTag');
         return $form;
     }
