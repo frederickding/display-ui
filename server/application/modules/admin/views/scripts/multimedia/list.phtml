@@ -95,7 +95,7 @@ $this->inlineScript('script', '$j(document).ready(function() {
 });
 ');
 ?>
-<p class="highlight" id="clicktoupload"><a
+<?php if($this->showUpload) : ?><p class="highlight" id="clicktoupload"><a
 	href="<?php
 	echo $this->url(
 	array(
@@ -103,6 +103,7 @@ $this->inlineScript('script', '$j(document).ready(function() {
 		'controller' => 'multimedia',
 		'action' => 'upload'));
 	?>">Click here to <em>upload</em> media.</a></p>
+<?php endif; ?>
 <p>Showing media objects <?php
 echo $this->mediaRange[0] . ' to ' . $this->mediaRange[1];
 ?> of <?php
