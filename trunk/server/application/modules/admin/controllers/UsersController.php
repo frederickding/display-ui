@@ -111,6 +111,11 @@ class Admin_UsersController extends Admin_ControllerAbstract
 			'usersubmit' => $submit, 
 			'userreset' => $reset));
 		// $form->removeDecorator('HtmlTag');
+		if (! $this->Acl->isAllowed($this->auth_session->userRole, 
+		$this->reqController, $this->reqAction)) {
+			$form->clearElements();
+			$form->addErrorMessage('Your role, <code>' . $this->auth_session->userRole . '</code>, is not authorized to add users.');
+		}
 		return $form;
 	}
 	public function insertProcessAction ()
