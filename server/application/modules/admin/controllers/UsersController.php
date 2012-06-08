@@ -85,7 +85,7 @@ class Admin_UsersController extends Admin_ControllerAbstract
         if (! $this->Acl->isAllowed($this->auth_session->userRole, 
         $this->reqController, 'insert-process')) {
             $form->clearElements();
-            $form->addErrorMessage(
+            $form->addError(
             'Your role, <code>' . $this->auth_session->userRole .
              '</code>, is not authorized to add users.');
         }
