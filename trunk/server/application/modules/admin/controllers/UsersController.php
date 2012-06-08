@@ -88,6 +88,7 @@ class Admin_UsersController extends Admin_ControllerAbstract
             $form->addError(
             'Your role, <code>' . $this->auth_session->userRole .
              '</code>, is not authorized to add users.');
+            $form->addDecorator('HtmlTag');
         }
         return $form;
     }
