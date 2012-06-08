@@ -49,7 +49,7 @@ class Admin_Model_Acl
 	{
 		$this->acl->addRole(new Zend_Acl_Role('guest')) // no permissions
 			->addRole(new Zend_Acl_Role('publisher'), 'guest') // publish content
-			->addRole(new Zend_Acl_Role('it'), 'guest') // manage options, users, clients, backup
+			->addRole(new Zend_Acl_Role('it'), 'guest') // manage options, clients, backup
 			->addRole(new Zend_Acl_Role('admin')) // everything
 			->addRole(new Zend_Acl_Role('banned')); // nothing
 	}
@@ -127,19 +127,23 @@ class Admin_Model_Acl
 			'edit',
 			'delete',
 			'link')) // deny publishers write access to client system info
+			->deny('publisher', 'weather', 'edit-process') // deny publishers weather location modification
 			->deny('publisher', 'users', NULL) // deny publishers access to users resource
 			->deny('it',
 		array(
 			'headlines',
 			'calendar',
-			'multimedia'),
+			'multimedia',
+			'users'),
 		array(
 			'add',
+			'insert',
 			'edit',
 			'toggle',
 			'upload',
 			'delete',
 			'delete-process',
+			'edit-process',
 			'insert-process',
 			'upload-process')) // deny IT write access to content functionality
 			->deny('banned'); // banned can do nothing
