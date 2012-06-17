@@ -196,7 +196,7 @@ class Admin_MultimediaController extends Admin_ControllerAbstract
         $reset->setDecorators(array('ViewHelper'));
         $file = new Zend_Form_Element_File('mediumfile', 
         array('label' => 'Media file', 'required' => true, 
-        'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, MPG, MPEG.'));
+        'description' => 'Upload a file in a supported format (JPEG, PNG, MP4, MOV, AVI, MKV, WMV, MPG, MPEG, ZIP).'));
         $file->addValidator('count', false, 1)
             ->addValidator('Extension', false, 
         array('jpg', 'jpeg', 'png', 'mov', 'mp4', 'avi', 'wmv', 'mkv', 'zip', 
